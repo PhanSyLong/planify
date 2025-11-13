@@ -1,0 +1,136 @@
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+/* Main container */
+.container {
+  position: relative;
+  width: 800px;       /* fixed width */
+  height: 500px;      /* fixed height */
+  display: flex;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background-color: #fff;
+}
+
+/* Form containers */
+.form-container {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.6s ease;
+  background-color: white;
+  z-index: 2;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-container input {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.form-container button {
+  margin-top: 20px;
+  padding: 12px;
+  background: #0b2c59;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.form-container button:hover {
+  background: #133c7a;
+}
+
+/* Positioning for login/signin */
+.login-container {
+  left: 0;
+}
+
+.signin-container {
+  right: 0;
+}
+
+/* Cover */
+.cover {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background: #0b2c59;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.6s ease;
+  z-index: 1;
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cover h2 {
+  font-size: 2rem;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Active class for sliding effect */
+.container.active .cover {
+  left: 0;
+  border-radius: 20px 0 0 20px;
+}
+
+.container.active .login-container {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.container:not(.active) .signin-container {
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Checkbox styling */
+.checkbox {
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Headings */
+h1 {
+  align-self: center;
+  margin-bottom: 20px;
+}
