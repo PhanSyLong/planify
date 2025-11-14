@@ -17,7 +17,7 @@ const LoginSignup = () => {
           </a>
           <button type="submit">Login</button>
           <p>
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a href="#" onClick={() => setIsSignUp(true)}>
               Sign Up
             </a>
@@ -26,9 +26,9 @@ const LoginSignup = () => {
       </div>
 
       {/* Sign In */}
-      <div className="form-container signin-container">
+      <div className="form-container signup-container">
         <form>
-          <h1>Sign In</h1>
+          <h1>Sign Up</h1>
           <input type="text" placeholder="Full Name" required />
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Password" required />
@@ -43,11 +43,11 @@ const LoginSignup = () => {
             </span>
           </label>
 
-          <button type="submit">Sign In</button>
+          <button type="submit">Sign Up</button>
           <p>
             Already have an account?{" "}
             <a href="#" onClick={() => setIsSignUp(false)}>
-              Log In
+              Login
             </a>
           </p>
         </form>
