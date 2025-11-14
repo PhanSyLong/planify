@@ -9,15 +9,15 @@
 	<name>backend</name>
 	<description>Website for planning personal studying</description>
 
-	<!-- Cấu hình cho maven project sử dụng jdk-11 -->
 	<properties>
-		<java.version>11</java.version>
+		<java.version>25</java.version>
 	</properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.4.RELEASE</version>
+		<version>3.5.7</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 
@@ -34,6 +34,19 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 
 	</dependencies>
 </project>
