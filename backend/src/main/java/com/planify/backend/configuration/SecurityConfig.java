@@ -26,7 +26,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {"/users" , "/auth/token" , "/auth/introspect"};
 
     @Value("${jwt.signerKey}")
-    private String signerkey; //Sử dụng cái signerKey ở trong file application.yaml
+    private String signerKey; //Sử dụng cái signerKey ở trong file application.yaml
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{

@@ -5,15 +5,18 @@ server:
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/planify"
+    url: jdbc:mysql://localhost:3306/planify
     username: root
     password: Thangbf2005@
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-jpa:
-  hibernate:
-    ddl-auto: none
-  show-sql: true
+  jpa:
+    hibernate:
+      ddl-auto: none   # vì b?n ?ã t?o b?ng tr??c r?i
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true   # giúp log SQL d? nhìn
 
 jwt:
   signerKey: "1TjXchw5FLoESb63Kc+DFhTARvpWL4jUGCwFGWxUG5SIf/1y/LgJxHnMqaF6A/ij"
-

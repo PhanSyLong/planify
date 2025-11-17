@@ -1,8 +1,12 @@
-package com.example.DatabaseSpringBoot.configuration;
+package com.planify.backend.configuration;
 
 import com.planify.backend.entity.User;
-import com.planify.backend.enums.Role;
+import com.planify.backend.entity.Role;
+import com.planify.backend.entity.Role.RoleName;
+import com.planify.backend.entity.UserRole;
+import com.planify.backend.repository.RoleRepository;
 import com.planify.backend.repository.UserRepository;
+import com.planify.backend.repository.UserRoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,18 +30,29 @@ public class ApplicationInitConfig {
 
     @Bean
     //Cái hàm này nó sẽ được khởi chạy mỗi khi ứng dụng của chúng ta start
-    ApplicationRunner applicationRunner(UserRepository userRepository){
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository){
         return args -> {
+            if(roleRepository.findAll().isEmpty()){
+                roleRepository.save(Role.builder().name(RoleName.ADMIN).build());
+                roleRepository.save(Role.builder().name(RoleName.USER).build());
+            }
+
             if(userRepository.findByUsername("admin").isEmpty()){
-                var roles = new HashSet<String>();
-                roles.add(Role.ADMIN.name());
-                User user = User.builder()
+                User admin = User.builder()
                         .username("admin")
-                        .password(passwordEncoder.encode("admin")) //Luôn để mật khẩu của admin là "admin"
-                        .roles(roles)
+                        .password(passwordEncoder.encode("admin"))
                         .build();
 
-                userRepository.save(user);
+                admin = userRepository.save(admin);
+
+                Role adminRole = roleRepository.findByName(RoleName.ADMIN).get();
+
+                UserRole ur = UserRole.builder()
+                        .user(admin)
+                        .role(adminRole)
+                        .build();
+
+                userRoleRepository.save(ur);
                 log.warn("admin user has been created with default password: admin , please change it");
             }
         };

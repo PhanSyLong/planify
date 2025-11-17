@@ -13,7 +13,6 @@ import java.util.Set;
 public class UserResponse {
     Integer id;
     String username;
-    String password;
     String email;
     String avatar;
     Set<String> roles;
