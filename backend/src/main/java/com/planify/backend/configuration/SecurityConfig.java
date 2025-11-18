@@ -23,7 +23,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
     //Khai báo endpoints
-    private final String[] PUBLIC_ENDPOINTS = {"/users" , "/auth/token" , "/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINTS = {  "/auth/token",  "/auth/introspect"};
 
     @Value("${jwt.signerKey}")
     private String signerKey; //Sử dụng cái signerKey ở trong file application.yaml

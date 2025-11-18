@@ -38,6 +38,7 @@ import java.util.StringJoiner;
 @Slf4j
 public class AuthenticationService {
     UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -48,7 +49,6 @@ public class AuthenticationService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         //Check Hash Password
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if(!authenticated){
@@ -95,8 +95,12 @@ public class AuthenticationService {
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" "); //Giữa 2 cái role trong scope được ngăn cách bằng dấu cách " "
 
-        user.getUserRoles()
-                .forEach(ur -> stringJoiner.add(ur.getRole().getName().name()));
+        if(user.getUserRoles() != null) {
+            user.getUserRoles()
+                    .stream()
+                    .filter(ur -> ur != null && ur.getRole() != null && ur.getRole().getName() != null)
+                    .forEach(ur -> stringJoiner.add(ur.getRole().getName().name()));
+        }
 
         return stringJoiner.toString();
     }

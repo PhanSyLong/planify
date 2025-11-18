@@ -12,11 +12,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none   # vì b?n ?ã t?o b?ng tr??c r?i
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
-        format_sql: true   # giúp log SQL d? nhìn
+        format_sql: true
 
 jwt:
   signerKey: "1TjXchw5FLoESb63Kc+DFhTARvpWL4jUGCwFGWxUG5SIf/1y/LgJxHnMqaF6A/ij"

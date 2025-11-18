@@ -27,7 +27,6 @@ public class User {
     String password;
     String email;
     String avatar;
-    Set<String> roles;
 
     @Column(columnDefinition = "ENUM('true','false')")
     String notificationenabled;

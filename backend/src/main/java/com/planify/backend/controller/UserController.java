@@ -5,7 +5,6 @@ import com.planify.backend.dto.request.ApiResponse;
 import com.planify.backend.dto.request.UserCreationRequest;
 import com.planify.backend.dto.request.UserUpdateRequest;
 import com.planify.backend.dto.response.UserResponse;
-import com.planify.backend.entity.User;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
 

@@ -16,13 +16,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.planify.backend.entity.Role.RoleName;
+
 
 import java.util.HashSet;
 import java.util.List;
@@ -73,10 +73,14 @@ public class UserService {
     }
 
     private UserResponse buildUserResponse(User user){
-        Set<String> roles = user.getUserRoles()
-                .stream()
-                .map(ur -> ur.getRole().getName().name())
-                .collect(Collectors.toSet());
+        Set<String> roles = new HashSet<>();
+        if(user.getUserRoles() != null) {
+            roles = user.getUserRoles()
+                    .stream()
+                    .filter(ur -> ur != null && ur.getRole() != null && ur.getRole().getName() != null)
+                    .map(ur -> ur.getRole().getName().name())
+                    .collect(Collectors.toSet());
+        }
 
         return UserResponse.builder()
                 .id(user.getId())
@@ -124,7 +128,15 @@ public class UserService {
 
     public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
+        var authentication = context.getAuthentication();
+        
+        if(authentication == null || authentication.getName() == null){
+            log.error("Authentication is null or name is null");
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        
+        String name = authentication.getName();
+        log.info("Getting my info for user: {}", name);
 
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
