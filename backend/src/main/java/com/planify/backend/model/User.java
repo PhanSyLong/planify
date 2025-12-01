@@ -12,8 +12,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 255, nullable = false)
     private String username;
+    @Column(length = 255, nullable = false)
     private String password;
+    @Column(length = 255, nullable = false)
     private String email;
 
     public Long getId() {
@@ -84,6 +87,7 @@ public class User {
     }
 
     private String avatar;
+    @Column(columnDefinition = "BIT(1)", nullable = false)
     private boolean notification_enabled;
     private Long created_by;
     private Long updated_by;
