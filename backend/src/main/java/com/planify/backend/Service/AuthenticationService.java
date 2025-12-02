@@ -45,17 +45,26 @@ public class AuthenticationService {
     protected String SIGNER_KEY;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request){
+        log.info("Attempting to authenticate user: {}", request.getUsername());
+        
         var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> {
+                    log.warn("User not found: {}", request.getUsername());
+                    return new AppException(ErrorCode.USER_NOT_EXISTED);
+                });
 
         //Check Hash Password
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        
+        log.info("Password match result for user {}: {}", request.getUsername(), authenticated);
 
         if(!authenticated){
+            log.warn("Authentication failed for user: {}", request.getUsername());
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         var token = generateToken(user);
+        log.info("Token generated successfully for user: {}", request.getUsername());
 
         return AuthenticationResponse.builder()
                 .token(token)

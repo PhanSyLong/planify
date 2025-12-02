@@ -16,6 +16,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.Optional;
 
 import java.util.HashSet;
 
@@ -32,10 +33,18 @@ public class ApplicationInitConfig {
     //Cái hàm này nó sẽ được khởi chạy mỗi khi ứng dụng của chúng ta start
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository){
         return args -> {
-            if(roleRepository.findAll().isEmpty()){
-                roleRepository.save(Role.builder().name(RoleName.ADMIN).build());
-                roleRepository.save(Role.builder().name(RoleName.USER).build());
-            }
+            // Đảm bảo luôn tồn tại cả 2 role ADMIN và USER
+            roleRepository.findByName(RoleName.ADMIN)
+                    .or(() -> {
+                        log.info("Role ADMIN not found, creating default ADMIN role");
+                        return Optional.of(roleRepository.save(Role.builder().name(RoleName.ADMIN).build()));
+                    });
+
+            roleRepository.findByName(RoleName.USER)
+                    .or(() -> {
+                        log.info("Role USER not found, creating default USER role");
+                        return Optional.of(roleRepository.save(Role.builder().name(RoleName.USER).build()));
+                    });
 
             if(userRepository.findByUsername("admin").isEmpty()){
                 User admin = User.builder()
