@@ -10,9 +10,11 @@ import com.planify.backend.dto.request.IntrospectRequest;
 import com.planify.backend.dto.request.LogoutRequest;
 import com.planify.backend.dto.response.AuthenticationResponse;
 import com.planify.backend.dto.response.IntrospectResponse;
+import com.planify.backend.model.InvalidatedToken;
 import com.planify.backend.model.User;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
+import com.planify.backend.repository.InvalidatedTokenRepository;
 import com.planify.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ import java.util.UUID;
 public class AuthenticationService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+    InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -116,17 +119,32 @@ public class AuthenticationService {
     //Method Introspect
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
-
-        verifyToken(token);
+        boolean isValid = true;
+        try {
+            verifyToken(token);
+        }catch(AppException e) {
+            isValid = false;
+        }
 
         return IntrospectResponse.builder()
-                .valid(true)
+                .valid(isValid)
                 .build();
     }
 
     //Hàm logout
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
         var signToken = verifyToken(request.getToken());
+
+        String jit = signToken.getJWTClaimsSet().getJWTID(); //ID của Token
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        //Lưu vào bảng Token trong database
+        invalidatedTokenRepository.save(invalidatedToken);
     }
 
     private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
@@ -142,6 +160,11 @@ public class AuthenticationService {
 
         //Nếu chữ ký không đúng hoặc hết hạn
         if(!(verified && expityTime.after(new Date()))){
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        //Nếu ID của một Token tồn tại trong bảng database InvalidatedToken thì
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
