@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     //Khai báo endpoints
-    private final String[] PUBLIC_ENDPOINTS = {  "/auth/token",  "/auth/introspect" , "/users" , "/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = {  "/auth/token",  "/auth/introspect" , "/users" , "/auth/logout", "/auth/refresh"};
 
     private final CustomJwtDecoder customJwtDecoder;
 
