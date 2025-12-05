@@ -5,11 +5,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name="notification")
@@ -26,6 +29,6 @@ public class Notification {
     String type;
     @Column(name="message_text")
     String messageText;
-    @Column(name="time", nullable = false)
+    @CreatedDate
     LocalDateTime time;
 }

@@ -5,8 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
+import org.springframework.data.annotation.CreatedDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,7 +26,7 @@ public class Follow {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "following_id", nullable = false)
     User following;
-
-     Instant createdAt = Instant.now();
+    @CreatedDate
+    LocalDateTime createdAt;
 }
 

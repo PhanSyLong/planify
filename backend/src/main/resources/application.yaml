@@ -18,5 +18,17 @@ spring:
       hibernate:
         format_sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: annmk.23bi14003@usth.edu.vn
+    password: eidm zwjj xcyh viac  # App Password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 file:
   upload-dir: /home/an/Pictures

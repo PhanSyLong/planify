@@ -19,6 +19,7 @@ import java.util.List;
 public class FollowService {
      FollowRepository followRepository;
      UserRepository userRepository;
+     NotificationService notificationService;
 
     @Transactional
     public void follow(Integer followerId, Integer followeeId) {
@@ -37,6 +38,12 @@ public class FollowService {
         follow.setFollower(follower);
         follow.setFollowing(followee);
         followRepository.save(follow);
+
+        notificationService.sendNotification(
+                followee.getId(),
+                follower.getUsername() + " followed you",
+                follower.getUsername() + " has followed you on Planify!",
+                "follower");
     }
 
     @Transactional
@@ -44,12 +51,12 @@ public class FollowService {
         followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
     }
 
-    @Transactional()
+    @Transactional
     public List<User> getFollowers(Integer userId) {
         return followRepository.findFollowersByUserId(userId);
     }
 
-    @Transactional()
+    @Transactional
     public List<User> getFollowing(Integer userId) {
         return followRepository.findFollowingByUserId(userId);
     }

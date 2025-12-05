@@ -14,19 +14,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/follows")
-public class UserFollowController {
+public class FollowController {
     private final FollowService followService;
 
     @PostMapping("{id}/follow/{targetId}")
-    public ResponseEntity<@NonNull Void> follow(@PathVariable Integer id, @PathVariable Integer targetId) {
+    public ResponseEntity<@NonNull String> follow(@PathVariable Integer id, @PathVariable Integer targetId) {
         followService.follow(id, targetId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("User " + id + " followed " + targetId);
     }
 
     @DeleteMapping("{id}/unfollow/{targetId}")
-    public ResponseEntity<@NonNull Void> unfollow(@PathVariable Integer id, @PathVariable Integer targetId) {
+    public ResponseEntity<@NonNull String> unfollow(@PathVariable Integer id, @PathVariable Integer targetId) {
         followService.unfollow(id, targetId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User " + id + " unfollowed " + targetId);
     }
 
     @GetMapping("{id}/followers")
