@@ -15,6 +15,5 @@ public class UserCreationRequest {
     @Size(min = 8 , message = "INVALID_PASSWORD")
     String password;
     String email;
-    String avatar;
     String notificationenabled;
 }

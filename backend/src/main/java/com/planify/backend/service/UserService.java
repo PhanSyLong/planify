@@ -87,7 +87,6 @@ public class UserService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .avatar(user.getAvatar())
                 .roles(roles)
                 .build();
     }

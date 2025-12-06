@@ -14,6 +14,5 @@ public class UserResponse {
     Integer id;
     String username;
     String email;
-    String avatar;
     Set<String> roles;
 }
