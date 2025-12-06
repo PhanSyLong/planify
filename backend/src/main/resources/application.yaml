@@ -31,4 +31,4 @@ spring:
             enable: true
 
 file:
-  upload-dir: /home/an/Pictures
+  upload-dir: ${UPLOAD_DIR}

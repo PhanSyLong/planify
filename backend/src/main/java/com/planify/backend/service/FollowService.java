@@ -1,5 +1,6 @@
 package com.planify.backend.service;
 
+import com.planify.backend.dto.request.NotificationRequest;
 import com.planify.backend.model.Follow;
 import com.planify.backend.model.User;
 import com.planify.backend.repository.FollowRepository;
@@ -39,11 +40,15 @@ public class FollowService {
         follow.setFollowing(followee);
         followRepository.save(follow);
 
-        notificationService.sendNotification(
-                followee.getId(),
-                follower.getUsername() + " followed you",
-                follower.getUsername() + " has followed you on Planify!",
-                "follower");
+        NotificationRequest notifRequest = NotificationRequest.builder()
+                .recipientId(followee.getId())
+                .messageText(follower.getUsername() + " has followed you on Planify!")
+                .type("follower")
+                .build();
+
+        notificationService.sendEmailNotification(
+                notifRequest,
+                follower.getUsername() + " followed you");
     }
 
     @Transactional

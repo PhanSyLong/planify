@@ -1,6 +1,6 @@
 package com.planify.backend.controller;
 
-import lombok.NonNull;
+import com.planify.backend.dto.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -18,20 +18,28 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @RestController
-@RequestMapping("/api/upload")
+@RequestMapping("/image")
 public class ImageUploadController {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    @PostMapping("/images")
-    public ResponseEntity<@NonNull String> uploadImage(@RequestParam("file") MultipartFile file) {
+    @PostMapping
+    ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             // Save the file to the directory
             String filePath = saveImage(file);
-            return ResponseEntity.ok("Image uploaded successfully: " + filePath);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.<String>builder()
+                            .code(HttpStatus.CREATED.value())
+                            .result("Image uploaded successfully: " + filePath)
+                            .build());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<String>builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .result("Error uploading image")
+                            .build());
         }
     }
 
@@ -49,21 +57,31 @@ public class ImageUploadController {
         return filePath.toString();
     }
 
-    @GetMapping("/images/{filename}")
-    public ResponseEntity<@NonNull Resource> getImage(@PathVariable String filename) {
+    @GetMapping("/{filename}")
+    public ResponseEntity<ApiResponse<Resource>> getImage(@PathVariable String filename) {
         try {
             Path filePath = Paths.get(uploadDir).resolve(filename);
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists()) {
-                return ResponseEntity.ok()
+                return ResponseEntity.status(HttpStatus.OK)
                         .contentType(MediaType.IMAGE_JPEG)
-                        .body(resource);
+                        .body(ApiResponse.<Resource>builder()
+                                .code(HttpStatus.OK.value())
+                                .result(resource)
+                                .build());
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.<Resource>builder()
+                                .code(HttpStatus.NOT_FOUND.value())
+                                .build());
             }
         } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<Resource>builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .build());
+
         }
     }
 }

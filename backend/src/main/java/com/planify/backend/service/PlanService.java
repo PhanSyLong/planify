@@ -1,8 +1,7 @@
 package com.planify.backend.service;
 
-import com.planify.backend.dto.PlanCreateRequest;
+import com.planify.backend.dto.request.PlanRequest;
 import com.planify.backend.model.Plan;
-import com.planify.backend.model.User;
 import com.planify.backend.repository.PlanRepository;
 import com.planify.backend.repository.UserRepository;
 import lombok.AccessLevel;
@@ -19,7 +18,7 @@ public class PlanService {
     PlanRepository planRepository;
     UserRepository userRepository;
 
-    public Plan addPlan(PlanCreateRequest request) {
+    public Plan addPlan(PlanRequest request) {
         Plan plan = new Plan();
         plan.setTitle(request.getTitle());
         plan.setDescription(request.getDescription());
@@ -28,9 +27,8 @@ public class PlanService {
         plan.setDuration(request.getDuration());
         plan.setPicture(request.getPicture());
 
-        User owner = userRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("Owner not found"));
-        plan.setOwner(owner);
+        plan.setOwner(userRepository.findById(request.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("Owner not found")));
         return planRepository.save(plan);
     }
 

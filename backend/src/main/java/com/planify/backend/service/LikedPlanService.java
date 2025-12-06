@@ -24,17 +24,17 @@ public class LikedPlanService {
     LikedPlanRepository likedPlanRepository;
 
     public void likePlan(Integer userId, Integer planId) {
-        if (likedPlanRepository.existsByUserIdAndPlanId(userId, planId)) {
-            return;
-        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
 
         LikedPlan likedPlan = new LikedPlan();
-        likedPlan.setUser(user);
-        likedPlan.setPlan(plan);
+        if (!likedPlanRepository.existsByUserIdAndPlanId(userId, planId)) {
+            likedPlan.setUser(user);
+            likedPlan.setPlan(plan);
+        }
+
         likedPlanRepository.save(likedPlan);
     }
 

@@ -1,13 +1,15 @@
 package com.planify.backend.controller;
 
-import com.planify.backend.dto.PlanDto;
-import com.planify.backend.dto.UserDto;
+import com.planify.backend.dto.response.ApiResponse;
+import com.planify.backend.dto.response.PlanResponse;
+import com.planify.backend.dto.response.UserResponse;
+import com.planify.backend.mapper.PlanMapper;
 import com.planify.backend.service.LikedPlanService;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,29 +19,50 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RestController
-@RequestMapping("/api/likedplan")
+@RequestMapping
 public class LikedPlanController {
     LikedPlanService likedPlanService;
+    PlanMapper planMapper;
 
     @PostMapping("/{userId}/like/{planId}")
-    public ResponseEntity<@NonNull String> likePlan(@PathVariable Integer userId, @PathVariable Integer planId) {
+    ResponseEntity<ApiResponse<String>> likePlan(@PathVariable Integer userId, @PathVariable Integer planId) {
         likedPlanService.likePlan(userId, planId);
-        return ResponseEntity.ok("UserId " + userId + " liked " + "planId " + planId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.<String>builder()
+                        .code(HttpStatus.CREATED.value())
+                        .result("User Id " + userId + " liked " + "plan Id " + planId)
+                        .build());
     }
 
     @DeleteMapping("/{userId}/unlike/{planId}")
-    public ResponseEntity<@NonNull String> unlikePlan(@PathVariable Integer userId, @PathVariable Integer planId) {
+    ResponseEntity<ApiResponse<String>> unlikePlan(@PathVariable Integer userId, @PathVariable Integer planId) {
         likedPlanService.unlikePlan(userId, planId);
-        return ResponseEntity.ok("UserId " + userId + " unliked " + "planId " + planId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ApiResponse.<String>builder()
+                        .code(HttpStatus.NO_CONTENT.value())
+                        .result("User Id " + userId + " unliked " + "plan Id " + planId)
+                        .build());
     }
 
-    @GetMapping("/{userId}/likedplans")
-    public List<PlanDto> getLikedPlans(@PathVariable Integer userId) {
-        return likedPlanService.getLikedPlans(userId).stream().map(PlanDto::from).toList();
+    @GetMapping("/likedplans/{userId}")
+    ResponseEntity<ApiResponse<List<PlanResponse>>> getLikedPlans(@PathVariable Integer userId) {
+        List<com.planify.backend.model.Plan> plans = likedPlanService.getLikedPlans(userId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<PlanResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(planMapper.toResponseList(plans))
+                        .build());
     }
 
-    @GetMapping("/{planId}/likers")
-    public List<UserDto> getLikers(@PathVariable Integer planId) {
-        return likedPlanService.getLikers(planId).stream().map(UserDto::from).toList();
+    @GetMapping("/likers/{planId}")
+    ResponseEntity<ApiResponse<List<UserResponse>>> getLikers(@PathVariable Integer planId) {
+        List<com.planify.backend.model.User> users = likedPlanService.getLikers(planId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<UserResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(users.stream().map(UserResponse::from).toList())
+                        .build());
     }
 }

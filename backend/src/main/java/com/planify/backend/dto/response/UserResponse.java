@@ -1,4 +1,4 @@
-package com.planify.backend.dto;
+package com.planify.backend.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,13 +8,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDto {
+public class UserResponse {
     Integer id;
     String username;
-    public static UserDto from(com.planify.backend.model.User user) {
+    public static UserResponse from(com.planify.backend.model.User user) {
         if (user == null) {
             return null;
         }
-        return new UserDto(user.getId(), user.getUsername());
+        return new UserResponse(user.getId(), user.getUsername());
     }
 }
