@@ -16,5 +16,5 @@ public class UserCreationRequest {
     String password;
     String email;
     String avatar;
-    String notificationenabled;
+    String notification_enabled;
 }

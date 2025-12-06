@@ -7,9 +7,10 @@ import com.planify.backend.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface UserMapper {
     //MapStruct sẽ tạo code để biến UserCreationRequest → User
     //Nếu hai class có field cùng tên → MapStruct tự map.
@@ -32,5 +33,5 @@ public interface UserMapper {
     @Mapping(target = "userRoles", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request );
 
-
+    List<UserResponse> toUserResponseList(List<User> users);
 }

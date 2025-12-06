@@ -3,17 +3,14 @@ package com.planify.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class NotificationResponse {
     Integer id;
-    String username;
-    String email;
-    String avatar;
-    Set<String> roles;
+    Integer recipientId;
+    String type;
+    String messageText;
 }

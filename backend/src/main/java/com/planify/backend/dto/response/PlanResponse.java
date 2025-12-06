@@ -3,17 +3,16 @@ package com.planify.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class PlanResponse {
     Integer id;
-    String username;
-    String email;
-    String avatar;
-    Set<String> roles;
+    String title;
+    Integer ownerId;
+    String visibility;
+    String status;
+    int duration;
 }

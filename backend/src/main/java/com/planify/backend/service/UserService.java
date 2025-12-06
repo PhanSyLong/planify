@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
-@Slf4j
+@Service
 public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
@@ -51,7 +51,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         //Xử lý Role
-        Role roleUser = roleRepository.findByName(RoleName.USER)
+        Role roleUser = roleRepository.findByName(RoleName.user)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         UserRole userRole = UserRole.builder()
@@ -113,7 +113,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user , request);
-        
+
         // Chỉ update password nếu có trong request
         if(request.getPassword() != null && !request.getPassword().isEmpty()){
             user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -134,32 +134,32 @@ public class UserService {
         // Kiểm tra user có tồn tại không
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        
+
         // Xóa các foreign key references trước khi xóa user
         // Set created_by = NULL cho các user được tạo bởi user này
         userRepository.clearCreatedByReferences(id);
-        
+
         // Set updated_by = NULL cho các user được update bởi user này
         userRepository.clearUpdatedByReferences(id);
-        
+
         // Xóa các UserRole liên quan (có thể đã có cascade, nhưng để chắc chắn)
         userRoleRepository.deleteAll(user.getUserRoles());
-        
+
         // Cuối cùng mới xóa user
         userRepository.deleteById(id);
-        
+
         log.info("User with id {} has been deleted", id);
     }
 
     public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
         var authentication = context.getAuthentication();
-        
+
         if(authentication == null || authentication.getName() == null){
             log.error("Authentication is null or name is null");
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        
+
         String name = authentication.getName();
         log.info("Getting my info for user: {}", name);
 
