@@ -31,9 +31,6 @@ public class User {
     String email;
     String avatar;
 
-    @Column(columnDefinition = "ENUM('true','false')")
-    String notificationenabled;
-
     @CreatedBy
     Integer created_by;
 
