@@ -23,15 +23,8 @@ public class Subtask {
     @Column(nullable = false)
     Integer duration;
 
-    public enum SubtaskStatus {
-        INCOMPLETE,
-        COMPLETED,
-        CANCELLED
-    }
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    SubtaskStatus status;
+    @Column(nullable = false, columnDefinition = "ENUM('incompleted', 'completed', 'cancelled')")
+    String status;
 
 
 }
