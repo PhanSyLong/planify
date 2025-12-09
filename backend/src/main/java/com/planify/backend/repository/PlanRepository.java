@@ -11,9 +11,9 @@ import java.util.List;
 
 @Repository
 public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull Integer> {
-    @Query("select p from Plan p where p.id = :planId")
+    @Query("SELECT p FROM Plan p WHERE p.id = :planId")
     Plan findPlanById(@Param("planId") Integer planId);
 
-    @Query("select p from Plan p where p.owner.id = :ownerId")
+    @Query("SELECT p FROM Plan p WHERE p.owner.id = :ownerId")
     List<Plan> findPlanByUserId(@Param("ownerId") Integer ownerId);
 }

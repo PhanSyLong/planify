@@ -56,9 +56,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL , fetch = FetchType.EAGER) //1 User -có->  nhiều bản ghi user_role
     Set<UserRole> userRoles = new HashSet<>();
 
-    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "following", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Follow> followings = new HashSet<>();
 
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Follow> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "liked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Plan> likedPlans = new HashSet<>();
+
+    @OneToMany(mappedBy = "forked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Plan> forkedPlans = new HashSet<>();
 }
