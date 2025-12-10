@@ -17,4 +17,5 @@ public class UserCreationRequest {
     String email;
     String avatar;
     String notification_enabled;
+    String bio;
 }

@@ -50,9 +50,12 @@ public class Plan {
 
     String picture;
 
-    @OneToMany(mappedBy = "liked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    Set<LikedPlan> likedPlans = new HashSet<>();
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<LikedPlan> plans = new HashSet<>();
 
-    @OneToMany(mappedBy = "forked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    Set<Plan> forkedPlans = new HashSet<>();
+    @OneToMany(mappedBy = "originalPlan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<ForkedPlan> originalPlans = new HashSet<>();
+
+    @OneToMany(mappedBy = "adoptedPlan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<ForkedPlan> adoptedPlans = new HashSet<>();
 }

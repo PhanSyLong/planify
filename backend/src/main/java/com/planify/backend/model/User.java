@@ -33,6 +33,7 @@ public class User {
     String password;
     String email;
     String avatar;
+    String bio;
 
     @Column(name="notificationenabled", columnDefinition = "ENUM('true', 'false')")
     String notification_enabled;
@@ -62,9 +63,9 @@ public class User {
     @OneToMany(mappedBy = "follower", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Follow> followers = new HashSet<>();
 
-    @OneToMany(mappedBy = "liked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    Set<Plan> likedPlans = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<LikedPlan> planUsers = new HashSet<>();
 
-    @OneToMany(mappedBy = "forked_plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    Set<Plan> forkedPlans = new HashSet<>();
+    @OneToMany(mappedBy = "adoptedUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<ForkedPlan> forkUsers = new HashSet<>();
 }
