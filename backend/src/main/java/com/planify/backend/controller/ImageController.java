@@ -1,7 +1,11 @@
 package com.planify.backend.controller;
 
 import com.planify.backend.dto.response.ApiResponse;
-import org.springframework.beans.factory.annotation.Value;
+import com.planify.backend.service.ImageService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -12,23 +16,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
+@Slf4j
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RestController
 @RequestMapping("/image")
-public class ImageUploadController {
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+public class ImageController {
+    ImageService imageService;
 
     @PostMapping
     ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             // Save the file to the directory
-            String filePath = saveImage(file);
+            String filePath = imageService.saveImage(file);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<String>builder()
                             .code(HttpStatus.CREATED.value())
@@ -43,24 +46,10 @@ public class ImageUploadController {
         }
     }
 
-    private String saveImage(MultipartFile file) throws IOException {
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        String fileName = file.getOriginalFilename();
-        assert fileName != null;
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return filePath.toString();
-    }
-
     @GetMapping("/{filename}")
     public ResponseEntity<ApiResponse<Resource>> getImage(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDir).resolve(filename);
+            Path filePath = Paths.get(imageService.uploadDir).resolve(filename);
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists()) {
