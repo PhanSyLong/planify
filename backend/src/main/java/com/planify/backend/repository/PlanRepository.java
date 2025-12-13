@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull Integer> {
-    @Query("select p.id from Plan p where p.id = :planId")
+    @Query("select p from Plan p where p.id = :planId")
     Plan findPlanById(@Param("planId") Integer planId);
 }

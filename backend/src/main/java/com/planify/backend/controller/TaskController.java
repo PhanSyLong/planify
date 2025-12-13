@@ -3,6 +3,7 @@ package com.planify.backend.controller;
 import com.planify.backend.dto.request.TaskRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.TaskResponse;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.TaskMapper;
 import com.planify.backend.model.Task;
 import com.planify.backend.service.TaskService;
@@ -66,6 +67,16 @@ public class TaskController {
                 .body(ApiResponse.<List<TaskResponse>>builder()
                         .code(HttpStatus.OK.value())
                         .result(taskMapper.toResponseList(tasks))
+                        .build());
+    }
+
+    @GetMapping("/plans/{planId}/{stageId}/{taskId}/timing")
+    ResponseEntity<ApiResponse<TimingResponse>> getTimingForTask(@PathVariable Integer planId, @PathVariable Integer stageId, @PathVariable Integer taskId) {
+        TimingResponse timing = taskService.computeTimeStatus(planId, stageId, taskId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<TimingResponse>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(timing)
                         .build());
     }
 }

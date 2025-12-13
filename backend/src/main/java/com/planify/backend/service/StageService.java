@@ -1,11 +1,13 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.StageRequest;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
 import com.planify.backend.model.Stage;
 import com.planify.backend.repository.PlanRepository;
 import com.planify.backend.repository.StageRepository;
+import com.planify.backend.repository.SubtaskRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +21,7 @@ import java.util.List;
 public class StageService {
     private  PlanRepository planRepository;
     private StageRepository stageRepository;
+    private SubtaskRepository subtaskRepository;
 
     public Stage addStage(StageRequest stageRequest) {
         Stage stage = new Stage();
@@ -48,5 +51,28 @@ public class StageService {
     // New: get specific stage for a given plan
     public Stage getStageByPlanIdAndStageId(Integer planId, Integer stageId) {
         return stageRepository.findStageByIdAndPlanId(stageId, planId);
+    }
+
+    // New: compute timing status for a stage
+    public TimingResponse computeTimeStatus(Integer planId, Integer stageId) {
+        Stage stage = stageRepository.findStageByIdAndPlanId(stageId, planId);
+        if (stage == null) {
+            throw new AppException(ErrorCode.STAGE_NOT_FOUND);
+        }
+
+        Integer expected = stage.getDuration();
+        Integer actual = subtaskRepository.sumCompletedDurationByStageId(stageId);
+
+        com.planify.backend.model.TimeStatus status;
+        if (actual < expected) status = com.planify.backend.model.TimeStatus.EARLY;
+        else if (actual > expected) status = com.planify.backend.model.TimeStatus.LATE;
+        else status = com.planify.backend.model.TimeStatus.ON_TIME;
+
+        return TimingResponse.builder()
+                .planId(planId)
+                .expectedTime(expected)
+                .actualTime(actual)
+                .status(status)
+                .build();
     }
 }

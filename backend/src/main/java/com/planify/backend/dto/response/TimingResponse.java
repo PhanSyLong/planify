@@ -1,5 +1,6 @@
 package com.planify.backend.dto.response;
 
+import com.planify.backend.model.TimeStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,14 +9,10 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PlanResponse {
-    Integer id;
-    String title;
-    Integer ownerId;
-    String visibility;
-    String status;
-    int duration;
-    // Computed when returning the DTO
+public class TimingResponse {
+    Integer planId;
     Integer expectedTime;
     Integer actualTime;
+    TimeStatus status;
 }
+

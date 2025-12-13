@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.SubtaskRequest;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
 import com.planify.backend.model.Subtask;
@@ -81,5 +82,34 @@ public class SubtaskService {
             if (s != null) results.add(s);
         }
         return results;
+    }
+
+    // New: compute timing status for a single subtask
+    public TimingResponse computeTimeStatus(Integer planId, Integer stageId, Integer taskId, Integer subtaskId) {
+        // Validate chain
+        Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
+        if (task == null){
+            throw new AppException(ErrorCode.TASK_NOT_FOUND);
+        }
+
+        Subtask subtask = subtaskRepository.findSubtaskById(subtaskId, taskId);
+        if (subtask == null){
+            throw new AppException(ErrorCode.SUBTASK_NOT_FOUND);
+        }
+
+        Integer expected = subtask.getDuration();
+        Integer actual = "completed".equalsIgnoreCase(subtask.getStatus()) ? subtask.getDuration() : 0;
+
+        com.planify.backend.model.TimeStatus status;
+        if (actual < expected) status = com.planify.backend.model.TimeStatus.EARLY;
+        else if (actual > expected) status = com.planify.backend.model.TimeStatus.LATE;
+        else status = com.planify.backend.model.TimeStatus.ON_TIME;
+
+        return TimingResponse.builder()
+                .planId(planId)
+                .expectedTime(expected)
+                .actualTime(actual)
+                .status(status)
+                .build();
     }
 }

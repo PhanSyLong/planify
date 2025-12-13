@@ -1,9 +1,13 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.PlanRequest;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.model.Plan;
+import com.planify.backend.model.TimeStatus;
 import com.planify.backend.repository.PlanRepository;
 import com.planify.backend.repository.UserRepository;
+import com.planify.backend.repository.StageRepository;
+import com.planify.backend.repository.SubtaskRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +21,8 @@ import java.util.List;
 public class PlanService {
     PlanRepository planRepository;
     UserRepository userRepository;
+    StageRepository stageRepository;
+    SubtaskRepository subtaskRepository;
 
     public Plan addPlan(PlanRequest request) {
         Plan plan = new Plan();
@@ -42,5 +48,36 @@ public class PlanService {
 
     public List<Plan> getAllPlans() {
         return planRepository.findAll();
+    }
+
+    // New helpers to compute expected and actual times
+    public Integer computeExpectedTime(Integer planId) {
+        return stageRepository.sumDurationByPlanId(planId);
+    }
+
+    public Integer computeActualTime(Integer planId) {
+        return subtaskRepository.sumCompletedDurationByPlanId(planId);
+    }
+
+    // New: compute time status for plan
+    public TimingResponse computeTimeStatus(Integer planId) {
+        Integer expected = computeExpectedTime(planId);
+        Integer actual = computeActualTime(planId);
+
+        TimeStatus status;
+        if (actual < expected) {
+            status = TimeStatus.EARLY;
+        } else if (actual > expected) {
+            status = TimeStatus.LATE;
+        } else {
+            status = TimeStatus.ON_TIME;
+        }
+
+        return TimingResponse.builder()
+                .planId(planId)
+                .expectedTime(expected)
+                .actualTime(actual)
+                .status(status)
+                .build();
     }
 }

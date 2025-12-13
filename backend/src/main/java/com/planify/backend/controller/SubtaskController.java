@@ -3,6 +3,7 @@ package com.planify.backend.controller;
 import com.planify.backend.dto.request.SubtaskRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.SubtaskResponse;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.SubtaskMapper;
 import com.planify.backend.model.Subtask;
 import com.planify.backend.service.SubtaskService;
@@ -66,6 +67,17 @@ public class SubtaskController {
                 .body(ApiResponse.<List<SubtaskResponse>>builder()
                         .code(HttpStatus.OK.value())
                         .result(subtaskMapper.toResponseList(subtasks))
+                        .build());
+    }
+
+    // New endpoint: timing for a subtask
+    @GetMapping("/plans/{planId}/{stageId}/{taskId}/{subtaskId}/timing")
+    ResponseEntity<ApiResponse<TimingResponse>> getTimingForSubtask(@PathVariable Integer planId, @PathVariable Integer stageId, @PathVariable Integer taskId, @PathVariable Integer subtaskId) {
+        TimingResponse timing = subtaskService.computeTimeStatus(planId, stageId, taskId, subtaskId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<TimingResponse>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(timing)
                         .build());
     }
 }

@@ -3,6 +3,7 @@ package com.planify.backend.controller;
 import com.planify.backend.dto.request.StageRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.StageResponse;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.StageMapper;
 import com.planify.backend.model.Stage;
 import com.planify.backend.service.StageService;
@@ -69,6 +70,17 @@ public class StageController {
                 .body(ApiResponse.<StageResponse>builder()
                         .code(HttpStatus.OK.value())
                         .result(stageMapper.toResponse(stage))
+                        .build());
+    }
+
+    // New endpoint: timing for a stage
+    @GetMapping("/plans/{planId}/{stageId}/timing")
+    ResponseEntity<ApiResponse<TimingResponse>> getTimingForStage(@PathVariable Integer planId, @PathVariable Integer stageId) {
+        TimingResponse timing = stageService.computeTimeStatus(planId, stageId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<TimingResponse>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(timing)
                         .build());
     }
 }

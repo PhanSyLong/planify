@@ -1,12 +1,14 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.TaskRequest;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
 import com.planify.backend.model.Task;
 import com.planify.backend.model.Stage;
 import com.planify.backend.repository.StageRepository;
 import com.planify.backend.repository.TaskRepository;
+import com.planify.backend.repository.SubtaskRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +22,7 @@ import java.util.List;
 public class TaskService {
     private StageRepository stageRepository;
     private TaskRepository taskRepository;
+    private SubtaskRepository subtaskRepository;
 
     public Task addTask(TaskRequest taskRequest){
         // Lookup stage by id (TaskRequest doesn't contain planId)
@@ -76,5 +79,33 @@ public class TaskService {
     // Helper to work around method name conflict in patch: call repository properly
     private Task task_repository_findTaskByIdAndStageId_suppressed(Integer taskId, Integer stageId) {
         return taskRepository.findTaskByIdAndStageId(taskId, stageId);
+    }
+
+    // New: compute timing status for task
+    public TimingResponse computeTimeStatus(Integer planId, Integer stageId, Integer taskId) {
+        Stage stage = stageRepository.findStageByIdAndPlanId(stageId, planId);
+        if (stage == null) {
+            throw new AppException(ErrorCode.TASK_NOT_FOUND);
+        }
+
+        Task task = taskRepository.findTaskByIdAndStageId(taskId, stageId);
+        if (task == null) {
+            throw new AppException(ErrorCode.TASK_NOT_FOUND);
+        }
+
+        Integer expected = task.getDuration();
+        Integer actual = subtaskRepository.sumCompletedDurationByTaskId(taskId);
+
+        com.planify.backend.model.TimeStatus status;
+        if (actual < expected) status = com.planify.backend.model.TimeStatus.EARLY;
+        else if (actual > expected) status = com.planify.backend.model.TimeStatus.LATE;
+        else status = com.planify.backend.model.TimeStatus.ON_TIME;
+
+        return TimingResponse.builder()
+                .planId(planId)
+                .expectedTime(expected)
+                .actualTime(actual)
+                .status(status)
+                .build();
     }
 }

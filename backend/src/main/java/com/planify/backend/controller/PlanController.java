@@ -3,6 +3,7 @@ package com.planify.backend.controller;
 import com.planify.backend.dto.request.PlanRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.PlanResponse;
+import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.PlanMapper;
 import com.planify.backend.model.Plan;
 import com.planify.backend.service.PlanService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,10 +31,15 @@ public class PlanController {
     ResponseEntity<ApiResponse<PlanResponse>> addPlan(@RequestBody PlanRequest request) {
         Plan plan = planService.addPlan(request);
 
+        // Map and set computed fields
+        PlanResponse resp = planMapper.toResponse(plan);
+        resp.setExpectedTime(planService.computeExpectedTime(plan.getId()));
+        resp.setActualTime(planService.computeActualTime(plan.getId()));
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.<PlanResponse>builder()
                         .code(HttpStatus.CREATED.value())
-                        .result(planMapper.toResponse(plan))
+                        .result(resp)
                         .build());
     }
 
@@ -52,10 +59,14 @@ public class PlanController {
     ResponseEntity<ApiResponse<PlanResponse>> getPlanById(@PathVariable("planId") Integer planId) {
         Plan plan = planService.getPlan(planId);
 
+        PlanResponse resp = planMapper.toResponse(plan);
+        resp.setExpectedTime(planService.computeExpectedTime(planId));
+        resp.setActualTime(planService.computeActualTime(planId));
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<PlanResponse>builder()
                         .code(HttpStatus.OK.value())
-                        .result(planMapper.toResponse(plan))
+                        .result(resp)
                         .build());
     }
 
@@ -63,10 +74,27 @@ public class PlanController {
     ResponseEntity<ApiResponse<List<PlanResponse>>> getAllPlan() {
         List<Plan> plans = planService.getAllPlans();
 
+        List<PlanResponse> responses = planMapper.toResponseList(plans).stream().map(r -> {
+            r.setExpectedTime(planService.computeExpectedTime(r.getId()));
+            r.setActualTime(planService.computeActualTime(r.getId()));
+            return r;
+        }).collect(Collectors.toList());
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<List<PlanResponse>>builder()
                         .code(HttpStatus.OK.value())
-                        .result(planMapper.toResponseList(plans))
+                        .result(responses)
+                        .build());
+    }
+
+    // New endpoint: timing status
+    @GetMapping("/{planId}/timing")
+    ResponseEntity<ApiResponse<TimingResponse>> getTiming(@PathVariable("planId") Integer planId) {
+        TimingResponse timing = planService.computeTimeStatus(planId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<TimingResponse>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(timing)
                         .build());
     }
 }
