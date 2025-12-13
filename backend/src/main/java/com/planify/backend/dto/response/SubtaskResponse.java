@@ -12,5 +12,7 @@ public class SubtaskResponse {
     Integer id;
     Integer taskId;
     String title;
-    int duration;
+    String description;
+    Integer duration;
+    String status;
 }

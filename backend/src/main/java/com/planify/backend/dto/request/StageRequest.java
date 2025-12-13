@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StageRequest {
-    String title;
     Integer planId;
+    String title;
     String description;
-    int duration;
+    Integer duration;
 }

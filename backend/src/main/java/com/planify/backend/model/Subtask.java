@@ -1,8 +1,11 @@
 package com.planify.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.EnumType;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "subtask")
 public class Subtask {
@@ -28,3 +31,4 @@ public class Subtask {
 
 
 }
+

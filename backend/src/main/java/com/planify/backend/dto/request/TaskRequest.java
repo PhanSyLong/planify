@@ -8,5 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TaskRequest {
-
+    Integer stageId;
+    String description;
+    Integer duration;
 }

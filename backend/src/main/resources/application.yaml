@@ -4,6 +4,8 @@ server:
     context-path: /planify
 
 spring:
+  config:
+    import: optional:classpath:application-secrets.yaml
   datasource:
     url: jdbc:mysql://localhost:3306/planify?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root

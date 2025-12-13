@@ -8,5 +8,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubtaskRequest {
-
+    Integer taskId;
+    String title;
+    String description;
+    Integer duration;
+    String status;
 }

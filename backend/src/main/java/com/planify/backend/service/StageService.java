@@ -1,6 +1,8 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.StageRequest;
+import com.planify.backend.exception.AppException;
+import com.planify.backend.exception.ErrorCode;
 import com.planify.backend.model.Stage;
 import com.planify.backend.repository.PlanRepository;
 import com.planify.backend.repository.StageRepository;
@@ -28,15 +30,23 @@ public class StageService {
         return stageRepository.save(stage);
     }
 
-    public void removeStageById(Integer stageId) {
-        stageRepository.deleteById(stageId);
+    // New: remove a stage by planId and stageId, ensuring it belongs to the plan
+    public void removeStageByPlanIdAndStageId(Integer planId, Integer stageId) {
+        Stage stage = stageRepository.findStageByIdAndPlanId(stageId, planId);
+        if (stage == null) {
+            throw new AppException(ErrorCode.STAGE_NOT_FOUND);
+        }
+
+        stageRepository.delete(stage);
     }
 
-    public Stage getStageById(Integer stageId) {
-        return stageRepository.findStageById(stageId);
+    // New: get all stages for a given plan
+    public List<Stage> getStagesByPlanId(Integer planId) {
+        return stageRepository.findAllStage(planId);
     }
 
-    public List<Stage> getAllStages() {
-        return stageRepository.findAll();
+    // New: get specific stage for a given plan
+    public Stage getStageByPlanIdAndStageId(Integer planId, Integer stageId) {
+        return stageRepository.findStageByIdAndPlanId(stageId, planId);
     }
 }

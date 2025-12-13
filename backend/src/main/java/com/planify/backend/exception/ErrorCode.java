@@ -9,7 +9,10 @@ public enum ErrorCode{
     INVALID_PASSWORD(1003, "Password must be at least 8 characters"),
     USER_NOT_EXISTED(1006, "User not existed"),
     UNAUTHENTICATED(1007, "Unauthenticated"),
-    ROLE_NOT_FOUND(1008, "Role not found");
+    ROLE_NOT_FOUND(1008, "Role not found"),
+    STAGE_NOT_FOUND(1009, "Stage not found"),
+    TASK_NOT_FOUND(1010, "Task not found"),
+    SUBTASK_NOT_FOUND(1011, "Subtask not found");
 
     private int code;
     private String message;
