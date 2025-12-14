@@ -1,6 +1,10 @@
-// src/pages/Home.jsx
-function Home() {
-  return <h1>Welcome to Home Page</h1>
-}
+import HomeLayout from "../layout/HomeLayout";
 
-export default Home
+
+export default function Home() {
+  return (
+    <HomeLayout>
+
+    </HomeLayout>
+  );
+}

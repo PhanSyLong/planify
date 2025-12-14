@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Đảm bảo import này
 import LikeButton from "./LikeButton";
 
 const PlanCard = ({ item }) => {
@@ -16,6 +17,7 @@ const PlanCard = ({ item }) => {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
           transition: all 0.3s ease;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          cursor: pointer; /* Thêm để người dùng biết card clickable */
         }
 
         .card:hover {
@@ -26,7 +28,7 @@ const PlanCard = ({ item }) => {
         .card-image {
           width: 100%;
           height: 140px;
-          background: linear-gradient(135deg, #6366f1, #4f46e5); /* Nice indigo-purple gradient */
+          background: linear-gradient(135deg, #6366f1, #4f46e5);
         }
 
         .card-info {
@@ -47,17 +49,26 @@ const PlanCard = ({ item }) => {
           font-size: 14px;
           line-height: 1.4;
         }
+
+        /* Để LikeButton không bị ảnh hưởng bởi Link */
+        .card-content {
+          display: block;
+          color: inherit;
+          text-decoration: none;
+        }
       `}</style>
 
-      {/* Unified Card Markup */}
+      {/* Card với Link bọc phần nội dung chính */}
       <div className="card">
-        <div className="card-image" />
+        <Link to={`/plans/${item.id}`} className="card-content">
+          <div className="card-image" />
+          <div className="card-info">
+            <h3>{item.title || item.name}</h3>
+            <p>{item.duration || item.info || "No description available"}</p>
+          </div>
+        </Link>
 
-        <div className="card-info">
-          <h3>{item.title || item.name}</h3>
-          <p>{item.duration || item.info || "No description available"}</p>
-        </div>
-
+        {/* LikeButton nằm ngoài Link để không bị navigate khi click */}
         <LikeButton itemId={item.id} />
       </div>
     </>

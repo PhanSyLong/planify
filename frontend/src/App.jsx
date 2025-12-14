@@ -3,14 +3,21 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginSignup from "./pages/LoginSignup.jsx";
 
+//main
 import MainLayout from './layout/MainLayout.jsx';
+
+//page
 import Home from './pages/Home.jsx';
 import MyPlanPage from "./pages/MyPlanPage.jsx";
 import SavedPage from "./pages/SavedPage";
 import ExplorePage from "./pages/ExplorePage.jsx";
-import PlanPage from "./pages/PlanPage";
+import CreatePlan from "./pages/CreatePlan.jsx";
 
-import Profile from "./pages/Profile.jsx";
+//detail plan, just for demo
+import PlanDetailPage from "./layout/PlanDetailPage.jsx";
+
+//idk
+import PlanPage from "./pages/PlanPage";
 
 
 function App() {
@@ -22,12 +29,12 @@ function App() {
           <Route path="/plan" element={<MyPlanPage/>} />
           <Route path="/saved" element={<SavedPage/>} />
           <Route path="/commu" element={<ExplorePage />} />
-          <Route path="/add" element={<PlanPage/>} />
+          <Route path="/add" element={<CreatePlan/>} />  {/* testing login signup */}
+
+          {/*detailplan*/}
+          <Route path="/plans/:id" element={<PlanDetailPage />} />
 
 
-
-
-          {/* Add more pages here */}
         </Route>
       </Routes>
     </BrowserRouter>
