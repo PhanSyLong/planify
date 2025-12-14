@@ -33,7 +33,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         //Đầu tiên dùng hàm introspect ở authenticationService để kiểm tra xem cái token này còn hiệu lực hay không
         try{
             var response = authenticationService.introspect(IntrospectRequest.builder()
-                            .token(token)
+                    .token(token)
                     .build());
             if(!response.isValid()){
                 throw new JwtException("Token invalid");
