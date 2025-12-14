@@ -48,6 +48,9 @@ public class NotificationService {
         User recipient = userRepository.findById(request.getRecipientId())
                 .orElseThrow(() -> new EntityNotFoundException("Recipient not found"));
         notification.setRecipient(recipient);
+        if (recipient.getNotification_enabled().equals("false")){
+            return notificationRepository.save(notification);
+        }
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipient.getEmail());
