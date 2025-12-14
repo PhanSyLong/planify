@@ -75,6 +75,17 @@ public class PlanService {
         return plan;
     }
 
+    public Plan getPlanByName(String name) {
+        Plan plan = planRepository.findPlanByName(name);
+        boolean isPublic = "public".equals(plan.getVisibility());
+
+        if (!isPublic && jwtUserContext.neitherPlanOwnerNorAdmin(plan)) {
+            // Hide the plan completely
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found");
+        }
+        return plan;
+    }
+
     public List<Plan> getPlanByUser(Integer userId) {
         List<Plan> plans = planRepository.findPlanByUserId(userId);
         return plans.stream()

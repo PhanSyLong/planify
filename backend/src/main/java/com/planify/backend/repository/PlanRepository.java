@@ -16,4 +16,7 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
 
     @Query("SELECT p FROM Plan p WHERE p.owner.id = :ownerId")
     List<Plan> findPlanByUserId(@Param("ownerId") Integer ownerId);
+
+    @Query("SELECT p FROM Plan p WHERE p.title = :planTitle")
+    Plan findPlanByName(@Param("planTitle") String planTitle);
 }

@@ -141,7 +141,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` enum('ADMIN','user') COLLATE utf8mb4_bin NOT NULL,
+  `name` enum('ADMIN','USER') COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
