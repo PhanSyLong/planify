@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RestController
-@RequestMapping("/subtasks")
+@RequestMapping
 public class SubtaskController {
     SubtaskService subtaskService;
     SubtaskMapper subtaskMapper;
 
-    @PostMapping
+    @PostMapping("/subtasks")
     ResponseEntity<ApiResponse<SubtaskResponse>> addSubtask(@RequestBody SubtaskRequest request){
         Subtask subtask = subtaskService.addSubtask(request);
 

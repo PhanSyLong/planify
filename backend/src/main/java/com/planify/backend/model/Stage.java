@@ -1,14 +1,20 @@
 package com.planify.backend.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name="stage")
 public class Stage {
@@ -31,5 +37,8 @@ public class Stage {
     Integer duration;
 
     @CreatedDate
-    LocalDateTime created_at;
+    LocalDateTime created_date;
+
+    @LastModifiedDate
+    LocalDateTime updated_date;
 }

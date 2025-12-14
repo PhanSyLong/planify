@@ -16,5 +16,5 @@ public class StageResponse {
     String title;
     String description;
     Integer duration;
-    LocalDateTime createdAt;
+
 }

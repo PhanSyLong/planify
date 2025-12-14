@@ -21,12 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RestController
-@RequestMapping("/stages")
+@RequestMapping
 public class StageController {
     StageService stageService;
     StageMapper stageMapper;
 
-    @PostMapping
+    @PostMapping("/stages")
     ResponseEntity<ApiResponse<StageResponse>> addStage(@RequestBody StageRequest request){
         Stage stage = stageService.addStage(request);
 

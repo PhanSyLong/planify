@@ -10,7 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface StageMapper {
     @Mapping(source = "plan_id.id", target = "planId")
-    @Mapping(source = "created_at", target = "createdAt")
     StageResponse toResponse(Stage stage);
 
     @Mapping(source = "plan_id.id", target = "planId")

@@ -21,12 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping
 public class TaskController {
     TaskService taskService;
     TaskMapper taskMapper;
 
-    @PostMapping
+    @PostMapping("/tasks")
     ResponseEntity<ApiResponse<TaskResponse>> addTask(@RequestBody TaskRequest request){
         Task task = taskService.addTask(request);
 
