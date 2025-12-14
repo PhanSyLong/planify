@@ -3,9 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginSignup from "./pages/LoginSignup.jsx";
 
+//main
 import MainLayout from './layout/MainLayout.jsx';
 
-//sidebar
+//page
 import Home from './pages/Home.jsx';
 import MyPlanPage from "./pages/MyPlanPage.jsx";
 import SavedPage from "./pages/SavedPage";
@@ -34,10 +35,6 @@ function App() {
           <Route path="/plans/:id" element={<PlanDetailPage />} />
 
 
-
-
-
-          {/* Add more pages here */}
         </Route>
       </Routes>
     </BrowserRouter>
