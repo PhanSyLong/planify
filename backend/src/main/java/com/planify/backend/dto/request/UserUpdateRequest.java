@@ -1,6 +1,5 @@
 package com.planify.backend.dto.request;
 
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,8 +9,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-
     String username;
     String password;
     String email;
+    String avatar;
+    String bio;
 }

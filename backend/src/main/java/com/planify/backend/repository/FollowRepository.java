@@ -14,11 +14,11 @@ import java.util.List;
 public interface FollowRepository extends JpaRepository<@NonNull Follow, @NonNull Integer> {
 
     // Get all followers (User objects) of a given user id using JPQL
-    @Query("select f.follower from Follow f where f.following.id = :userId")
+    @Query("SELECT f.follower FROM Follow f WHERE f.following.id = :userId")
     List<User> findFollowersByUserId(@Param("userId") Integer userId);
 
     // Get all users that given user is following
-    @Query("select f.following from Follow f where f.follower.id = :userId")
+    @Query("SELECT f.following FROM Follow f WHERE f.follower.id = :userId")
     List<User> findFollowingByUserId(@Param("userId") Integer userId);
 
     // existence check

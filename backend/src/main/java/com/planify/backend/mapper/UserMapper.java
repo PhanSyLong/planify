@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
     //MapStruct sẽ tạo code để biến UserCreationRequest → User
@@ -29,5 +31,5 @@ public interface UserMapper {
     @Mapping(target = "userRoles", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request );
 
-
+    List<UserResponse> toUserResponseList(List<User> users);
 }

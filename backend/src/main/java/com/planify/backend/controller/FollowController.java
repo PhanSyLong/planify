@@ -24,29 +24,27 @@ public class FollowController {
     FollowService followService;
     UserMapper userMapper;
 
-    @PostMapping("/{id}/follow/{targetId}")
-    ResponseEntity<ApiResponse<String>> follow(@PathVariable Integer id, @PathVariable Integer targetId) {
-        followService.follow(id, targetId);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.<String>builder()
-                        .code(HttpStatus.CREATED.value())
-                        .result("User " + id + " followed " + targetId)
-                        .build());
-    }
-
-    @DeleteMapping("/{id}/unfollow/{targetId}")
-    ResponseEntity<ApiResponse<String>> unfollow(@PathVariable Integer id, @PathVariable Integer targetId) {
-        followService.unfollow(id, targetId);
+    @PostMapping("/users/{targetId}/follow")
+    ResponseEntity<ApiResponse<String>> follow(@PathVariable Integer targetId) {
+        followService.follow(targetId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(ApiResponse.<String>builder()
                         .code(HttpStatus.NO_CONTENT.value())
-                        .result("User " + id + " followed " + targetId)
                         .build());
     }
 
-    @GetMapping("/followers/{id}")
+    @DeleteMapping("/users/{targetId}/unfollow")
+    ResponseEntity<ApiResponse<String>> unfollow(@PathVariable Integer targetId) {
+        followService.unfollow(targetId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ApiResponse.<String>builder()
+                        .code(HttpStatus.NO_CONTENT.value())
+                        .build());
+    }
+
+    @GetMapping("/users/{id}/followers")
     ResponseEntity<ApiResponse<List<UserResponse>>> getFollowers(@PathVariable Integer id) {
         List<User> followers = followService.getFollowers(id);
 
@@ -57,7 +55,7 @@ public class FollowController {
                         .build());
     }
 
-    @GetMapping("/followings/{id}")
+    @GetMapping("/users/{id}/followings")
     ResponseEntity<ApiResponse<List<UserResponse>>> getFollowing(@PathVariable Integer id) {
         List<User> following = followService.getFollowing(id);
 

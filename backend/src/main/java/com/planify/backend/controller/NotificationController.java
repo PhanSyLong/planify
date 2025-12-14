@@ -20,12 +20,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/notification")
+@RequestMapping
 public class NotificationController {
     NotificationService notificationService;
     NotificationMapper notificationMapper;
 
-    @PostMapping("/add")
+    @PostMapping("/notifications")
     ResponseEntity<ApiResponse<NotificationResponse>> addNotification(@RequestBody NotificationRequest request) {
         Notification notif = notificationService.addNotification(request);
 
@@ -37,7 +37,7 @@ public class NotificationController {
                         .build());
     }
 
-    @PostMapping("/send")
+    @PostMapping("/notifications/send")
     ResponseEntity<ApiResponse<NotificationResponse>> sendEmailNotification(@RequestBody NotificationRequest request, @RequestParam String title) {
         Notification notif = notificationService.sendEmailNotification(request, title);
 
@@ -49,7 +49,7 @@ public class NotificationController {
                         .build());
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("users/{userId}/notifications")
     ResponseEntity<ApiResponse<List<NotificationResponse>>> getNotificationsByUserId(@PathVariable Integer userId) {
         List<Notification> notifs = notificationService.getNotificationsByUserId(userId);
 
@@ -57,6 +57,17 @@ public class NotificationController {
                 .body(ApiResponse.<List<NotificationResponse>>builder()
                         .code(HttpStatus.OK.value())
                         .result(notificationMapper.toResponseList(notifs))
+                        .build());
+    }
+
+    @DeleteMapping("/notifications/{notifId}")
+    ResponseEntity<ApiResponse<Void>> deleteNotification(@PathVariable Integer notifId) {
+        notificationService.deleteNotificationById(notifId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<Void>builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Notification removed successfully")
                         .build());
     }
 }

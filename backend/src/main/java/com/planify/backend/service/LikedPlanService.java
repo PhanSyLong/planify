@@ -22,16 +22,18 @@ public class LikedPlanService {
     UserRepository userRepository;
     PlanRepository planRepository;
     LikedPlanRepository likedPlanRepository;
+    JwtUserContext jwtUserContext;
 
-    public void likePlan(Integer userId, Integer planId) {
-        User user = userRepository.findById(userId)
+    public void likePlan(Integer planId) {
+        Integer currentUserId = jwtUserContext.getCurrentUserId();
+        User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
 
         LikedPlan likedPlan = new LikedPlan();
-        if (!likedPlanRepository.existsByUserIdAndPlanId(userId, planId)) {
-            likedPlan.setUser(user);
+        if (!likedPlanRepository.existsByUserIdAndPlanId(currentUserId, planId)) {
+            likedPlan.setUser(currentUser);
             likedPlan.setPlan(plan);
         }
 
@@ -39,15 +41,19 @@ public class LikedPlanService {
     }
 
     @Transactional
-    public void unlikePlan(Integer userId, Integer planId) {
-        likedPlanRepository.deleteByUserIdAndPlanId(userId, planId);
+    public void unlikePlan(Integer planId) {
+        Integer currentUserId = jwtUserContext.getCurrentUserId();
+        if (!likedPlanRepository.existsByUserIdAndPlanId(currentUserId, planId)) {
+            return;
+        }
+        likedPlanRepository.deleteByUserIdAndPlanId(currentUserId, planId);
     }
 
     public List<Plan> getLikedPlans(Integer userId) {
-        return likedPlanRepository.findPlansByUserId(userId);
+        return likedPlanRepository.findPlanByUserId(userId);
     }
 
     public List<User> getLikers(Integer planId) {
-        return likedPlanRepository.findUsersByPlanId(planId);
+        return likedPlanRepository.findUserByPlanId(planId);
     }
 }

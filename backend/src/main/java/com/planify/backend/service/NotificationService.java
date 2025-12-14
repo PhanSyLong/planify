@@ -12,6 +12,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +27,9 @@ public class NotificationService {
     final UserRepository userRepository;
     @Value("${spring.mail.username}")
     String gmailAddress;
+    final JwtUserContext jwtUserContext;
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public Notification addNotification(NotificationRequest request) {
         Notification notification = new Notification();
         notification.setType(request.getType());
@@ -36,6 +40,7 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public Notification sendEmailNotification(NotificationRequest request, String subject) {
         Notification notification = new Notification();
         notification.setType(request.getType());
@@ -43,6 +48,9 @@ public class NotificationService {
         User recipient = userRepository.findById(request.getRecipientId())
                 .orElseThrow(() -> new EntityNotFoundException("Recipient not found"));
         notification.setRecipient(recipient);
+        if (recipient.getNotification_enabled().equals("false")){
+            return notificationRepository.save(notification);
+        }
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipient.getEmail());
@@ -55,6 +63,16 @@ public class NotificationService {
     }
 
     public List<Notification> getNotificationsByUserId(Integer userId) {
-        return notificationRepository.getNotificationsByRecipientId(userId);
+        boolean isUser = userId.equals(jwtUserContext.getCurrentUserId());
+        if (!isUser && !jwtUserContext.isCurrentUserAdmin()){
+            throw new AccessDeniedException("You are not allowed to access these notifications");
+        }
+
+        return notificationRepository.getNotificationByRecipientId(userId);
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public void deleteNotificationById(Integer notificationId) {
+        notificationRepository.deleteById(notificationId);
     }
 }

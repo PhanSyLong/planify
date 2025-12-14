@@ -21,39 +21,42 @@ public class FollowService {
      FollowRepository followRepository;
      UserRepository userRepository;
      NotificationService notificationService;
+     JwtUserContext jwtUserContext;
 
     @Transactional
-    public void follow(Integer followerId, Integer followeeId) {
-        if (followerId.equals(followeeId)) {
-            throw new IllegalArgumentException("Cannot follow yourself");
+    public void follow(Integer followeeId) {
+        Integer currentUserId = jwtUserContext.getCurrentUserId();
+        if (currentUserId.equals(followeeId)) {
+            throw new IllegalArgumentException("Cannot follow yourself!");
         }
-        if (followRepository.existsByFollowerIdAndFollowingId(followerId, followeeId)) {
+        if (followRepository.existsByFollowerIdAndFollowingId(currentUserId, followeeId)) {
             return;
         }
-        User follower = userRepository.findById(followerId)
-                .orElseThrow(() -> new EntityNotFoundException("Follower not found"));
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         User followee = userRepository.findById(followeeId)
-                .orElseThrow(() -> new EntityNotFoundException("Followee not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Followee not found!"));
 
         Follow follow = new Follow();
-        follow.setFollower(follower);
+        follow.setFollower(currentUser);
         follow.setFollowing(followee);
         followRepository.save(follow);
 
         NotificationRequest notifRequest = NotificationRequest.builder()
                 .recipientId(followee.getId())
-                .messageText(follower.getUsername() + " has followed you on Planify!")
+                .messageText(currentUser.getUsername() + " has followed you on Planify!")
                 .type("follower")
                 .build();
 
         notificationService.sendEmailNotification(
                 notifRequest,
-                follower.getUsername() + " followed you");
+                currentUser.getUsername() + " followed you");
     }
 
     @Transactional
-    public void unfollow(Integer followerId, Integer followingId) {
-        followRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
+    public void unfollow(Integer followeeId) {
+        Integer currentUserId = jwtUserContext.getCurrentUserId();
+        followRepository.deleteByFollowerIdAndFollowingId(currentUserId, followeeId);
     }
 
     @Transactional

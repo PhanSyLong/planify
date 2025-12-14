@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<@NonNull Notification, @NonNull Integer> {
-    List<Notification> getNotificationsByRecipientId(Integer userId);
+    List<Notification> getNotificationByRecipientId(Integer userId);
 }

@@ -16,9 +16,9 @@ public interface LikedPlanRepository extends JpaRepository<@NonNull LikedPlan, @
     boolean existsByUserIdAndPlanId(Integer userId, Integer planId);
     void deleteByUserIdAndPlanId(Integer userId, Integer planId);
 
-    @Query("select lp.plan from LikedPlan lp where lp.user.id = :userId")
-    List<Plan> findPlansByUserId(@Param("userId") Integer userId);
+    @Query("SELECT lp.plan FROM LikedPlan lp WHERE lp.user.id = :userId")
+    List<Plan> findPlanByUserId(@Param("userId") Integer userId);
 
-    @Query("select lp.user from LikedPlan lp where lp.plan.id = :planId")
-    List<User> findUsersByPlanId(@Param("planId") Integer planId);
+    @Query("SELECT lp.user FROM LikedPlan lp WHERE lp.plan.id = :planId")
+    List<User> findUserByPlanId(@Param("planId") Integer planId);
 }
