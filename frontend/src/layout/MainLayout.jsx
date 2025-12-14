@@ -15,6 +15,8 @@ function MainLayout() {
           marginLeft: "70px", // sidebar width collapsed
           marginTop: "70px",  // header height
           padding: "20px",
+
+
         }}
       >
         <Outlet />

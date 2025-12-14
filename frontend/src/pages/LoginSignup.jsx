@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ← Để redirect
 import Eye from "../assets/icons/Eye.svg";
 import EyeOff from "../assets/icons/Eye_off.svg";
 import { authApi } from "../api/auth";
 
 const LoginSignup = () => {
+  const navigate = useNavigate();
+
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [signupData, setSignupData] = useState({
@@ -52,13 +55,13 @@ const LoginSignup = () => {
     e.preventDefault();
     setErrorMsg("");
     setStatusMsg("");
+    setPasswordError("");
 
     if (signupData.password !== signupData.confirmPassword) {
       setPasswordError("Passwords do not match!");
       return;
     }
 
-    setPasswordError("");
     setLoading(true);
     try {
       await authApi.signup({
@@ -66,11 +69,14 @@ const LoginSignup = () => {
         email: signupData.email.trim(),
         password: signupData.password,
       });
-      setStatusMsg("Đăng ký thành công, hãy đăng nhập.");
-      setIsSignUp(false);
+      setStatusMsg("Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
+      setIsSignUp(false); // Chuyển về form login
       setSignupData({ username: "", email: "", password: "", confirmPassword: "" });
     } catch (err) {
-      setErrorMsg(err.message || "Đăng ký thất bại");
+      console.error("Signup error:", err);
+      setErrorMsg(
+        err.response?.data?.message || err.message || "Đăng ký thất bại. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -81,24 +87,42 @@ const LoginSignup = () => {
     setErrorMsg("");
     setStatusMsg("");
     setLoading(true);
+
     try {
       const { data } = await authApi.login({
         username: loginData.username.trim(),
         password: loginData.password,
       });
 
-      const token = data?.result?.token;
+      const token = data?.result?.token || data?.token;
       if (!token) {
-        throw new Error("Không nhận được token");
+        throw new Error("Không nhận được token từ server");
       }
+
       localStorage.setItem("accessToken", token);
 
-      const meRes = await authApi.me();
-      const username = meRes?.data?.result?.username || loginData.username;
-      setStatusMsg(`Đăng nhập thành công. Xin chào ${username}!`);
+      // Gọi API me để lấy thông tin user (username, etc.)
+      let username = loginData.username;
+      try {
+        const meRes = await authApi.me();
+        username = meRes?.data?.result?.username || meRes?.data?.username || username;
+      } catch (meErr) {
+        console.warn("Không thể lấy thông tin user (me):", meErr);
+        // Vẫn cho login nếu me thất bại (token vẫn hợp lệ)
+      }
+
+      setStatusMsg(`Đăng nhập thành công! Xin chào ${username}!`);
       setLoginData({ username: "", password: "" });
+
+      // ← CHUYỂN HƯỚNG VỀ TRANG CHỦ
+      setTimeout(() => {
+        navigate("/home");
+      }, 800); // Delay nhẹ để user thấy thông báo thành công
     } catch (err) {
-      setErrorMsg(err.message || "Đăng nhập thất bại");
+      console.error("Login error:", err);
+      setErrorMsg(
+        err.response?.data?.message || err.message || "Đăng nhập thất bại. Kiểm tra lại thông tin."
+      );
     } finally {
       setLoading(false);
     }
@@ -165,8 +189,7 @@ const LoginSignup = () => {
         }
 
         .form-container button {
-          margin-top: 10px;
-          margin-bottom: 10px;
+          margin-top: 20px;
           padding: 12px;
           background: #0b2c59;
           color: white;
@@ -252,29 +275,15 @@ const LoginSignup = () => {
           pointer-events: auto;
         }
 
-        /* Headings */
-        h1 {
-          align-self: center;
-          margin-bottom: 20px;
-          color: #000;
-        }
-
-        /* Paragraphs & links */
-        p {
-          color: #000;
+        /* Messages */
+        .message {
+          font-size: 0.95rem;
+          margin: 8px 0;
           text-align: center;
-          margin-top: 10px;
         }
 
-        p a {
-          color: #0b2c59;
-          text-decoration: none;
-          font-weight: bold;
-        }
-
-        p a:hover {
-          text-decoration: underline;
-        }
+        .error { color: red; }
+        .success { color: green; }
 
         /* Password wrapper & eye icon */
         .password-wrapper {
@@ -297,14 +306,23 @@ const LoginSignup = () => {
           width: 20px;
           height: 20px;
           cursor: pointer;
-          pointer-events: auto;
-          user-select: none;
           opacity: 0.7;
           transition: opacity 0.2s ease;
         }
 
         .eye-icon:hover {
           opacity: 1;
+        }
+
+        /* Links */
+        p a {
+          color: #0b2c59;
+          text-decoration: none;
+          font-weight: bold;
+        }
+
+        p a:hover {
+          text-decoration: underline;
         }
       `}</style>
 
@@ -314,8 +332,8 @@ const LoginSignup = () => {
           <form onSubmit={handleLoginSubmit}>
             <h1>Login</h1>
 
-            {statusMsg && <p style={{ color: "green", fontSize: "0.95rem", margin: "8px 0" }}>{statusMsg}</p>}
-            {errorMsg && <p style={{ color: "red", fontSize: "0.95rem", margin: "8px 0" }}>{errorMsg}</p>}
+            {statusMsg && <p className="message success">{statusMsg}</p>}
+            {errorMsg && <p className="message error">{errorMsg}</p>}
 
             <input
               type="text"
@@ -324,6 +342,7 @@ const LoginSignup = () => {
               value={loginData.username}
               onChange={handleLoginChange}
               required
+              disabled={loading}
             />
 
             <div className="password-wrapper">
@@ -334,6 +353,7 @@ const LoginSignup = () => {
                 value={loginData.password}
                 onChange={handleLoginChange}
                 required
+                disabled={loading}
               />
               <img
                 src={showLoginPassword ? EyeOff : Eye}
@@ -344,13 +364,13 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Processing..." : "Login"}
+              {loading ? "Đang xử lý..." : "Login"}
             </button>
 
             <p>
-              Don't have an account?{" "}
+              Chưa có tài khoản?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(true); }}>
-                Sign Up
+                Đăng ký ngay
               </a>
             </p>
           </form>
@@ -361,13 +381,9 @@ const LoginSignup = () => {
           <form onSubmit={handleSignupSubmit}>
             <h1>Sign Up</h1>
 
-            {passwordError && (
-              <p style={{ color: "red", fontSize: "0.9rem", margin: "8px 0" }}>
-                {passwordError}
-              </p>
-            )}
-            {errorMsg && <p style={{ color: "red", fontSize: "0.95rem", margin: "8px 0" }}>{errorMsg}</p>}
-            {statusMsg && <p style={{ color: "green", fontSize: "0.95rem", margin: "8px 0" }}>{statusMsg}</p>}
+            {passwordError && <p className="message error">{passwordError}</p>}
+            {errorMsg && <p className="message error">{errorMsg}</p>}
+            {statusMsg && <p className="message success">{statusMsg}</p>}
 
             <input
               type="text"
@@ -376,6 +392,7 @@ const LoginSignup = () => {
               value={signupData.username}
               onChange={handleSignupChange}
               required
+              disabled={loading}
             />
 
             <input
@@ -385,6 +402,7 @@ const LoginSignup = () => {
               value={signupData.email}
               onChange={handleSignupChange}
               required
+              disabled={loading}
             />
 
             <div className="password-wrapper">
@@ -395,6 +413,7 @@ const LoginSignup = () => {
                 value={signupData.password}
                 onChange={handleSignupChange}
                 required
+                disabled={loading}
               />
               <img
                 src={showSignupPassword ? EyeOff : Eye}
@@ -412,6 +431,7 @@ const LoginSignup = () => {
                 value={signupData.confirmPassword}
                 onChange={handleSignupChange}
                 required
+                disabled={loading}
               />
               <img
                 src={showConfirmPassword ? EyeOff : Eye}
@@ -422,13 +442,13 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Processing..." : "Sign Up"}
+              {loading ? "Đang xử lý..." : "Sign Up"}
             </button>
 
             <p>
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(false); }}>
-                Login
+                Đăng nhập
               </a>
             </p>
           </form>
