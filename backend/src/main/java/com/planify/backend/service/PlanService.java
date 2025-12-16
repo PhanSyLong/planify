@@ -1,7 +1,11 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.PlanRequest;
+import com.planify.backend.dto.request.PlanUpdateRequest;
 import com.planify.backend.dto.response.TimingResponse;
+import com.planify.backend.exception.AppException;
+import com.planify.backend.exception.ErrorCode;
+import com.planify.backend.mapper.PlanMapper;
 import com.planify.backend.model.Plan;
 import com.planify.backend.model.TimeStatus;
 import com.planify.backend.repository.PlanRepository;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @Service
@@ -23,6 +28,7 @@ public class PlanService {
     UserRepository userRepository;
     StageRepository stageRepository;
     SubtaskRepository subtaskRepository;
+    private final PlanMapper planMapper;
 
     public Plan addPlan(PlanRequest request) {
         Plan plan = new Plan();
@@ -35,6 +41,19 @@ public class PlanService {
 
         plan.setOwner(userRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Owner not found")));
+        return planRepository.save(plan);
+    }
+
+    public Plan updatePlan(Integer planId, PlanUpdateRequest request) {
+        Plan plan = planRepository.findById(planId).orElseThrow(() -> new AppException(ErrorCode.PLAN_NOT_FOUND));
+        planMapper.updatePlan(plan, request);
+
+        plan.setTitle(request.getTitle());
+        plan.setDescription(request.getDescription());
+        plan.setVisibility(request.getVisibility());
+        plan.setStatus(request.getStatus());
+        plan.setPicture(request.getPicture());
+
         return planRepository.save(plan);
     }
 

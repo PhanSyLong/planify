@@ -1,6 +1,7 @@
 package com.planify.backend.controller;
 
 import com.planify.backend.dto.request.PlanRequest;
+import com.planify.backend.dto.request.PlanUpdateRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.PlanResponse;
 import com.planify.backend.dto.response.TimingResponse;
@@ -54,6 +55,8 @@ public class PlanController {
                         .build());
 
     }
+
+
 
     @GetMapping("/{planId}")
     ResponseEntity<ApiResponse<PlanResponse>> getPlanById(@PathVariable("planId") Integer planId) {

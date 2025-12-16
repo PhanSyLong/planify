@@ -10,9 +10,10 @@ public enum ErrorCode{
     USER_NOT_EXISTED(1006, "User not existed"),
     UNAUTHENTICATED(1007, "Unauthenticated"),
     ROLE_NOT_FOUND(1008, "Role not found"),
-    STAGE_NOT_FOUND(1009, "Stage not found"),
-    TASK_NOT_FOUND(1010, "Task not found"),
-    SUBTASK_NOT_FOUND(1011, "Subtask not found");
+    PLAN_NOT_FOUND(1009, "Plan not found"),
+    STAGE_NOT_FOUND(1010, "Stage not found"),
+    TASK_NOT_FOUND(1011, "Task not found"),
+    SUBTASK_NOT_FOUND(1012, "Subtask not found");
 
     private int code;
     private String message;
