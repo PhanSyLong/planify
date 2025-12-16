@@ -4,7 +4,6 @@
 -- ------------------------------------------------------
 -- Server version	8.0.34
 
-DROP DATABASE IF EXISTS planify;
 CREATE DATABASE planify;
 USE planify;
 
@@ -242,16 +241,7 @@ CREATE TABLE `user` (
   `avatar` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
   `notificationenabled` enum('true','false') COLLATE utf8mb4_bin DEFAULT NULL,
   `bio` longtext COLLATE utf8mb4_bin,
-  `created_by` int DEFAULT NULL,
-  `updated_by` int DEFAULT NULL,
-  `created_date` datetime DEFAULT NULL,
-  `updated_date` datetime DEFAULT NULL,
-  `status` tinyint DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_user_create_user_idx` (`created_by`),
-  KEY `fk_user_update_user_idx` (`updated_by`),
-  CONSTRAINT `fk_user_create_user` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
-  CONSTRAINT `fk_user_update_user` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 
@@ -274,6 +264,11 @@ CREATE TABLE `user_role` (
 
 LOCK TABLES `user_role` WRITE;
 UNLOCK TABLES;
+
+CREATE TABLE invalidated_token (
+    id VARCHAR(255) PRIMARY KEY,
+    expiry_time DATETIME NOT NULL
+);
 
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

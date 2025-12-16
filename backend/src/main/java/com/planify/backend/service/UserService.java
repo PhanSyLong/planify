@@ -42,6 +42,10 @@ public class UserService {
     UserRoleRepository userRoleRepository;
 
     public UserResponse createUser(UserCreationRequest request){
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+
         User user = userMapper.toUser(request);
 
         //Hash Password
