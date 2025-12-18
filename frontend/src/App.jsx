@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import LoginSignup from "./pages/LoginSignup.jsx";
+
+// Main layout và các page chính
+import MainLayout from './layout/MainLayout.jsx';
+import Home from './pages/Home.jsx';
+import MyPlanPage from "./pages/MyPlanPage.jsx";
+import SavedPage from "./pages/SavedPage";
+import ExplorePage from "./pages/ExplorePage.jsx";
+import CreatePlan from "./pages/CreatePlan.jsx";
+
+// Detail plan
+import PlanDetailPage from "./layout/PlanDetailPage.jsx";
+
+// (nếu còn dùng)
+import PlanPage from "./pages/PlanPage";
+
+import { PlansProvider } from "./context/planContext.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <PlansProvider>
+        <Routes>
+          {/* Trang Login/Signup - không dùng MainLayout */}
+          <Route path="/" element={<LoginSignup />} />
+
+          {/* Các trang chính có MainLayout */}
+          <Route element={<MainLayout />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/plan" element={<MyPlanPage />} />
+            <Route path="/saved" element={<SavedPage />} />
+            <Route path="/commu" element={<ExplorePage />} />
+            <Route path="/add" element={<CreatePlan />} />
+
+            {/* Detail plan */}
+            <Route path="/plans/:id" element={<PlanDetailPage />} />
+
+            {/* Các route khác nếu cần */}
+          </Route>
+
+          {/* Optional: Redirect từ root về /login nếu muốn login là trang đầu tiên */}
+          {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
+        </Routes>
+      </PlansProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

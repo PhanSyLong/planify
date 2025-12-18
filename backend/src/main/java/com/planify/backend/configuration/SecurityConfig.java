@@ -1,5 +1,6 @@
 package com.planify.backend.configuration;
 
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,4 +70,10 @@ public class SecurityConfig {
 
         return urlBasedCorsConfigurationSource;
     }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers("/uploads/**");
+    }
+
 }

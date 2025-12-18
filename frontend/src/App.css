@@ -1,42 +1,157 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+
+/* Reset-ish */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Root layout */
+.app-root {
+  display: flex;
+  height: 100vh;
+  background: #fafafa;
+  color: #1a1a1a;
+  font-family: Inter, Arial, sans-serif;
+  overflow: hidden;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* Sidebar */
+.sidebar {
+  width: 64px;
+  background: #ffffff;
+  border-right: 1px solid #e6e6e6;
+  padding: 12px 8px;
+  transition: width 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.sidebar.open { width: 220px; }
+.sidebar .toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.sidebar .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 6px;}
+.sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.sidebar .nav-item:hover { background: #f2f7fb; }
+.sidebar .icon { font-size: 18px; width: 24px; text-align: center; }
+.sidebar .label { font-size: 15px; color: #133b6b; }
+
+/* Main column */
+.main-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* allow child to shrink (for overflow) */
+  overflow: hidden;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Header */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0f4b78;
+  color: #fff;
+  padding: 14px 20px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+.site-header .brand { font-weight: 700; font-size: 20px; }
+.header-icons { display: flex; gap: 10px; }
+.icon-btn { background: transparent; border: none; color: white; cursor: pointer; font-size: 16px; }
+
+/* Profile header area */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: #fff;
+  border-bottom: 1px solid #e6e6e6;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Profile Info */
+.profile-info { display: flex; gap: 16px; align-items: center; min-width: 0; }
+.avatar {
+  width: 88px;
+  height: 88px;
+  background: #e0e6ea;
+  border-radius: 12px;
+  flex: 0 0 88px;
+}
+.profile-meta h2 { font-size: 20px; margin-bottom: 6px; }
+.counts { color: #6b7280; font-size: 13px; }
+
+/* Follow button */
+.follow-wrap { display: flex; align-items: center; }
+.follow-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #1f6fb8;
+  background: #e6f0fb;
+  color: #0f4b78;
+  cursor: pointer;
+  font-weight: 600;
+}
+.follow-btn.followed {
+  background: #f0f2f4;
+  color: #333;
+  border-color: #c9c9c9;
 }
 
-.card {
-  padding: 2em;
+/* Tabs */
+.tabs { display: flex; gap: 18px; padding: 12px 22px; background: #fff; border-bottom: 1px solid #eee; }
+.tab-btn {
+  background: none;
+  border: none;
+  padding-bottom: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #7a8797;
+}
+.tab-btn.active { color: #0f4b78; border-bottom: 3px solid #0f4b78; }
+
+/* Page content area */
+.page-content {
+  display: flex;
+  gap: 20px;
+  padding: 22px;
+  overflow-y: auto; /* scrollable content area */
+  height: calc(100vh - 170px); /* header + tabs + margins ~170px */
+}
+.about-card {
+  flex: 0 0 260px;
+  background: #f3f6f8;
+  border-radius: 12px;
+  padding: 18px;
+  height: fit-content;
+}
+.tab-content {
+  flex: 1;
+  min-width: 0;
+}
+.content-box {
+  background: #eef3f7;
+  padding: 18px;
+  border-radius: 12px;
+  min-height: 220px;
 }
 
-.read-the-docs {
-  color: #888;
+/* Responsive behavior */
+@media (max-width: 900px) {
+  .sidebar.open { width: 180px; }
+  .app-root { flex-direction: column; }
+  .sidebar { width: 100%; display: flex; flex-direction: row; gap: 10px; overflow-x: auto; border-right: none; border-bottom: 1px solid #e6e6e6; }
+  .main-column { width: 100%; }
+  .profile-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-content { flex-direction: column; height: auto; }
+  .about-card { width: 100%; }
 }

@@ -12,7 +12,9 @@ public class PlanResponse {
     Integer id;
     String title;
     Integer ownerId;
+    String description;
     String visibility;
     String status;
     int duration;
+    String picture;
 }

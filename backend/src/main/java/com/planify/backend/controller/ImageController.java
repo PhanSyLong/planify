@@ -35,7 +35,8 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<String>builder()
                             .code(HttpStatus.CREATED.value())
-                            .result("Image uploaded successfully: " + filePath)
+                            .message("Image uploaded successfully: ")
+                            .result(filePath)
                             .build());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

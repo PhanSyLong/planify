@@ -34,7 +34,7 @@ public class PlanService {
         plan.setVisibility(request.getVisibility());
         plan.setStatus(request.getStatus());
         plan.setDuration(request.getDuration());
-        plan.setPicture(request.getPicture());
+        plan.setPicture(request.getPicture().replace(" ", "_"));
         plan.setReminderAt(request.getReminderAt());
 
         plan.setOwner(userRepository.findById(jwtUserContext.getCurrentUserId())

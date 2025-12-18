@@ -4,6 +4,7 @@
 -- ------------------------------------------------------
 -- Server version	8.0.34
 
+DROP DATABASE IF EXISTS planify;
 CREATE DATABASE planify;
 USE planify;
 
