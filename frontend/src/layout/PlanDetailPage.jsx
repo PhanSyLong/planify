@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { getAllPlans } from '../api/plan.js';
-import { usePlans } from '../context/planContext.jsx';
+import { usePlans } from '../context/PlanContext.jsx';
 // import allPlans from "../data/allPlans"; // ← Quan trọng: dùng chung data
 
 const PlanDetailPage = () => {

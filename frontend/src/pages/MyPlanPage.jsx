@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Carousel from "../components/common/Carousel.jsx";
 import PlanList from "../components/common/PlanList.jsx";
 import { jwtDecode } from 'jwt-decode';
-import { usePlans } from '../context/planContext.jsx';
+import { usePlans } from '../context/PlanContext.jsx';
 
 const MyPlanPage = () => {
   const [fullView, setFullView] = useState(null);

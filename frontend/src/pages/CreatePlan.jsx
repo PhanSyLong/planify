@@ -4,12 +4,14 @@ import { useState } from "react";
 import { createPlan } from "../api/plan";
 import { uploadImage } from "../api/image";
 import { useNavigate } from "react-router-dom";
+import { usePlans } from "../context/PlanContext.jsx";
 
 const CreatePlan = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [pictureFile, setPicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const { addPlan } = usePlans();
 
   const navigate = useNavigate();
 
@@ -42,6 +44,10 @@ const CreatePlan = () => {
       });
 
       console.log("Plan created:", response.data);
+      
+      // Add the new plan to context
+      addPlan(response.data.result);
+
       navigate("/plan");
     
     } catch (error) {

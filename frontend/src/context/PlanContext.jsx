@@ -13,8 +13,12 @@ export function PlansProvider({ children }) {
       .catch(err => console.error("Error fetching plans:", err));
   }, []);
 
+  const addPlan = (newPlan) => {
+    setPlans(prevPlans => [...prevPlans, newPlan]);
+  };
+
   return (
-    <PlansContext.Provider value={{ plans }}>
+    <PlansContext.Provider value={{ plans, addPlan }}>
       {children}
     </PlansContext.Provider>
   );

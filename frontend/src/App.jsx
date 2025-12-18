@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
 import LoginSignup from "./pages/LoginSignup.jsx";
 
@@ -16,18 +16,24 @@ import PlanDetailPage from "./layout/PlanDetailPage.jsx";
 // (nếu còn dùng)
 import PlanPage from "./pages/PlanPage";
 
-import { PlansProvider } from "./context/planContext.jsx";
+import { PlansProvider } from "./context/PlanContext.jsx";
 
 function App() {
   return (
     <BrowserRouter>
-      <PlansProvider>
-        <Routes>
-          {/* Trang Login/Signup - không dùng MainLayout */}
-          <Route path="/" element={<LoginSignup />} />
+      <Routes>
+        {/* Trang Login/Signup - không dùng MainLayout */}
+        <Route path="/" element={<LoginSignup />} />
 
-          {/* Các trang chính có MainLayout */}
-          <Route element={<MainLayout />}>
+        {/* Các trang chính có MainLayout */}
+        <Route element={<MainLayout />}>
+          <Route 
+            element={
+              <PlansProvider> 
+                <Outlet/> 
+              </PlansProvider>
+            }
+          >
             <Route path="/home" element={<Home />} />
             <Route path="/plan" element={<MyPlanPage />} />
             <Route path="/saved" element={<SavedPage />} />
@@ -36,14 +42,12 @@ function App() {
 
             {/* Detail plan */}
             <Route path="/plans/:id" element={<PlanDetailPage />} />
-
             {/* Các route khác nếu cần */}
           </Route>
-
+        </Route>
           {/* Optional: Redirect từ root về /login nếu muốn login là trang đầu tiên */}
           {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
-        </Routes>
-      </PlansProvider>
+      </Routes>
     </BrowserRouter>
   );
 }
