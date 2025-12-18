@@ -95,6 +95,7 @@ public class AuthenticationService {
                 ))
                 .jwtID(UUID.randomUUID().toString()) //Tự gen ra 1 ID duy nhất cho 1 token
                 .claim("scope", buildScope(user))
+                .claim("userId", user.getId())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -141,7 +142,7 @@ public class AuthenticationService {
     }
 
     //Hàm logout
-    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+    public void logout(LogoutRequest request) throws ParseException , JOSEException {
         try {
             var signToken = verifyToken(request.getToken(), true);
 

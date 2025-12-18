@@ -27,6 +27,7 @@ public class PlanService {
     UserRepository userRepository;
     StageRepository stageRepository;
     SubtaskRepository subtaskRepository;
+    JwtUserContext jwtUserContext;
 
     public Plan addPlan(PlanRequest request) {
         Plan plan = new Plan();
@@ -36,7 +37,7 @@ public class PlanService {
         plan.setStatus(request.getStatus());
         plan.setPicture(request.getPicture());
 
-        plan.setOwner(userRepository.findById(request.getOwnerId())
+        plan.setOwner(userRepository.findById(jwtUserContext.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Owner not found")));
         return planRepository.save(plan);
     }

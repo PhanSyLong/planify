@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PlanRequest {
     String title;
-    Integer ownerId;
     String description;
     String visibility;
     String status;
