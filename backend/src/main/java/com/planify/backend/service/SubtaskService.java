@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.SubtaskRequest;
+import com.planify.backend.dto.request.SubtaskUpdateRequest;
 import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
@@ -172,7 +173,7 @@ public class SubtaskService {
 
     // New: partial update for Subtask. If duration is updated, propagate changes up to Task, Stage, and Plan.
     @Transactional
-    public Subtask updateSubtaskPartial(Integer subtaskId, com.planify.backend.dto.request.SubtaskUpdateRequest request) {
+    public Subtask updateSubtaskPartial(Integer subtaskId, SubtaskUpdateRequest request) {
         // Find the subtask
         Subtask subtask = subtaskRepository.findById(subtaskId).orElse(null);
         if (subtask == null) {

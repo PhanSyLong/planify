@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.PlanRequest;
+import com.planify.backend.dto.request.PlanUpdateRequest;
 import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
@@ -33,7 +34,6 @@ public class PlanService {
         plan.setDescription(request.getDescription());
         plan.setVisibility(request.getVisibility());
         plan.setStatus(request.getStatus());
-//        plan.setDuration(request.getDuration());
         plan.setPicture(request.getPicture());
 
         plan.setOwner(userRepository.findById(request.getOwnerId())
@@ -87,7 +87,7 @@ public class PlanService {
     }
 
     // New: partial update for Plan
-    public Plan updatePlanPartial(Integer planId, com.planify.backend.dto.request.PlanUpdateRequest request) {
+    public Plan updatePlanPartial(Integer planId, PlanUpdateRequest request) {
         Plan plan = planRepository.findPlanById(planId);
         if (plan == null) {
             throw new AppException(ErrorCode.PLAN_NOT_FOUND);

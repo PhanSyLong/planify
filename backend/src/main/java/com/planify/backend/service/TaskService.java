@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.TaskRequest;
+import com.planify.backend.dto.request.TaskUpdateRequest;
 import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
@@ -111,7 +112,7 @@ public class TaskService {
     }
 
     // New: partial update for Task
-    public Task updateTaskPartial(Integer taskId, com.planify.backend.dto.request.TaskUpdateRequest request) {
+    public Task updateTaskPartial(Integer taskId, TaskUpdateRequest request) {
         Task task = taskRepository.findTaskById(taskId);
         if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);

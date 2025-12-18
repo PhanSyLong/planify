@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.StageRequest;
+import com.planify.backend.model.TimeStatus;
 import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
@@ -63,7 +64,7 @@ public class StageService {
         Integer expected = stage.getDuration();
         Integer actual = subtaskRepository.sumCompletedDurationByStageId(stageId);
 
-        com.planify.backend.model.TimeStatus status;
+        TimeStatus status;
         if (actual < expected) status = com.planify.backend.model.TimeStatus.EARLY;
         else if (actual > expected) status = com.planify.backend.model.TimeStatus.LATE;
         else status = com.planify.backend.model.TimeStatus.ON_TIME;

@@ -6,13 +6,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "subtask")
