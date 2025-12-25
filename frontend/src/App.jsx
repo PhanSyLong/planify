@@ -6,6 +6,8 @@ import Saved from "./pages/SavedPlan.jsx";
 import Commu from "./pages/ExplorePage.jsx";
 import Add from "./pages/CreatePlan.jsx";
 import MyProfile from "./pages/MyProfile.jsx";
+import LoginSignup from "./pages/LoginSignup.jsx"
+
 
 function App() {
   return (
@@ -18,8 +20,12 @@ function App() {
           <Route path="/commu" element={<Commu />} />
           <Route path="/add" element={<Add />} />
           <Route path="/myprofile" element={<MyProfile />} />
+
+
+
           {/* Add more pages here */}
         </Route>
+        <Route path="/logout" element={<LoginSignup/> } />
       </Routes>
     </BrowserRouter>
   );

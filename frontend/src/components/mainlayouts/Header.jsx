@@ -8,11 +8,12 @@ import {
   faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Logo SVG
 import Logo from "../../assets/images/Logo.svg";
+import UserPopUp from "./UserPopUp";
 
 export default function Header() {
   const [searchValue, setSearchValue] = useState("");
+  const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
 
   return (
     <header
@@ -32,33 +33,14 @@ export default function Header() {
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
       }}
     >
-      {/* LEFT: LOGO */}
-      <NavLink
-        to="/"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          textDecoration: "none",
-        }}
-      >
+      {/* LEFT */}
+      <NavLink to="/" style={{ display: "flex", alignItems: "center" }}>
         <img src={Logo} alt="Planify Logo" style={{ height: 40 }} />
       </NavLink>
 
-      {/* MIDDLE: SEARCH */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            maxWidth: "420px",
-          }}
-        >
+      {/* MIDDLE */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ position: "relative", width: "100%", maxWidth: "420px" }}>
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
             style={{
@@ -69,7 +51,6 @@ export default function Header() {
               color: "#64748b",
             }}
           />
-
           <input
             type="text"
             placeholder="Search..."
@@ -88,7 +69,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* RIGHT: ICONS */}
+      {/* RIGHT */}
       <div
         style={{
           display: "flex",
@@ -97,31 +78,27 @@ export default function Header() {
           fontSize: "20px",
         }}
       >
-        <FontAwesomeIcon
-          icon={faGlobe}
-          title="Language"
-          style={{ color: "white", cursor: "pointer" }}
-        />
+        <FontAwesomeIcon icon={faGlobe} style={{ color: "white" }} />
+        <FontAwesomeIcon icon={faBell} style={{ color: "white" }} />
 
-        <FontAwesomeIcon
-          icon={faBell}
-          title="Notifications"
-          style={{ color: "white", cursor: "pointer" }}
-        />
-
-        <NavLink
-          to="/myprofile"
+        <div
           style={{
             color: "white",
-            textDecoration: "none",
             display: "flex",
             alignItems: "center",
             cursor: "pointer",
           }}
+          onClick={() => setIsUserPopupOpen((prev) => !prev)}
         >
-          <FontAwesomeIcon icon={faUser} title="My Profile" />
-        </NavLink>
+          <FontAwesomeIcon icon={faUser} />
+        </div>
       </div>
+
+      <UserPopUp
+        isOpen={isUserPopupOpen}
+        onClose={() => setIsUserPopupOpen(false)}
+        userName="Ngọc"
+      />
     </header>
   );
 }

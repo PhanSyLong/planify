@@ -57,6 +57,7 @@ export default function Sidebar() {
         top: "70px",
         left: 0,
         display: "flex",
+        zIndex: 1000,
         flexDirection: "column",
         justifyContent: "space-between",
         padding: "10px 0",
