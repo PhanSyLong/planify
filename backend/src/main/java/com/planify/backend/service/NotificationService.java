@@ -41,7 +41,6 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public Notification sendEmailNotification(NotificationRequest request, Plan plan, String subject) {
         Notification notification = new Notification();
         notification.setType(request.getType());
