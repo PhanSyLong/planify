@@ -1,0 +1,153 @@
+.preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.preview-modal {
+    background: #fff;
+    border-radius: 20px;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    padding: 32px;
+    position: relative;
+}
+
+.preview-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.preview-close:hover {
+    background: #f0f0f0;
+}
+
+.preview-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #002765;
+    margin-bottom: 24px;
+}
+
+.preview-plan-title {
+    margin-bottom: 24px;
+}
+
+.preview-plan-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.preview-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.preview-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.preview-categories {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.preview-categories strong {
+    font-size: 14px;
+    color: #666;
+}
+
+.preview-category-tag {
+    padding: 4px 12px;
+    background: #4e085f;
+    color: #fff;
+    border-radius: 16px;
+    font-size: 12px;
+}
+
+.preview-stage {
+    margin-bottom: 24px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.preview-stage-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #002765;
+    margin-bottom: 8px;
+}
+
+.preview-stage-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.preview-task {
+    margin-left: 20px;
+    margin-bottom: 16px;
+    padding-left: 16px;
+    border-left: 3px solid #4e085f;
+}
+
+.preview-task-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.preview-task-description {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.preview-task-duration {
+    font-size: 13px;
+    color: #888;
+}
+
+.preview-subtasks {
+    margin-top: 8px;
+    margin-left: 20px;
+    font-size: 13px;
+    color: #555;
+}
+
+.preview-subtasks li {
+    margin-bottom: 4px;
+}

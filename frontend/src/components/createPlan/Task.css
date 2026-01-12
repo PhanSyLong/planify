@@ -1,0 +1,89 @@
+.task-wrapper {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    margin-left: 0;
+    margin-right: auto;
+    max-width: 85%;
+}
+
+.task-header h2 {
+    font-size: 20px;
+    margin: 0;
+    color: #002765;
+}
+
+.delete-task-btn {
+    padding: 6px 14px;
+    background-color: #153677;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.delete-task-btn:hover {
+    opacity: 0.9;
+}
+
+/* Card container */
+.task-card {
+    background: #e8e9eb;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+    margin-left: 0;
+    margin-right: auto;
+    max-width: 85%;
+}
+
+/* Each field */
+.task-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.task-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #002765;
+    margin-bottom: 6px;
+}
+
+.task-field input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    background: #f5f6f7;
+}
+
+.task-field input:focus {
+    border-color: #4e085f;
+}
+
+/* Duration */
+.duration-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.duration-input input {
+    width: 100px;
+}
+
+.duration-unit {
+    font-size: 14px;
+    color: #555;
+}

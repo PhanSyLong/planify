@@ -1,0 +1,182 @@
+/* ExploreHeader.css */
+
+.explore-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ========== SEARCH BAR ========== */
+.search-bar {
+  position: relative;
+  flex: 1;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 50px 10px 15px;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  outline: none;
+  background: white;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.search-bar input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.search-bar input::placeholder {
+  color: #94a3b8;
+}
+
+.search-icon-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.search-icon-btn:hover {
+  background: #f1f5f9;
+}
+
+.search-icon-btn:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.search-icon-img {
+  width: 32px;
+  height: 32px;
+  color: #94a3b8;
+}
+
+/* ========== TABS ========== */
+.main-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 24px;
+  border: none;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: #c7d2fe;
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: #002765;
+  color: white;
+  box-shadow: 0 3px 9px rgba(79, 70, 229, 0.3);
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid #002765;
+  outline-offset: 2px;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .explore-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-bar {
+    max-width: 100%;
+  }
+
+  .search-bar input {
+    padding: 9px 45px 9px 12px;
+    font-size: 13px;
+  }
+
+  .search-icon-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .main-tabs {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tab-btn {
+    padding: 7px 18px;
+    font-size: 12px;
+    flex: 1;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-bar input {
+    padding: 8px 40px 8px 10px;
+    font-size: 12px;
+  }
+
+  .search-icon-img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-btn {
+    padding: 6px 16px;
+    font-size: 11px;
+  }
+}
+
+/* ========== ACCESSIBILITY ========== */
+.search-bar input:focus,
+.tab-btn:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* ========== DARK MODE SUPPORT (OPTIONAL) ========== */
+@media (prefers-color-scheme: dark) {
+  .search-bar input {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+
+  .search-bar input::placeholder {
+    color: #64748b;
+  }
+
+  .search-icon-btn:hover {
+    background: #334155;
+  }
+}

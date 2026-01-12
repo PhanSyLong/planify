@@ -1,35 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+//sidebar
+import Home from "./pages/Home.jsx";
+import MainLayout from "./layouts/MainLayout.jsx";
+import MyPlan from "./pages/MyPlan.jsx";
+import Saved from "./pages/SavedPlan.jsx";
+import Commu from "./pages/ExplorePage.jsx";
+import Add from "./pages/CreatePlan.jsx";
+import About from "./pages/About.jsx";
+
+//header
+import MyProfile from "./pages/MyProfile.jsx";
+
+//other
+import LoginSignup from "./pages/LoginSignup.jsx"
+import Admin from "./pages/Admin.jsx";
+import Notifications from "./components/header/Notification.jsx";
+
+//view
+import ViewPlan from "./components/myPlan/ViewPlan.jsx"
+import ViewMyPlan from "./components/myPlan/ViewMyPlan.jsx"
+import UserView from "./components/users/UserView";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/LoginSignup" element={<LoginSignup />} />
+
+        <Route element={<MainLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
+
+          {/* Nested routes for plans with context */}
+          <Route path="/myplan">
+            <Route index element={<MyPlan />} />
+            <Route path="plans/:id" element={<ViewMyPlan/>} />
+          </Route>
+
+          <Route path="/saved">
+            <Route index element={<Saved />} />
+            <Route path="plans/:id" element={<ViewPlan />} />
+          </Route>
+
+          <Route path="/commu">
+            <Route index element={<Commu />} />
+            <Route path="plans/:id" element={<ViewPlan />} />
+          </Route>
+
+          <Route path="/add" element={<Add />} />
+          <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/about" element={<About/>} />
+
+          {/* Fallback: direct access still works */}
+          <Route path="/plans/:id" element={<ViewPlan />} />
+
+          <Route path="/users/:userId" element={<UserView />} />
+
+          {/*Notification */}
+          <Route path="/notifications" element={<Notifications />} />
+        </Route>
+
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
