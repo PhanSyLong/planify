@@ -1,9 +1,13 @@
-package com.planify.backend.Scheduler;
+package com.planify.backend.service;
 
+import com.planify.backend.constant.NotificationTypeConst;
+import com.planify.backend.dto.request.NotificationRequest;
 import com.planify.backend.model.Plan;
+import com.planify.backend.model.User;
 import com.planify.backend.repository.PlanRepository;
-import com.planify.backend.service.NotificationProducer;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,16 +20,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DealineService{
+@FieldDefaults(level = AccessLevel.PRIVATE)
 
-    private final PlanRepository planRepository;
-    private final NotificationProducer notificationProducer;
+public class DealineReminderService {
+
+    final PlanRepository planRepository;
+    final NotificationService notificationService;
 
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void scan() {
 
-        // Tạo Authentication giả lập với quyền ADMIN
+        // Create Authentication with role ADMIN
         var auth = new UsernamePasswordAuthenticationToken(
                 "system",
                 null,
@@ -36,17 +42,62 @@ public class DealineService{
         try {
             LocalDateTime now = LocalDateTime.now();
 
-            // reminder
+            // ============================Find reminder Plan==================================
             List<Plan> reminders = planRepository.findRemindersPlanWithDetails(now);
             for (Plan plan : reminders) {
-                notificationProducer.sendReminder(plan);
+                User recipient = plan.getOwner();
+
+                // Create REQUEST DTO
+                NotificationRequest notificationRequest = NotificationRequest.builder()
+                        .recipientId(recipient.getId())
+                        .type(NotificationTypeConst.PLAN_REMINDER)
+                        .messageText(
+                                "The deadline for plan \"" + plan.getTitle() + "\" is coming up"
+                        )
+                        .planId(plan.getId())
+                        .time(plan.getExpiredAt())
+                        .build();
+
+                // Send Mail
+                notificationService.sendEmailNotification(
+                        notificationRequest,
+                        plan,
+                        "PLAN DEADLINE REMINDER"
+                );
+                notificationService.sendWebNotification(
+                        notificationRequest,
+                        "PLAN DEADLINE REMINDER"
+                );
+
                 plan.setReminderSent(true);
             }
 
-            // expired
+            // ==============================Find expired Plan===============================================
             List<Plan> duePlans = planRepository.findDuePlansWithDetails(now);
             for (Plan plan : duePlans) {
-                notificationProducer.sendDue(plan);       // @PreAuthorize trong method này sẽ pass
+                Plan managedPlan = planRepository.findById(plan.getId())
+                        .orElseThrow(() -> new RuntimeException("Plan not found"));
+                User recipient = managedPlan.getOwner();
+                // Create REQUEST DTO
+                NotificationRequest notificationRequest = NotificationRequest.builder()
+                        .recipientId(recipient.getId()) // USER ID
+                        .type(NotificationTypeConst.PLAN_EXPIRED)
+                        .messageText(
+                                "The deadline for plan \"" + plan.getDescription() + "\" is expired"
+                        )
+                        .planId(plan.getId())
+                        .time(plan.getExpiredAt())
+                        .build();
+                // Send Mail
+                notificationService.sendEmailNotification(
+                        notificationRequest,
+                        plan,
+                        "PLAN IS EXPIRED" //
+                );
+                notificationService.sendWebNotification(
+                        notificationRequest,
+                        "PLAN IS EXPIRED" //
+                );
                 plan.setExpiredSent(true);
             }
 
@@ -54,7 +105,7 @@ public class DealineService{
             planRepository.saveAll(duePlans);
 
         } finally {
-            SecurityContextHolder.clearContext();  // Xóa Authentication sau khi task xong
+            SecurityContextHolder.clearContext();  // Delete Authentication when task done
         }
     }
 }

@@ -29,7 +29,7 @@ public class Notification {
     @JoinColumn(name="user_id", nullable = false)
     User recipient;
 
-    @Column(nullable = false, columnDefinition = "ENUM('task_deadline', 'task_fork', 'follower', 'daily_reminder')")
+    @Column(nullable = false, columnDefinition = "ENUM('task_deadline', 'task_fork', 'follower', 'task_reminder', 'daily_performance')")
     String type;
 
     @Column(name="message_text")

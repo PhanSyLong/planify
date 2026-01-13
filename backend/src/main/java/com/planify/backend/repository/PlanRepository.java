@@ -33,7 +33,7 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
             "AND p.reminderSent = FALSE")
     List<Plan> findRemindersPlanWithDetails(@Param("now") LocalDateTime now);
 
-    /** Due Plan Function
+    /** Expired Plan Function
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Plan p " +
