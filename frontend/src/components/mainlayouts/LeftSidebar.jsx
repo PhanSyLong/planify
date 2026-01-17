@@ -15,7 +15,7 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
 
   const menuItems = [
-    { label: "Home", icon: faHouse, path: "/" },
+    { label: "Home", icon: faHouse, path: "/home" },
     { label: "My Plan", icon: faListCheck, path: "/myplan" },
     { label: "Saved", icon: faBookmark, path: "/saved" },
     { label: "Community", icon: faUsers, path: "/commu" },

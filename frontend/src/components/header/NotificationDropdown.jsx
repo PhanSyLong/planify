@@ -150,9 +150,7 @@ const NotificationDropdown = ({ isOpen, onClose, containerRef }) => {
             className="view-all"
             onClick={() => {
               onClose();
-              // navigate to full page - assuming you have useNavigate
               window.location.href = '/notifications';
-              // or better: use navigate('/notifications') if you import useNavigate
             }}
           >
             View all notifications

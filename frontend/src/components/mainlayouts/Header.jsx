@@ -11,8 +11,7 @@ import {
 // Logo SVG
 import Logo from "../../assets/images/Logo.svg";
 
-// Import your NotificationDropdown component
-// Adjust the path based on your folder structure
+
 import NotificationDropdown from "../header/NotificationDropdown"; // ← change if needed
 import LanguageDropdown from "../header/LanguageDropdown";
 
@@ -20,7 +19,7 @@ export default function Header() {
   const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('en'); // Default: 'en' for English
+  const [currentLanguage, setCurrentLanguage] = useState('en');
 
   // Refs for containers
   const bellContainerRef = useRef(null);
@@ -52,7 +51,7 @@ export default function Header() {
     >
       {/* LEFT: LOGO */}
       <NavLink
-        to="/"
+        to="/home"
         style={{
           display: "flex",
           alignItems: "center",
@@ -147,19 +146,16 @@ export default function Header() {
             containerRef={bellContainerRef}  // ← Pass ref to include bell in "inside" check
           />
         </div>
+        <div
+          style={{color: "white",display: "flex", alignItems: "center", cursor: "pointer",}}
 
-        <NavLink
-          to="/myprofile"
-          style={{
-            color: "white",
-            textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-          }}
         >
-          <FontAwesomeIcon icon={faUser} title="My Profile" />
-        </NavLink>
+              <FontAwesomeIcon icon={faUser} />
+
+        </div>
+
+
+
       </div>
     </header>
   );

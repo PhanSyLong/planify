@@ -26,11 +26,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/LoginSignup" element={<LoginSignup />} />
+        <Route path="/" element={<LoginSignup />} />
 
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Home />} />
 
           {/* Nested routes for plans with context */}
           <Route path="/myplan">
