@@ -24,25 +24,32 @@ const Notifications = () => {
             // map backend → frontend model
             const notif = {
                 id: data.id,
-                name: data.senderName,
-                avatar: data.senderAvatar,
-                action: data.action,
-                message: data.message,
+                name: data.plan?.name,
+                action: data.type,
+                message: data.messageText,
                 time: "just now",
                 read: false,
-                link: data.link
+                link: `/plans/${data.plan?.id}`
             };
 
+
+            //  UI realtime
             setNotifications(prev => [notif, ...prev]);
         });
 
-        es.onerror = () => {
-            console.error("❌ SSE error");
+        // error -> close SSE
+        es.onerror = (err) => {
+            console.error("❌ SSE error", err);
             es.close();
         };
 
-        return () => es.close();
+        //  Cleanup when reload / unmount
+        return () => {
+            console.log("🔌 SSE cleanup");
+            es.close();
+        };
     }, []);
+
 
     const displayedNotifications = notifications.filter(
         notif => filter === 'all' || !notif.read

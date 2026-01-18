@@ -164,10 +164,27 @@ public class NotificationService {
                 .add(emitter);
         log.info("SSE subscribed: userId={}, total={}",
                 userId, emitters.get(userId).size());
+        try {
+            emitter.send(SseEmitter.event().name("connected").data("ok"));
+        } catch (IOException e) {
+            removeEmitter(userId, emitter);
+        }
 
-        emitter.onCompletion(() -> removeEmitter(userId, emitter));
-        emitter.onTimeout(() -> removeEmitter(userId, emitter));
-        emitter.onError(e -> removeEmitter(userId, emitter));
+        emitter.onCompletion(() -> {
+            removeEmitter(userId, emitter);
+            emitter.complete();
+        });
+
+        emitter.onTimeout(() -> {
+            removeEmitter(userId, emitter);
+            emitter.complete();
+        });
+
+        emitter.onError(e -> {
+            removeEmitter(userId, emitter);
+            emitter.complete();
+        });
+
 
         return emitter;
     }
@@ -192,6 +209,7 @@ public class NotificationService {
                 );
             } catch (IOException e) {
                 removeEmitter(userId, emitter);
+                emitter.complete();
             }
         }
     }

@@ -30,7 +30,7 @@ public class DailyNotificationService {
     final UserRepository userRepository;
     final DailyPerformanceRepository dailyPerformanceRepository;
 
-    @Scheduled(cron = "0 16 15,23 * * ?")
+    @Scheduled(cron = "0 0 8,23 * * ?")
     @Transactional
     public void scan() {
 
