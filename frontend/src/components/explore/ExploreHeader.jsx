@@ -1,29 +1,55 @@
-// src/components/explore/ExploreHeader.jsx
-import React from 'react';
-import SearchIcon from '../../assets/icons/search.svg';
+import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import './ExploreHeader.css';
 
 const ExploreHeader = ({ activeTab, setActiveTab }) => {
-  return (
-    <div className="header">
-      <div className="search-bar">
-        <input type="text" placeholder="Tìm kiếm khóa học, giáo viên..." />
+  const [searchTerm, setSearchTerm] = useState('');
 
-        <span className="search-icon flex items-center gap-2 text-gray-600 font-medium">
-          <img
-            src={SearchIcon}
-            className="w-10 h-10 "
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log('Searching for:', searchTerm);
+    // TODO: Implement actual search
+  };
+
+  const tabs = [
+    { id: 'subject', label: 'Subjects' },
+    { id: 'certificate', label: 'Certificates' },
+    { id: 'other', label: 'Other' }
+  ];
+
+  return (
+    <div className="explore-header">
+      <form className="search-bar" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Tìm kiếm khóa học, giáo viên..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="search-icon-btn"
+          aria-label="Tìm kiếm"
+        >
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            className="search-icon"
+            size="lg"  // Optional: makes it slightly bolder, looks great at small size
           />
-        </span>
-      </div>
+        </button>
+      </form>
 
       <div className="main-tabs">
-        {['subject', 'certificate', 'other'].map(tab => (
+        {tabs.map((tab) => (
           <button
-            key={tab}
-            className={activeTab === tab ? 'active' : ''}
-            onClick={() => setActiveTab(tab)}
+            key={tab.id}
+            className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+            aria-pressed={activeTab === tab.id}
           >
-            {tab === 'subject' ? 'Môn học' : tab === 'certificate' ? 'Chứng chỉ' : 'Khác'}
+            {tab.label}
           </button>
         ))}
       </div>

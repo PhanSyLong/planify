@@ -1,0 +1,101 @@
+/* src/components/users/UserList.css */
+
+.userlist-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background: white;
+  padding-top: 20px;
+}
+
+.userlist-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.userlist-header {
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #333;
+  padding: 8px;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: #eee;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  flex: 1;
+}
+
+.search-box {
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  outline: none;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  color: #888;
+  pointer-events: none;
+}
+
+.userlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 198px); /* 180px card + 18px gap */
+  gap: 24px 18px; /* vertical 24px, horizontal 18px */
+  justify-content: center; /* căn giữa nếu hàng chưa đầy */
+}
+
+.user-card-wrapper {
+  width: 180px;
+  margin: 0 auto;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 20px;
+  color: #777;
+  font-weight: 500;
+}

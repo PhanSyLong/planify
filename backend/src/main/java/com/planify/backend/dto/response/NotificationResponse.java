@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class NotificationResponse {
     Integer id;
     Integer planId;
+    String title;
     Integer recipientId;
     String type;
     String messageText;

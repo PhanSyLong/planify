@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Stage from "./Stage";
+import "./PlanInfo.css";
 
 const CATEGORIES = [
   "Study",
@@ -12,13 +13,29 @@ const CATEGORIES = [
   "Project"
 ];
 
-const PlanInfo = ({ title, setTitle, description, setDescription, pictureFile, setPicture, previewUrl, setPreviewUrl}) => {
-  const [stages, setStages] = useState([0]);
+const PlanInfo = () => {
+  const [planTitle, setPlanTitle] = useState('');
+  const [planDescription, setPlanDescription] = useState('');
+  const [stages, setStages] = useState([{ title: '', description: '', tasks: [] }]);
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   const addStage = () => {
-    setStages([...stages, stages.length]);
+    setStages([...stages, { title: '', description: '', tasks: [] }]);
+  };
+
+  const updateStage = (index, updatedStage) => {
+    const newStages = [...stages];
+    newStages[index] = updatedStage;
+    setStages(newStages);
+  };
+
+  const deleteStage = (index) => {
+    if (stages.length > 1) {
+      setStages(stages.filter((_, i) => i !== index));
+    } else {
+      alert("You must have at least one stage!");
+    }
   };
 
   const toggleCategory = (category) => {
@@ -30,269 +47,81 @@ const PlanInfo = ({ title, setTitle, description, setDescription, pictureFile, s
   };
 
   return (
-    <>
-      <style>{`
-        .planinfo-wrapper {
-          width: 100%;
-        }
+    <div className="planinfo-wrapper">
+      {/* Plan Title */}
+      <div className="plan-title-card">
+        <label>Title</label>
+        <input
+          type="text"
+          placeholder="Enter plan title"
+          className="plan-title-input"
+          value={planTitle}
+          onChange={(e) => setPlanTitle(e.target.value)}
+        />
+      </div>
 
-        /* Title card */
-        .plan-title-card {
-          background: #ffffff;
-          border-radius: 20px;
-          padding: 24px;
-          margin-bottom: 24px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-          display: flex;
-          flex-direction: column;
-        }
-
-        .plan-title-card label {
-          font-size: 16px;
-          font-weight: 700;
-          margin-bottom: 8px;
-        }
-
-        .plan-title-input {
-          font-size: 22px;
-          padding: 14px;
-          border-radius: 12px;
-          border: 1px solid #ccc;
-          outline: none;
-        }
-
-        /* Info card */
-        .planinfo-card {
-          display: flex;
-          gap: 24px;
-          background: #ffffff;
-          border-radius: 20px;
-          padding: 24px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-          margin-bottom: 32px;
-        }
-
-        /* Image input */
-        .image-upload {
-          width: 180px;
-          height: 180px;
-          border: 2px dashed #ccc;
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          position: relative;
-          text-align: center;
-          overflow: hidden;
-        }
-
-        .image-upload input {
-          opacity: 0;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          cursor: pointer;
-          cursor: pointer;
-          z-index: 2;        /* sits ABOVE the preview */
-        }
-        
-        .image-upload img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover; 
-          border-radius: 16px;
-          position: absolute;
-          top: 0;
-          left: 0;
-          z-index: 1;         /* Behind the input */
-          }
-          
-        .image-upload.has-image {
-          border: none; 
-        }
-
-        .image-upload span {
-          font-size: 14px;
-          color: #666;
-        }
-
-        /* Right side */
-        .planinfo-right {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .planinfo-field {
-          display: flex;
-          flex-direction: column;
-          margin-bottom: 16px;
-        }
-
-        .planinfo-field label {
-          font-size: 14px;
-          font-weight: 600;
-          margin-bottom: 6px;
-        }
-
-        .planinfo-field textarea {
-          resize: none;
-          min-height: 100px;
-          padding: 12px;
-          border-radius: 10px;
-          border: 1px solid #ccc;
-          font-size: 14px;
-          outline: none;
-        }
-
-        /* Categories */
-        .categories-section {
-          position: relative;
-        }
-
-        .categories-btn {
-          padding: 10px 14px;
-          background-color: #4e085f;
-          color: #ffffff;
-          border: none;
-          border-radius: 10px;
-          font-size: 14px;
-          cursor: pointer;
-          width: fit-content;
-        }
-
-        .categories-popup {
-          margin-top: 12px;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .category-tag {
-          padding: 8px 14px;
-          border-radius: 20px;
-          border: 1px solid #4e085f;
-          font-size: 13px;
-          cursor: pointer;
-          color: #4e085f;
-          user-select: none;
-        }
-
-        .category-tag.active {
-          background-color: #4e085f;
-          color: #ffffff;
-        }
-
-        /* Stages */
-        .stage-list {
-          margin-top: 24px;
-        }
-
-        .add-stage-btn {
-          margin-top: 20px;
-          padding: 12px 18px;
-          background-color: #153677;
-          color: #ffffff;
-          border: none;
-          border-radius: 12px;
-          font-size: 14px;
-          cursor: pointer;
-        }
-
-        .add-stage-btn:hover {
-          opacity: 0.9;
-        }
-      `}</style>
-
-      <div className="planinfo-wrapper">
-        {/* Plan Title */}
-        <div className="plan-title-card">
-          <label>Title</label>
-          <input
-            type="text"
-            placeholder="Enter plan title"
-            className="plan-title-input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+      {/* Plan Info Card */}
+      <div className="planinfo-card">
+        {/* Image Upload */}
+        <div className="image-upload">
+          <input type="file" accept="image/*" />
+          <span>Upload Image</span>
         </div>
 
-        {/* Plan Info Card */}
-        <div className="planinfo-card">
-          {/* Image Upload */}
-          <div className={`image-upload ${previewUrl ? "has-image" : ""}`}>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={(e) => {
-                const file = e.target.files[0];
-                setPicture(file);
-                setPreviewUrl(URL.createObjectURL(file));
-                }
-              }  
+        {/* Description + Categories */}
+        <div className="planinfo-right">
+          <div className="planinfo-field">
+            <label>Description</label>
+            <textarea
+              placeholder="Describe your plan..."
+              value={planDescription}
+              onChange={(e) => setPlanDescription(e.target.value)}
             />
-            <span>Upload Image</span>
+          </div>
 
-            {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Preview"
-              />
+          <div className="categories-section">
+            <button
+              className="categories-btn"
+              onClick={() => setShowCategories(!showCategories)}
+            >
+              Categories
+            </button>
+
+            {showCategories && (
+              <div className="categories-popup">
+                {CATEGORIES.map((cat) => (
+                  <span
+                    key={cat}
+                    className={`category-tag ${
+                      selectedCategories.includes(cat) ? "active" : ""
+                    }`}
+                    onClick={() => toggleCategory(cat)}
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
             )}
-
           </div>
-
-          {/* Description + Categories */}
-          <div className="planinfo-right">
-            <div className="planinfo-field">
-              <label>Description</label>
-              <textarea
-                  placeholder="Describe your plan..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-
-            <div className="categories-section">
-              <button
-                className="categories-btn"
-                onClick={() => setShowCategories(!showCategories)}
-              >
-                Categories
-              </button>
-
-              {showCategories && (
-                <div className="categories-popup">
-                  {CATEGORIES.map((cat) => (
-                    <span
-                      key={cat}
-                      className={`category-tag ${
-                        selectedCategories.includes(cat) ? "active" : ""
-                      }`}
-                      onClick={() => toggleCategory(cat)}
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Stages */}
-        <div className="stage-list">
-          {stages.map((_, index) => (
-            <Stage key={index} />
-          ))}
-
-          <button className="add-stage-btn" onClick={addStage}>
-            + Add Stage
-          </button>
         </div>
       </div>
-    </>
+
+      {/* Stages */}
+      <div className="stage-list">
+        {stages.map((stage, index) => (
+          <Stage
+            key={index}
+            stage={stage}
+            updateStage={(updatedStage) => updateStage(index, updatedStage)}
+            deleteStage={() => deleteStage(index)}
+          />
+        ))}
+
+        <button className="add-stage-btn" onClick={addStage}>
+          + Add Stage
+        </button>
+      </div>
+    </div>
   );
 };
 

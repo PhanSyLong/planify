@@ -1,45 +1,69 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LoginSignup from "./pages/LoginSignup.jsx";
+//sidebar
+import Home from "./pages/Home.jsx";
+import MainLayout from "./layouts/MainLayout.jsx";
+import MyPlan from "./pages/MyPlan.jsx";
+import Saved from "./pages/SavedPlan.jsx";
+import Commu from "./pages/ExplorePage.jsx";
+import Add from "./pages/CreatePlan.jsx";
+import About from "./pages/About.jsx";
 
-//main
-import MainLayout from './layout/MainLayout.jsx';
+//header
+import MyProfile from "./pages/MyProfile.jsx";
 
-//page
-import Home from './pages/Home.jsx';
-import MyPlanPage from "./pages/MyPlanPage.jsx";
-import SavedPage from "./pages/SavedPage";
-import ExplorePage from "./pages/ExplorePage.jsx";
-import CreatePlan from "./pages/CreatePlan.jsx";
+//other
+import LoginSignup from "./pages/LoginSignup.jsx"
+import Admin from "./pages/Admin.jsx";
+import Notifications from "./components/header/Notification.jsx";
 
-//detail plan, just for demo
-import PlanDetailPage from "./layout/PlanDetailPage.jsx";
-
-//idk
-import PlanPage from "./pages/PlanPage";
-
+//view
+import ViewPlan from "./components/myPlan/ViewPlan.jsx"
+import ViewMyPlan from "./components/myPlan/ViewMyPlan.jsx"
+import UserView from "./components/users/UserView";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<MainLayout/>}>
-          <Route path="/" element={<Home/>} />
-          <Route path="/plan" element={<MyPlanPage/>} />
-          <Route path="/saved" element={<SavedPage/>} />
-          <Route path="/commu" element={<ExplorePage />} />
-          <Route path="/add" element={<CreatePlan/>} />  {/* testing login signup */}
+        <Route path="/" element={<LoginSignup />} />
 
-          {/*detailplan*/}
-          <Route path="/plans/:id" element={<PlanDetailPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/home" element={<Home />} />
 
+          {/* Nested routes for plans with context */}
+          <Route path="/myplan">
+            <Route index element={<MyPlan />} />
+            <Route path="plans/:id" element={<ViewMyPlan/>} />
+          </Route>
 
+          <Route path="/saved">
+            <Route index element={<Saved />} />
+            <Route path="plans/:id" element={<ViewPlan />} />
+          </Route>
+
+          <Route path="/commu">
+            <Route index element={<Commu />} />
+            <Route path="plans/:id" element={<ViewPlan />} />
+          </Route>
+
+          <Route path="/add" element={<Add />} />
+          <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/about" element={<About/>} />
+
+          {/* Fallback: direct access still works */}
+          <Route path="/plans/:id" element={<ViewPlan />} />
+
+          <Route path="/users/:userId" element={<UserView />} />
+
+          {/*Notification */}
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
+
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-

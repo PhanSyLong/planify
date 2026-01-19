@@ -1,6 +1,8 @@
 package com.planify.backend.configuration;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,21 +32,45 @@ public class SecurityConfig {
     public SecurityConfig(@Lazy CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;
     }
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        return request -> {
+            if (request.getCookies() == null) return null;
+
+            for (Cookie c : request.getCookies()) {
+                if ("access_token".equals(c.getName())) {
+                    return c.getValue(); // 👈 JWT lấy từ cookie
+                }
+            }
+            return null;
+        };
+    }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                                .anyRequest().authenticated());
+                .csrf(AbstractHttpConfigurer::disable)//Cái này nó sẽ bảo vệ app của bạn khỏi attach 2 , ở đây mình không cần nên mình tắt nó đi
+
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/planify/notifications/stream").authenticated()
+                        .anyRequest().authenticated());
 
         //Đến phần security của phương thức GET token , chúng ta sẽ cấu hình rằng : Nếu User mà có một token hợp lệ thì sẽ Get được
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)) //decoder : Chuyển đổi chuỗi JWT thành object để đọc thông tin bên trong:)
+                oauth2
+                        // lấy JWT từ cookie
+                        .bearerTokenResolver(bearerTokenResolver())
+
+                        // decode + verify JWT
+                        .jwt(jwtConfigurer ->
+                                jwtConfigurer.decoder(customJwtDecoder)
+                        ) //decoder : Chuyển đổi chuỗi JWT thành object để đọc thông tin bên trong:)
         );
 
-        httpSecurity.csrf(AbstractHttpConfigurer::disable); //Cái này nó sẽ bảo vệ app của bạn khỏi attach 2 , ở đây mình không cần nên mình tắt nó đi
+
         return httpSecurity.build();
     }
 

@@ -1,0 +1,29 @@
+/* layouts/MainLayout.css */
+
+.app-root {
+  display: flex;
+  height: 100vh;
+  background: #fafafa;
+  color: #1a1a1a;
+  font-family: Inter, Arial, sans-serif;
+  overflow: hidden;
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Responsive shell behavior */
+@media (max-width: 900px) {
+  .app-root {
+    flex-direction: column;
+  }
+
+  .main-column {
+    width: 100%;
+  }
+}

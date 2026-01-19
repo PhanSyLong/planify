@@ -1,0 +1,162 @@
+/* src/pages/About.css */
+
+.about-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Sections */
+.section {
+  padding: 80px 0;
+}
+
+.bg-light {
+  background-color: #f0f4f8;
+}
+
+/* Hero */
+.hero {
+  padding: 100px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #2c3e50;
+}
+
+/* Grid System */
+.grid {
+  display: grid;
+  gap: 40px;
+}
+
+.two-columns {
+  grid-template-columns: 1fr 1fr;
+}
+
+.three-columns {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .two-columns,
+  .three-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .reverse-on-mobile {
+    grid-template-columns: 1fr;
+  }
+
+  .reverse-on-mobile > :first-child {
+    order: 2;
+  }
+
+  .reverse-on-mobile > :last-child {
+    order: 1;
+  }
+}
+
+/* Story */
+.story-text p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+/* Image */
+.image-rounded {
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+
+.shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Cards */
+.card {
+  background: white;
+  padding: 40px 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card-icon {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.card-text {
+  font-size: 1.05rem;
+  color: #555;
+}
+
+/* Features */
+.feature-item {
+  font-size: 1.15rem;
+  margin-bottom: 20px;
+}
+
+/* CTA Button */
+.btn-primary {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 14px 32px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #764ba2;
+}
+
+/* Text helpers */
+.text-center {
+  text-align: center;
+}
+
+.lead {
+  font-size: 1.2rem;
+  color: #555;
+}
