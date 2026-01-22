@@ -1,0 +1,9 @@
+.otheruser-page {
+  container-type: inline-size;
+  container-name: otheruserpage;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  min-height: 100vh;
+}

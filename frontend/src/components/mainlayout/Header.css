@@ -1,0 +1,66 @@
+.app-header {
+  height: 72px;
+  background: #0c4a6e;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  container-type: inline-size;
+}
+
+/* Logo */
+.app-header-logo img {
+  height: 42px;
+}
+
+/* Search bar */
+.app-header-search {
+  flex: 1;
+  max-width: 480px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #e5eef5;
+  border-radius: 999px;
+  padding: 0 18px;
+}
+
+.app-header-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+}
+
+/* Actions - moved to the right */
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;          /* This pushes everything to the right */
+}
+
+.trigger-icon {
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.popup-trigger {
+  position: relative;
+}
+
+/* Hover feedback */
+.trigger-icon:hover {
+  opacity: 0.85;
+}
+
+/* Responsive */
+@container (max-width: 700px) {
+  .app-header-search {
+    display: none;
+  }
+}

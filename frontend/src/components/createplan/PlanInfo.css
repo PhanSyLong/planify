@@ -1,0 +1,231 @@
+.planinfo-wrapper {
+  container-type: inline-size;
+  container-name: planinfo;
+  width: 100%;
+}
+
+/* Title card */
+.plan-title-card {
+  background: #e8e9eb;
+  border-radius: 20px;
+  padding: clamp(16px, 3cqi, 24px);
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.plan-title-card label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #002765;
+  display: block;
+}
+
+.plan-title-input {
+  width: 100%;
+  font-size: clamp(18px, 3cqi, 22px);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  outline: none;
+  background: #f5f6f7;
+}
+
+.plan-title-input:focus {
+  border-color: #4e085f;
+  box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
+}
+
+/* Info card */
+.planinfo-card {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  background: #e8e9eb;
+  border-radius: 20px;
+  padding: clamp(16px, 3cqi, 24px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 32px;
+}
+
+@container planinfo (max-width: 600px) {
+  .planinfo-card {
+    flex-direction: column;
+  }
+}
+
+/* Image input */
+.image-upload {
+  width: 180px;
+  height: 180px;
+  border: 2px dashed #ccc;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+  flex-shrink: 0;
+  background: #f5f6f7;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.image-upload:hover {
+  border-color: #4e085f;
+}
+
+@container planinfo (max-width: 600px) {
+  .image-upload {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+.image-upload input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.image-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.image-upload-label .icon {
+  width: 32px;
+  height: 32px;
+  color: #666;
+}
+
+.image-upload-label span {
+  font-size: 14px;
+  color: #666;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.image-remove-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Right side */
+.planinfo-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planinfo-field label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #002765;
+  display: block;
+}
+
+.planinfo-field textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 100px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  background: #f5f6f7;
+  font-family: inherit;
+}
+
+.planinfo-field textarea:focus {
+  border-color: #4e085f;
+  box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
+}
+
+/* Categories */
+.categories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categories-btn {
+  align-self: flex-start;
+  background-color: #153677;
+  color: #ffffff;
+}
+
+.categories-btn:hover {
+  background-color: #0f2556;
+}
+
+.categories-popup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category-tag {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid #4e085f;
+  font-size: 13px;
+  cursor: pointer;
+  color: #4e085f;
+  user-select: none;
+  transition: all 0.2s ease;
+  background-color: transparent;
+}
+
+.category-tag:hover {
+  background-color: rgba(78, 8, 95, 0.1);
+}
+
+.category-tag.active {
+  background-color: #4e085f;
+  color: #ffffff;
+}
+
+/* Stages */
+.stage-list {
+  margin-top: 24px;
+}
+
+.add-stage-btn {
+  margin-top: 20px;
+  background-color: #153677;
+  color: #ffffff;
+}
+
+.add-stage-btn:hover {
+  background-color: #0f2556;
+}

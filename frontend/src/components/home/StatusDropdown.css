@@ -1,0 +1,35 @@
+.status-dropdown {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Status colors */
+.status-dropdown.incomplete {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.status-dropdown.in_progress {
+  background: #38bdf8;
+  color: #ffffff;
+}
+
+.status-dropdown.done {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.status-dropdown.cancelled {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.status-dropdown:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

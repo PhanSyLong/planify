@@ -1,8 +1,8 @@
-/* src/components/users/UserCard.css */
+/* UserCard.css - Container Query Optimized */
 
 .user-card {
-  width: 180px;                    /* CỐ ĐỊNH giống CARD_WIDTH trong Carousel */
-  flex-shrink: 0;                  /* Không cho co lại */
+  width: 180px;
+  flex-shrink: 0;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -100,6 +100,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+  height: auto;
 }
 
 .follow-btn.following {
@@ -116,4 +117,42 @@
 .follow-btn.following:hover {
   background: #0056b3;
   border-color: #0056b3;
+}
+
+.follow-btn:active {
+  background: #004085;
+  border-color: #004085;
+}
+
+/* Container Query Responsive */
+@container main (max-width: 480px) {
+  .user-card {
+    width: 160px;
+  }
+
+  .user-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .avatar-placeholder {
+    font-size: 28px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+
+  .user-description {
+    font-size: 12px;
+  }
+
+  .user-stats {
+    font-size: 11px;
+  }
+
+  .follow-btn {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
 }

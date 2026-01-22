@@ -193,7 +193,7 @@ export default function Admin() {
     if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("role");
-      window.location.href = "/LoginSignup"; // Quay về trang login
+      window.location.href = "/"; // Quay về trang login
     }
   };
 

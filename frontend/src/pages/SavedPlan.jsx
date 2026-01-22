@@ -1,7 +1,6 @@
-// SavedPage.jsx
-import React, { useState, useEffect } from 'react';
-import Carousel from '../components/myPlan/Carousel';
-import PlanList from '../components/myPlan/PlanList';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Carousel from '../components/plans/Carousel';
+import PlanList from '../components/plans/PlanList';
 import './SavedPlan.css';
 
 const SavedPage = () => {
@@ -12,18 +11,23 @@ const SavedPage = () => {
     coding: []
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch saved plans from backend
   useEffect(() => {
+    let isMounted = true;
+
     const fetchSavedPlans = async () => {
       setLoading(true);
+      setError(null);
 
       try {
         // TODO: Replace with your actual API endpoint
         // const response = await fetch('/api/saved-plans');
+        // if (!response.ok) throw new Error('Failed to fetch plans');
         // const data = await response.json();
 
-        // Simulated API call with demo data
+        // Simulated API call
         await new Promise(resolve => setTimeout(resolve, 500));
 
         const mockData = {
@@ -53,37 +57,59 @@ const SavedPage = () => {
           ]
         };
 
-        setSavedPlans(mockData);
-      } catch (error) {
-        console.error('Error fetching saved plans:', error);
+        if (isMounted) {
+          setSavedPlans(mockData);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message);
+          console.error('Error fetching saved plans:', err);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchSavedPlans();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Handle view more click
-  const handleViewMore = (category, title) => {
+  // Memoized handler to prevent unnecessary re-renders
+  const handleViewMore = useCallback((category, title) => {
     setFullView({
-      title: title,
+      title,
       items: savedPlans[category]
     });
-  };
+  }, [savedPlans]);
 
-  // Full view mode - show all plans in a category
-  if (fullView) {
+  const handleBack = useCallback(() => {
+    setFullView(null);
+  }, []);
+
+  // Memoized full view content
+  const fullViewContent = useMemo(() => {
+    if (!fullView) return null;
+
     return (
       <div className="explore-page">
         <PlanList
           initialPlans={fullView.items}
           isFullView={true}
           fullViewTitle={fullView.title}
-          onBack={() => setFullView(null)}
+          onBack={handleBack}
         />
       </div>
     );
+  }, [fullView, handleBack]);
+
+  // Full view mode
+  if (fullView) {
+    return fullViewContent;
   }
 
   // Loading state
@@ -91,8 +117,21 @@ const SavedPage = () => {
     return (
       <div className="saved-page loading-container">
         <div className="spinner-wrapper">
-          <div className="spinner"></div>
-          <p className="loading-text">Đang tải...</p>
+          <div className="spinner" role="status" aria-label="Loading"></div>
+          <p className="loading-text">Loading saved plans...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="saved-page loading-container">
+        <div className="spinner-wrapper">
+          <p className="loading-text" style={{ color: '#ef4444' }}>
+            Failed to load plans. Please try again later.
+          </p>
         </div>
       </div>
     );

@@ -1,77 +1,63 @@
-/* CreatePlan.css */
 .createplan-page {
-    width: 900px;
-    padding: 24px 32px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  container-type: inline-size;
+  container-name: createplan;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
 }
 
 /* Header */
 .createplan-header {
-    width: 900px;
-    max-width: 100%;
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .createplan-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #002765;
+  font-size: clamp(22px, 3cqi, 28px);
+  font-weight: 700;
+  color: #002765;
 }
 
 /* Content */
 .createplan-content {
-    width: 900px;
-    max-width: 100%;
+  width: 100%;
 }
 
 /* Actions */
 .createplan-actions {
-    width: 900px;
-    max-width: 100%;
-    position: static;
-    bottom: 0;
-    padding: 16px 0;
-    margin-top: 40px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 16px;
-    border-top: 1px solid #eee;
+  width: 100%;
+  padding: 16px 0;
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid #eee;
+}
+
+@container createplan (max-width: 500px) {
+  .createplan-actions {
+    flex-direction: column-reverse;
+  }
+
+  .createplan-actions button {
+    width: 100%;
+  }
 }
 
 .review-btn {
-    padding: 12px 22px;
-    background-color: #edeef0;
-    color: #333;
-    border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
+  background-color: #edeef0;
+  color: #333;
 }
 
-.create-btn, .save-btn{
-    padding: 12px 26px;
-    background-color: #153677;
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-}
-.cancel-btn{
-    padding: 12px 26px;
-    background-color: #D10000;
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
+.review-btn:hover {
+  background-color: #d8dade;
 }
 
-.create-btn:hover,
-.review-btn:hover,
-.save-btn:hover,
-.cancel-btn:hover{
-    opacity: 0.9;
+.create-btn {
+  background-color: #153677;
+  color: #ffffff;
+}
+
+.create-btn:hover {
+  background-color: #0f2556;
 }

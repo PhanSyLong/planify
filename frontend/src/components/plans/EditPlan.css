@@ -1,0 +1,118 @@
+/* EditPlan.css - Container Query Optimized */
+
+.createplan-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 32px 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.createplan-header {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.createplan-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #002765;
+  margin: 0;
+}
+
+.createplan-content {
+  width: 100%;
+}
+
+.createplan-actions {
+  width: 100%;
+  padding: 16px 0;
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid #eee;
+}
+
+.review-btn,
+.save-btn,
+.cancel-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  height: 40px;
+}
+
+.review-btn {
+  background-color: #edeef0;
+  color: #333;
+}
+
+.save-btn {
+  background-color: #153677;
+  color: #ffffff;
+}
+
+.cancel-btn {
+  background-color: #D10000;
+  color: #ffffff;
+}
+
+.review-btn:hover,
+.save-btn:hover,
+.cancel-btn:hover {
+  opacity: 0.9;
+}
+
+.review-btn:active,
+.save-btn:active,
+.cancel-btn:active {
+  opacity: 0.8;
+}
+
+/* Container Query Responsive */
+@container main (max-width: 768px) {
+  .createplan-page {
+    padding: 20px 16px 50px;
+  }
+
+  .createplan-header h1 {
+    font-size: 24px;
+  }
+
+  .createplan-actions {
+    flex-wrap: wrap;
+  }
+
+  .review-btn,
+  .save-btn,
+  .cancel-btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+@container main (max-width: 480px) {
+  .createplan-page {
+    padding: 16px 12px 40px;
+  }
+
+  .createplan-header h1 {
+    font-size: 20px;
+  }
+
+  .createplan-actions {
+    flex-direction: column;
+  }
+
+  .review-btn,
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}

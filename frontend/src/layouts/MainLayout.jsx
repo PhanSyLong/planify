@@ -1,27 +1,23 @@
-import Header from "../components/mainlayouts/Header";
-import LeftSidebar from "../components/mainlayouts/LeftSidebar";
-import RightSidebar from "../components/mainlayouts/RightSidebar";
 import { Outlet } from "react-router-dom";
+import Header from "../components/mainlayout/Header";
+import Sidebar from "../components/mainlayout/LeftSidebar";
+import RightSidebar from "../components/mainlayout/RightSidebar";
+import "./MainLayout.css";
 
 export default function MainLayout() {
   return (
-    <>
+    <div className="layout-root">
       <Header />
-      <LeftSidebar />
-      <RightSidebar />
 
-      <main
-        style={{
-          marginTop: "70px",
-          marginLeft: "70px",
-          marginRight: "260px",
-          minHeight: "calc(100vh - 70px)",
-          padding: "24px",
-          background: "#fafafa",
-        }}
-      >
-        <Outlet />
-      </main>
-    </>
+      <div className="layout-body">
+        <Sidebar />
+
+        <main className="layout-content">
+          <Outlet />
+        </main>
+
+        <RightSidebar />
+      </div>
+    </div>
   );
 }

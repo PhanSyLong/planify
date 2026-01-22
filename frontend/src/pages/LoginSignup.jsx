@@ -81,7 +81,7 @@ const LoginSignup = () => {
       console.error("Signup error:", err);
       addToast(
         "error",
-        err.response?.data?.message || err.message || "Đăng ký thất bại. Vui lòng thử lại."
+        err.response?.data?.message || err.message || "Signup failed, please try again."
       );
     } finally {
       setLoading(false);
@@ -105,19 +105,20 @@ const LoginSignup = () => {
 
       const token = data?.result?.token || data?.token;
       if (!token) {
-        throw new Error("Không nhận được token từ server");
+        throw new Error("Unable to receive token from server");
       }
 
       localStorage.setItem("accessToken", token);
 
       let username = loginData.username;
       let detectedRole = data?.result?.role || data?.role || "";
+
       try {
         const meRes = await authApi.me();
         username = meRes?.data?.result?.username || meRes?.data?.username || username;
         detectedRole = meRes?.data?.result?.role || meRes?.data?.role || detectedRole;
       } catch (meErr) {
-        console.warn("Không thể lấy thông tin user (me):", meErr);
+        console.warn("Cannot retrieve user info (me):", meErr);
       }
 
       if (!detectedRole) {
@@ -126,7 +127,7 @@ const LoginSignup = () => {
 
       localStorage.setItem("role", detectedRole);
 
-      addToast("success", `Đăng nhập thành công! Xin chào ${username}!`);
+      addToast("success", `Login successfully! Welcome ${username}!`);
       setLoginData({ username: "", password: "" });
 
       // Kiểm tra role và chuyển hướng phù hợp
@@ -143,7 +144,7 @@ const LoginSignup = () => {
       console.error("Login error:", err);
       addToast(
         "error",
-        err.response?.data?.message || err.message || "Đăng nhập thất bại. Kiểm tra lại thông tin."
+        err.response?.data?.message || err.message || "Login failed. Please recheck your login details."
       );
     } finally {
       setLoading(false);
@@ -447,8 +448,8 @@ const LoginSignup = () => {
       {showSuccessModal && (
         <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
-            <h2>Đăng ký thành công!</h2>
-            <p>Bạn đã tạo tài khoản thành công.<br />Hãy đăng nhập để tiếp tục.</p>
+            <h2>Signup successfully!</h2>
+            <p>You have successfully created an account.<br />Please login to continue.</p>
             <button onClick={handleModalOk}>OK</button>
           </div>
         </div>
@@ -488,13 +489,13 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Đang xử lý..." : "Login"}
+              {loading ? "Loading..." : "Login"}
             </button>
 
             <p>
-              Chưa có tài khoản?{" "}
+              Don't have an account yet?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(true); }}>
-                Đăng ký ngay
+                Sign In
               </a>
             </p>
           </form>
@@ -560,13 +561,13 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Đang xử lý..." : "Sign Up"}
+              {loading ? "Loading..." : "Sign Up"}
             </button>
 
             <p>
-              Đã có tài khoản?{" "}
+              Already have an account?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(false); }}>
-                Đăng nhập
+                    Log In
               </a>
             </p>
           </form>

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import UserCard from './UserCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import './UserList.css'; // Bạn có thể copy styles từ PlanList.css và chỉnh nhẹ
+import './UserList.css';
 
 const UserList = ({
   users = [],
@@ -11,52 +11,53 @@ const UserList = ({
   fullViewTitle,
   onBack,
 }) => {
-  // Hỗ trợ cả props users và initialUsers để tương thích với code cũ
-  const userData = users.length > 0 ? users : initialUsers || [];
+  const userData = useMemo(() => {
+    return users.length > 0 ? users : initialUsers || [];
+  }, [users, initialUsers]);
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredUsers = userData.filter((user) => {
+  const handleSearchChange = useCallback((e) => {
+    setSearchTerm(e.target.value);
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return userData;
+
     const search = searchTerm.toLowerCase();
-    const name = (user?.name || '').toLowerCase();
-    const description = (user?.description || '').toLowerCase();
-    return name.includes(search) || description.includes(search);
-  });
+    return userData.filter((user) => {
+      const name = (user?.name || '').toLowerCase();
+      const description = (user?.description || '').toLowerCase();
+      return name.includes(search) || description.includes(search);
+    });
+  }, [userData, searchTerm]);
 
   return (
     <div className="userlist-wrapper">
       <div className="userlist-container">
-        {/* Header */}
-        <div
-          className="userlist-header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <div className="userlist-header">
           {isFullView && (
             <>
               <button
                 className="back-btn"
                 onClick={onBack}
-                style={{ marginRight: '10px' }}
+                aria-label="Go back"
               >
-                <FontAwesomeIcon icon={faArrowLeft} />
+                <FontAwesomeIcon icon={faArrowLeft} className="icon" />
+                Back
               </button>
-              <h1 className="page-title" style={{ flex: 1, margin: 0 }}>
-                {fullViewTitle}
-              </h1>
+              <h1 className="page-title">{fullViewTitle}</h1>
             </>
           )}
 
-          <div className="search-box" style={{ flex: isFullView ? 'none' : 1 }}>
+          <div className="search-box">
             <input
               type="text"
               placeholder="Search teachers..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="search-input"
+              aria-label="Search teachers"
             />
             <svg
               className="search-icon"
@@ -64,6 +65,7 @@ const UserList = ({
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -71,7 +73,6 @@ const UserList = ({
           </div>
         </div>
 
-        {/* Grid */}
         <div className="userlist-grid">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
@@ -92,4 +93,4 @@ const UserList = ({
   );
 };
 
-export default UserList;
+export default React.memo(UserList);

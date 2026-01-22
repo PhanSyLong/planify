@@ -1,0 +1,240 @@
+.user-bio-menu {
+  container-type: inline-size;
+  container-name: userbiomenu;
+}
+
+/* Tabs */
+.user-bio-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.user-bio-tab {
+  flex: 1;
+  padding: 14px 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8e8e8e;
+  cursor: pointer;
+  position: relative;
+  height: auto;
+}
+
+.user-bio-tab:hover {
+  color: #262626;
+  background: none;
+}
+
+.user-bio-tab.active {
+  color: #262626;
+}
+
+.user-bio-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #262626;
+}
+
+/* Content */
+.user-bio-content {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  padding: 24px;
+}
+
+@container userbiomenu (max-width: 700px) {
+  .user-bio-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* About Box */
+.user-bio-about-box {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  height: fit-content;
+}
+
+@container userbiomenu (max-width: 700px) {
+  .user-bio-about-box {
+    order: -1;
+  }
+}
+
+.user-bio-about-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.user-bio-about-text {
+  font-size: 13px;
+  color: #262626;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Grid */
+.user-bio-grid {
+  container-type: inline-size;
+  container-name: userbiogrid;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+@container userbiogrid (max-width: 600px) {
+  .user-bio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.user-bio-users-grid {
+  container-type: inline-size;
+  container-name: userusersgrid;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+@container userusersgrid (max-width: 600px) {
+  .user-bio-users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+/* Plan Card */
+.user-plan-card {
+  background: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-plan-card-image {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.user-plan-card-content {
+  padding: 12px;
+}
+
+.user-plan-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.user-plan-card-meta {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+/* User Follower Card */
+.user-follower-card {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s;
+}
+
+.user-follower-card:hover {
+  transform: translateY(-2px);
+}
+
+.user-follower-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-follower-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-follower-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 2px;
+}
+
+.user-follower-stats {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.user-follower-follow-btn {
+  padding: 6px 16px;
+  background: #0095f6;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  height: 28px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.user-follower-follow-btn:hover {
+  background: #0084e0;
+}
+
+.user-follower-follow-btn.following {
+  background: #e0e0e0;
+  color: #262626;
+}
+
+.user-follower-follow-btn.following:hover {
+  background: #d0d0d0;
+}
+
+/* Empty State */
+.user-bio-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8e8e8e;
+}
+
+.user-bio-empty p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.user-bio-empty span {
+  font-size: 14px;
+  color: #b0b0b0;
+}

@@ -1,7 +1,6 @@
-// src/pages/MyPlan.jsx
-import React, { useState, useEffect } from 'react';
-import Carousel from '../components/myPlan/Carousel.jsx';
-import PlanList from '../components/myPlan/PlanList.jsx';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Carousel from '../components/plans/Carousel.jsx';
+import PlanList from '../components/plans/PlanList.jsx';
 import './MyPlan.css';
 
 // ============================================================================
@@ -66,41 +65,81 @@ const PlanService = {
 const MyPlan = () => {
   const [fullView, setFullView] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [planData, setPlanData] = useState({
     recentlyOpened: [],
     inProgress: [],
     allPlans: []
   });
 
-  const currentUserId = 'user123';
+  const currentUserId = useMemo(() => 'user123', []);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchPlans = async () => {
       setLoading(true);
+      setError(null);
+
       try {
         const data = await PlanService.getUserPlans(currentUserId);
-        setPlanData(data);
-      } catch (error) {
-        console.error('Failed to fetch plans:', error);
+
+        if (isMounted) {
+          setPlanData(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message);
+          console.error('Failed to fetch plans:', err);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchPlans();
+
+    return () => {
+      isMounted = false;
+    };
   }, [currentUserId]);
 
+  const handleViewMore = useCallback((title, items) => {
+    setFullView({ title, items });
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setFullView(null);
+  }, []);
+
+  // Loading state
   if (loading) {
     return (
       <div className="loading-container">
         <div className="loading-content">
-          <div className="loading-spinner" />
+          <div className="loading-spinner" role="status" aria-label="Loading"></div>
           <p className="loading-text">Loading your plans...</p>
         </div>
       </div>
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="loading-container">
+        <div className="loading-content">
+          <p className="loading-text" style={{ color: '#ef4444' }}>
+            Failed to load plans. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Full view mode
   if (fullView) {
     return (
       <div className="explore-page">
@@ -108,30 +147,27 @@ const MyPlan = () => {
           initialPlans={fullView.items}
           isFullView={true}
           fullViewTitle={fullView.title}
-          onBack={() => setFullView(null)}
+          onBack={handleBack}
         />
       </div>
     );
   }
 
+  // Main view - carousel sections
   return (
     <div className="myplan-container">
       <Carousel
         title="Recently Opened"
         items={planData.recentlyOpened}
-        onViewMore={() => setFullView({
-          title: 'Recently',
-          items: planData.recentlyOpened
-        })}
+        onViewMore={() => handleViewMore('Recently Opened', planData.recentlyOpened)}
       />
+
       <Carousel
         title="In Progress"
         items={planData.inProgress}
-        onViewMore={() => setFullView({
-          title: 'In Progress',
-          items: planData.inProgress
-        })}
+        onViewMore={() => handleViewMore('In Progress', planData.inProgress)}
       />
+
       <PlanList plans={planData.allPlans} />
     </div>
   );
