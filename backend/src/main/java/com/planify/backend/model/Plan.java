@@ -47,11 +47,11 @@ public class Plan {
 
     @CreationTimestamp
     @Column(name="created_date", nullable = false, updatable = false)
-    LocalDateTime created_date;
+    LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name="updated_date", nullable = false)
-    LocalDateTime updated_date;
+    LocalDateTime updatedAt;
 
     @Column(name="started_at")
     LocalDateTime started_at;
