@@ -6,10 +6,21 @@
   flex-shrink: 0;
   background: white;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
+}
+
+.plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .plan-card:hover {
@@ -28,6 +39,8 @@
   height: 140px;
   background: linear-gradient(135deg, #002765 0%, #004ba8 100%);
   position: relative;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 
 .card-info {
@@ -57,7 +70,8 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 5;
+  z-index: 15;
+  pointer-events: all;
 }
 
 /* Container Query Responsive */

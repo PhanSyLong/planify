@@ -1,9 +1,7 @@
-/* Carousel.css - Container Query Optimized */
-
 .carousel-box {
   background: white;
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px 20px; /* Reduced vertical padding from 20px to 16px */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   margin: 0 auto 28px;
   overflow: hidden;
@@ -14,18 +12,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 0px; /* Reduced from 16px to 12px */
   gap: 12px;
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 12px;
   font-weight: 600;
   margin: 0;
+  padding: 0;
   color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   flex: 1;
 }
 
@@ -143,8 +141,7 @@
 /* Container Query Responsive */
 @container main (max-width: 768px) {
   .carousel-box {
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 12px 16px; /* Adjusted vertical padding */
   }
 
   .section-title {
@@ -159,11 +156,15 @@
     width: 36px;
     height: 36px;
   }
+
+  .section-header {
+    margin-bottom: 10px; /* Adjusted */
+  }
 }
 
 @container main (max-width: 480px) {
   .carousel-box {
-    padding: 12px;
+    padding: 8px 12px; /* Further reduced vertical padding */
   }
 
   .section-title {
@@ -183,5 +184,9 @@
   .nav-btn .icon {
     width: 16px;
     height: 16px;
+  }
+
+  .section-header {
+    margin-bottom: 8px; /* Adjusted */
   }
 }

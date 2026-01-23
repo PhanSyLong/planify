@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import LikeButton from './LikeButton';        // ← Đã thêm import
 import './ViewPlan.css';
 
 const MOCK_PLANS = {
@@ -50,6 +51,7 @@ const ViewPlan = () => {
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);   // ← Thêm state này
 
   useEffect(() => {
     let isMounted = true;
@@ -68,6 +70,7 @@ const ViewPlan = () => {
             setError('Plan not found');
           } else {
             setPlan(foundPlan);
+            // TODO: Sau này có thể load trạng thái bookmark thật từ API/localStorage
           }
         }
       } catch (err) {
@@ -91,12 +94,19 @@ const ViewPlan = () => {
 
   const handleForkClick = useCallback(() => {
     console.log('Fork Plan clicked - feature in development');
-    // TODO: Implement fork functionality
-  }, []);
+    navigate(`/plans/${id}/fork`);
+  }, [id, navigate]);
 
   const handleGoBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  // Handler cho LikeButton
+  const handleBookmarkToggle = useCallback((key, newValue) => {
+    setIsBookmarked(newValue);
+    console.log(`Plan ${id} bookmark toggled: ${newValue ? 'saved' : 'removed'}`);
+    // TODO: Gọi API lưu bookmark hoặc lưu vào localStorage/context
+  }, [id]);
 
   if (loading) {
     return (
@@ -124,9 +134,18 @@ const ViewPlan = () => {
         </button>
 
         <div className="viewplan-actions">
+
+
           <button className="btn-fork" onClick={handleForkClick}>
             Fork Plan
           </button>
+          <LikeButton
+            itemId={id}
+            type="plan"
+            isLiked={isBookmarked}
+            onToggle={handleBookmarkToggle}
+          />
+
         </div>
       </div>
 

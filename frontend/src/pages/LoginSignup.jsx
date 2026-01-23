@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import "./LoginSignup.css";
+import { authApi } from "../api/auth";
+import "./LoginSignup.css"
 
 const LoginSignup = () => {
   const navigate = useNavigate();
@@ -26,29 +27,39 @@ const LoginSignup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  // Toast notifications (error, login success, etc.)
   const [toasts, setToasts] = useState([]);
+
+  // Modal success sau đăng ký
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const addToast = useCallback((type, message) => {
+  const addToast = (type, message) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, type, message }]);
 
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
-  }, []);
+  };
 
-  const handleSignupChange = useCallback((e) => {
+  const handleSignupChange = (e) => {
     const { name, value } = e.target;
-    setSignupData(prev => ({ ...prev, [name]: value }));
-  }, []);
+    setSignupData({
+      ...signupData,
+      [name]: value,
+    });
+  };
 
-  const handleLoginChange = useCallback((e) => {
+  const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setLoginData(prev => ({ ...prev, [name]: value }));
-  }, []);
+    setLoginData({
+      ...loginData,
+      [name]: value,
+    });
+  };
 
-  const handleSignupSubmit = useCallback(async (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
     if (signupData.password !== signupData.confirmPassword) {
@@ -58,74 +69,91 @@ const LoginSignup = () => {
 
     setLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // await authApi.signup({
-      //   username: signupData.username.trim(),
-      //   email: signupData.email.trim(),
-      //   password: signupData.password,
-      // });
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authApi.signup({
+        username: signupData.username.trim(),
+        email: signupData.email.trim(),
+        password: signupData.password,
+      });
 
       setShowSuccessModal(true);
+
       setSignupData({ username: "", email: "", password: "", confirmPassword: "" });
     } catch (err) {
       console.error("Signup error:", err);
       addToast(
         "error",
-        err.response?.data?.message || err.message || "Sign up failed. Please try again."
+        err.response?.data?.message || err.message || "Đăng ký thất bại. Vui lòng thử lại."
       );
     } finally {
       setLoading(false);
     }
-  }, [signupData, addToast]);
+  };
 
-  const handleModalOk = useCallback(() => {
+  const handleModalOk = () => {
     setShowSuccessModal(false);
     setIsSignUp(false);
-  }, []);
+  };
 
-  const handleLoginSubmit = useCallback(async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const { data } = await authApi.login({
-      //   username: loginData.username.trim(),
-      //   password: loginData.password,
-      // });
-      
-      // const token = data?.result?.token || data?.token;
-      // if (!token) {
-      //   throw new Error("No token received from server");
-      // }
-      // localStorage.setItem("accessToken", token);
+      const { data } = await authApi.login({
+        username: loginData.username.trim(),
+        password: loginData.password,
+      });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = data?.result?.token || data?.token;
+      if (!token) {
+        throw new Error("Không nhận được token từ server");
+      }
 
-      const username = loginData.username;
-      addToast("success", `Login successful! Welcome ${username}!`);
+      localStorage.setItem("accessToken", token);
+
+      let username = loginData.username;
+      let detectedRole = data?.result?.role || data?.role || "";
+
+      try {
+        const meRes = await authApi.me();
+        username = meRes?.data?.result?.username || meRes?.data?.username || username;
+        detectedRole = meRes?.data?.result?.role || meRes?.data?.role || detectedRole;
+      } catch (meErr) {
+        console.warn("Không thể lấy thông tin user (me):", meErr);
+      }
+
+      if (!detectedRole) {
+        detectedRole = username?.toLowerCase() === "admin" ? "admin" : "user";
+      }
+
+      localStorage.setItem("role", detectedRole);
+
+      addToast("success", `Đăng nhập thành công! Xin chào ${username}!`);
       setLoginData({ username: "", password: "" });
 
+      // Kiểm tra role và chuyển hướng phù hợp
+      const userRole = localStorage.getItem("role");
+
       setTimeout(() => {
-        navigate("/home");
+        if (userRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
       }, 800);
     } catch (err) {
       console.error("Login error:", err);
       addToast(
         "error",
-        err.response?.data?.message || err.message || "Login failed. Please check your credentials."
+        err.response?.data?.message || err.message || "Đăng nhập thất bại. Kiểm tra lại thông tin."
       );
     } finally {
       setLoading(false);
     }
-  }, [loginData, navigate, addToast]);
+  };
 
   return (
-    <div className="auth-wrapper">
+    <>
       {/* Toast notifications */}
       <div className="toasts">
         {toasts.map((toast) => (
@@ -135,18 +163,18 @@ const LoginSignup = () => {
         ))}
       </div>
 
-      {/* Success Modal */}
+      {/* Modal thành công đăng ký */}
       {showSuccessModal && (
         <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
-            <h2>Sign Up Successful!</h2>
-            <p>You have successfully created an account.<br />Please login to continue.</p>
+            <h2>Đăng ký thành công!</h2>
+            <p>Bạn đã tạo tài khoản thành công.<br />Hãy đăng nhập để tiếp tục.</p>
             <button onClick={handleModalOk}>OK</button>
           </div>
         </div>
       )}
 
-      <div className={`auth-container ${isSignUp ? "active" : ""}`}>
+      <div className={`container ${isSignUp ? "active" : ""}`} id="container">
         {/* LOGIN FORM */}
         <div className="form-container login-container">
           <form onSubmit={handleLoginSubmit}>
@@ -180,13 +208,13 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Processing..." : "Login"}
+              {loading ? "Loading..." : "Login"}
             </button>
 
             <p>
-              Don't have an account?{" "}
+              Don't have an account yet?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(true); }}>
-                Sign up now
+                Sign In
               </a>
             </p>
           </form>
@@ -252,24 +280,24 @@ const LoginSignup = () => {
             </div>
 
             <button type="submit" disabled={loading}>
-              {loading ? "Processing..." : "Sign Up"}
+              {loading ? "Loading..." : "Sign Up"}
             </button>
 
             <p>
               Already have an account?{" "}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsSignUp(false); }}>
-                Login
+                    Log In
               </a>
             </p>
           </form>
         </div>
 
         {/* Sliding Cover */}
-        <div className="auth-cover">
+        <div className="cover">
           <h2>WELCOME!</h2>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

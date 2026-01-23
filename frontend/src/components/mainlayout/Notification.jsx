@@ -1,7 +1,6 @@
-// src/pages/Notifications.jsx
-import React, { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Notification.css'; // we'll create this next
+import './Notification.css';
 
 // Using the same fake data (you can later replace with real data from API/context)
 const fakeNotifications = [
@@ -13,7 +12,7 @@ const fakeNotifications = [
     message: "This looks amazing! 🔥",
     time: "5m ago",
     read: false,
-    link: "/plans/123" // example - you can make these clickable
+    link: "/plans/123"
   },
   {
     id: 2,
@@ -31,7 +30,7 @@ const fakeNotifications = [
     action: "started following you",
     time: "2h ago",
     read: true,
-    link: "/users/emma123"
+    link: "/profile/emma123"
   },
   {
     id: 4,
@@ -70,14 +69,28 @@ const fakeNotifications = [
 ];
 
 const Notifications = () => {
-  const [filter, setFilter] = useState('all'); // 'all' | 'unread'
+  const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
 
-  const displayedNotifications = fakeNotifications.filter(notif =>
-    filter === 'all' || !notif.read
-  );
+  const unreadCount = useMemo(() => {
+    return fakeNotifications.filter(n => !n.read).length;
+  }, []);
 
-  const unreadCount = fakeNotifications.filter(n => !n.read).length;
+  const displayedNotifications = useMemo(() => {
+    return fakeNotifications.filter(notif =>
+      filter === 'all' || !notif.read
+    );
+  }, [filter]);
+
+  const handleNotificationClick = useCallback((notification) => {
+    if (notification.link) {
+      navigate(notification.link);
+    }
+  }, [navigate]);
+
+  const handleFilterChange = useCallback((newFilter) => {
+    setFilter(newFilter);
+  }, []);
 
   return (
     <div className="notifications-page">
@@ -91,13 +104,17 @@ const Notifications = () => {
       <div className="notifications-filters">
         <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-          onClick={() => setFilter('all')}
+          onClick={() => handleFilterChange('all')}
+          type="button"
+          aria-label="Show all notifications"
         >
           All
         </button>
         <button
           className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
-          onClick={() => setFilter('unread')}
+          onClick={() => handleFilterChange('unread')}
+          type="button"
+          aria-label={`Show unread notifications (${unreadCount})`}
         >
           Unread ({unreadCount})
         </button>
@@ -117,10 +134,23 @@ const Notifications = () => {
             <div
               key={notif.id}
               className={`notification-item ${!notif.read ? 'unread' : ''}`}
-              onClick={() => notif.link && navigate(notif.link)}
-              style={notif.link ? { cursor: 'pointer' } : {}}
+              onClick={() => handleNotificationClick(notif)}
+              style={{ cursor: notif.link ? 'pointer' : 'default' }}
+              role={notif.link ? 'button' : undefined}
+              tabIndex={notif.link ? 0 : undefined}
+              onKeyDown={(e) => {
+                if (notif.link && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault();
+                  handleNotificationClick(notif);
+                }
+              }}
             >
-              <img src={notif.avatar} alt={notif.name} className="avatar" />
+              <img
+                src={notif.avatar}
+                alt={`${notif.name}'s avatar`}
+                className="avatar"
+                loading="lazy"
+              />
               <div className="content">
                 <p className="main-text">
                   <strong>{notif.name}</strong> {notif.action}
@@ -128,7 +158,7 @@ const Notifications = () => {
                 </p>
                 <span className="time">{notif.time}</span>
               </div>
-              {!notif.read && <div className="unread-dot" />}
+              {!notif.read && <div className="unread-dot" aria-label="Unread notification" />}
             </div>
           ))
         )}
