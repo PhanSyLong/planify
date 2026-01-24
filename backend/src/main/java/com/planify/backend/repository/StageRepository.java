@@ -24,7 +24,7 @@ public interface StageRepository extends JpaRepository<@NonNull Stage, @NonNull 
 
     // Sum durations of stages that belong to a plan (expected time)
     @Query("select coalesce(sum(s.duration), 0) from Stage s where s.plan_id.id = :planId")
-    Integer sumDurationByPlanId(@Param("planId") @NonNull Integer planId);
+    Long sumDurationByPlanId(@Param("planId") @NonNull Integer planId);
 
     @Modifying
     @Query(value = "UPDATE stage SET duration = :duration WHERE id = :stageId", nativeQuery = true)

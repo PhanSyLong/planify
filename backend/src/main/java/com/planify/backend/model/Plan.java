@@ -39,9 +39,7 @@ public class Plan {
     String status;
 
     @Column(nullable = false)
-    Long duration;
-
-
+    long duration;
 
     String picture;
 

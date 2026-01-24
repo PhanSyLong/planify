@@ -31,7 +31,7 @@ public class Stage {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    Integer duration;
+    int duration;
 
     @CreatedDate
     LocalDateTime created_date;

@@ -60,7 +60,7 @@ public class SubtaskService {
 
             Plan plan = stage.getPlan_id();
             if (plan != null) {
-                Integer planDuration = stageRepository.sumDurationByPlanId(plan.getId());
+                Long planDuration = stageRepository.sumDurationByPlanId(plan.getId());
                 planRepository.updateDuration(plan.getId(), planDuration);
             }
         }
@@ -98,7 +98,7 @@ public class SubtaskService {
 
             Plan plan = stage.getPlan_id();
             if (plan != null) {
-                Integer planDuration = stageRepository.sumDurationByPlanId(plan.getId());
+                Long planDuration = stageRepository.sumDurationByPlanId(plan.getId());
                 planRepository.updateDuration(plan.getId(), planDuration);
             }
         }
@@ -222,7 +222,7 @@ public class SubtaskService {
 
                     Plan plan = stage.getPlan_id();
                     if (plan != null) {
-                        Integer planDuration = stageRepository.sumDurationByPlanId(plan.getId());
+                        Long planDuration = stageRepository.sumDurationByPlanId(plan.getId());
                         planRepository.updateDuration(plan.getId(), planDuration);
                     }
                 }

@@ -56,6 +56,6 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
 
     @Modifying
     @Query(value = "UPDATE plan SET duration = :duration WHERE id = :planId", nativeQuery = true)
-    void updateDuration(@Param("planId") Integer planId, @Param("duration") Integer duration);
+    void updateDuration(@Param("planId") Integer planId, @Param("duration") Long duration);
 
 }
