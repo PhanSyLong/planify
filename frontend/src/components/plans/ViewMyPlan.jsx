@@ -1,25 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import EditPlan from './EditPlan';
 import PreviewModal from '../createplan/Preview';
+import StatusDropdown from '../../components/home/StatusDropdown';
+import ReviewPlanPopup from './ReviewPlanPopUp';
 import './ViewMyPlan.css';
 
+// Backend-ready structure with subtask statuses and deadlines
 const MOCK_PLANS = {
-  'plan-1': {
-    title: 'IELTS Speaking Mastery',
-    description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking.',
+  'my-recent-1': {
+    title: 'Morning Workout Routine',
+    description: 'Build a sustainable morning habit.',
     imageUrl: null,
-    categories: ['Language', 'Exam', 'English'],
+    categories: ['Fitness', 'Health'],
     stages: [
       {
-        title: 'Week 1-2: Fluency & Coherence',
-        description: 'Build confidence and natural speaking flow.',
+        title: 'Week 1: Basics',
+        description: 'Get started with simple routines.',
         tasks: [
           {
-            title: 'Daily Topic Practice',
-            description: 'Speak on 3 Part 1 topics every day.',
-            duration: '14',
-            subtasks: ['Record yourself', 'Note new vocabulary', 'Self-evaluate fluency'],
+            title: 'Warm-up & Push-ups',
+            description: 'Basic warm-up and strength building.',
+            duration: '7',
+            subtasks: [
+              {
+                text: '10 min jog in place',
+                status: 'DONE',
+                deadline: '2026-01-15',
+                completedAt: '2026-01-14'
+              },
+              {
+                text: '3 sets of push-ups',
+                status: 'IN_PROGRESS',
+                deadline: '2026-01-20',
+                completedAt: null
+              }
+            ],
           },
         ],
       },
@@ -39,27 +55,20 @@ const MOCK_PLANS = {
             title: 'Custom Hooks Practice',
             description: 'Create reusable custom hooks.',
             duration: '7',
-            subtasks: ['useEffect for side effects', 'useState for local state'],
-          },
-        ],
-      },
-    ],
-  },
-  'my-recent-1': {
-    title: 'Morning Workout Routine',
-    description: 'Build a sustainable morning habit.',
-    imageUrl: null,
-    categories: ['Fitness', 'Health'],
-    stages: [
-      {
-        title: 'Week 1: Basics',
-        description: 'Get started with simple routines.',
-        tasks: [
-          {
-            title: 'Warm-up & Push-ups',
-            description: 'Basic warm-up and strength building.',
-            duration: '7',
-            subtasks: ['10 min jog in place', '3 sets of push-ups'],
+            subtasks: [
+              {
+                text: 'useEffect for side effects',
+                status: 'DONE',
+                deadline: '2026-01-10',
+                completedAt: '2026-01-12'
+              },
+              {
+                text: 'useState for local state',
+                status: 'CANCELLED',
+                deadline: '2026-01-15',
+                completedAt: null
+              }
+            ],
           },
         ],
       },
@@ -79,7 +88,59 @@ const MOCK_PLANS = {
             title: 'Grocery List Creation',
             description: 'Make a healthy shopping list.',
             duration: '7',
-            subtasks: ['Choose veggies', 'Select proteins'],
+            subtasks: [
+              {
+                text: 'Choose veggies',
+                status: 'INCOMPLETE',
+                deadline: '2026-01-25',
+                completedAt: null
+              },
+              {
+                text: 'Select proteins',
+                status: 'IN_PROGRESS',
+                deadline: '2026-01-27',
+                completedAt: null
+              }
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  'plan-1': {
+    title: 'IELTS Speaking Mastery',
+    description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking.',
+    imageUrl: null,
+    categories: ['Language', 'Exam', 'English'],
+    stages: [
+      {
+        title: 'Week 1-2: Fluency & Coherence',
+        description: 'Build confidence and natural speaking flow.',
+        tasks: [
+          {
+            title: 'Daily Topic Practice',
+            description: 'Speak on 3 Part 1 topics every day.',
+            duration: '14',
+            subtasks: [
+              {
+                text: 'Record yourself',
+                status: 'DONE',
+                deadline: '2026-01-15',
+                completedAt: '2026-01-14'
+              },
+              {
+                text: 'Note new vocabulary',
+                status: 'IN_PROGRESS',
+                deadline: '2026-01-20',
+                completedAt: null
+              },
+              {
+                text: 'Self-evaluate fluency',
+                status: 'INCOMPLETE',
+                deadline: '2026-01-25',
+                completedAt: null
+              }
+            ],
           },
         ],
       },
@@ -90,6 +151,7 @@ const MOCK_PLANS = {
 const ViewMyPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const reviewBtnRef = useRef(null);
 
   const [plan, setPlan] = useState(null);
   const [originalPlan, setOriginalPlan] = useState(null);
@@ -97,6 +159,7 @@ const ViewMyPlan = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -137,11 +200,92 @@ const ViewMyPlan = () => {
     };
   }, [id]);
 
+  // Calculate review statistics
+  const calculateReviewData = useCallback(() => {
+    if (!plan) return {};
+
+    let totalSubtasks = 0;
+    let cancelled = 0;
+    let completedOnTime = 0;
+    let completedLate = 0;
+    let inProgress = 0;
+    let incomplete = 0;
+
+    plan.stages.forEach(stage => {
+      stage.tasks.forEach(task => {
+        if (task.subtasks) {
+          task.subtasks.forEach(subtask => {
+            totalSubtasks++;
+
+            switch (subtask.status) {
+              case 'DONE':
+                if (subtask.completedAt && subtask.deadline) {
+                  const completed = new Date(subtask.completedAt);
+                  const deadline = new Date(subtask.deadline);
+                  if (completed <= deadline) {
+                    completedOnTime++;
+                  } else {
+                    completedLate++;
+                  }
+                } else {
+                  completedOnTime++;
+                }
+                break;
+              case 'CANCELLED':
+                cancelled++;
+                break;
+              case 'IN_PROGRESS':
+                inProgress++;
+                break;
+              case 'INCOMPLETE':
+                incomplete++;
+                break;
+              default:
+                incomplete++;
+            }
+          });
+        }
+      });
+    });
+
+    return {
+      totalSubtasks,
+      cancelled,
+      completedOnTime,
+      completedLate,
+      inProgress,
+      incomplete,
+    };
+  }, [plan]);
+
+  // Handle subtask status change
+  const handleSubtaskStatusChange = useCallback((stageIdx, taskIdx, subtaskIdx, newStatus) => {
+    setPlan(prevPlan => {
+      const updatedPlan = JSON.parse(JSON.stringify(prevPlan));
+      const subtask = updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx];
+
+      subtask.status = newStatus;
+
+      // Set completedAt timestamp when marked as DONE
+      if (newStatus === 'DONE' && !subtask.completedAt) {
+        subtask.completedAt = new Date().toISOString().split('T')[0];
+      } else if (newStatus !== 'DONE') {
+        subtask.completedAt = null;
+      }
+
+      // TODO: Send update to backend API
+      // await updateSubtaskStatus(planId, stageIdx, taskIdx, subtaskIdx, { status: newStatus, completedAt: subtask.completedAt });
+
+      return updatedPlan;
+    });
+  }, []);
+
   const handleSave = useCallback(() => {
     console.log('Saved plan:', plan);
     setOriginalPlan(JSON.parse(JSON.stringify(plan)));
     setIsEditing(false);
     // TODO: Send to API
+    // await savePlan(id, plan);
   }, [plan]);
 
   const handleCancel = useCallback(() => {
@@ -203,6 +347,17 @@ const ViewMyPlan = () => {
         </button>
 
         <div className="viewplan-actions">
+          <div ref={reviewBtnRef} style={{ position: 'relative' }}>
+            <button className="btn-review" onClick={() => setShowReview(!showReview)}>
+              Review
+            </button>
+            <ReviewPlanPopup
+              isOpen={showReview}
+              onClose={() => setShowReview(false)}
+              containerRef={reviewBtnRef}
+              reviewData={calculateReviewData()}
+            />
+          </div>
           <button className="btn-edit" onClick={() => setIsEditing(true)}>
             Edit Plan
           </button>
@@ -278,8 +433,20 @@ const ViewMyPlan = () => {
                       <div className="subtasks">
                         <strong>Subtasks:</strong>
                         <ul>
-                          {task.subtasks.map((sub, i) => (
-                            <li key={i}>{sub}</li>
+                          {task.subtasks.map((subtask, subtaskIdx) => (
+                            <li key={subtaskIdx} className="subtask-item">
+                              <span className="subtask-text">
+                                {typeof subtask === 'string' ? subtask : subtask.text}
+                              </span>
+                              {typeof subtask === 'object' && (
+                                <StatusDropdown
+                                  value={subtask.status || 'INCOMPLETE'}
+                                  onChange={(newStatus) =>
+                                    handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, newStatus)
+                                  }
+                                />
+                              )}
+                            </li>
                           ))}
                         </ul>
                       </div>

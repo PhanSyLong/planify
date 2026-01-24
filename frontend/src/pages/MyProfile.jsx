@@ -5,13 +5,12 @@ import "./MyProfile.css";
 
 export default function MyProfile() {
   const [avatar, setAvatar] = useState(null);
-  const [bio, setBio] = useState("This is bio");
-
-  const stats = {
+  const [bio, setBio] = useState("Passionate developer and fitness enthusiast. Love creating useful apps!");
+  const [stats, setStats] = useState({
     followings: 15,
     followers: 5,
     plans: 12
-  };
+  });
 
   const handleAvatarChange = useCallback((newAvatar) => {
     setAvatar(newAvatar);
@@ -23,6 +22,12 @@ export default function MyProfile() {
     setBio(newBio);
     // TODO: Save to backend
     console.log("Bio updated:", newBio);
+  }, []);
+
+  const handleStatsChange = useCallback((newStats) => {
+    setStats(newStats);
+    // TODO: Update stats in backend
+    console.log("Stats updated:", newStats);
   }, []);
 
   return (
@@ -37,7 +42,8 @@ export default function MyProfile() {
       <MyBioMenu
         bio={bio}
         onBioChange={handleBioChange}
-
+        stats={stats}
+        onStatsChange={handleStatsChange}
       />
     </div>
   );

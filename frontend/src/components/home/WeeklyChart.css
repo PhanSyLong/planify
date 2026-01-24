@@ -5,6 +5,7 @@
   /* Make this a container */
   container-type: inline-size;
   container-name: weekly-chart;
+<<<<<<< HEAD
 }
 
 .button{
@@ -22,6 +23,8 @@
 .button:disabled {
   background-color: #cbd5f5;
   cursor: not-allowed;
+=======
+>>>>>>> b1b6a5ee0d0ca0408fad574366f63cffecf87d6c
 }
 
 .weekly-chart__header {

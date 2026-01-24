@@ -24,11 +24,19 @@ const MOCK_FOLLOWERS = [
   { id: 5, username: "sarah_jones", plans: 20, followers: 450 },
 ];
 
-export default function MyBioMenu({ bio, onBioChange }) {
+export default function MyBioMenu({ bio, onBioChange, stats, onStatsChange }) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("about");
+  const [activeTab, setActiveTab] = useState("plans");
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState(bio);
+
+  // Track follow state for followings (starts as all followed)
+  const [followingStates, setFollowingStates] = useState(
+    Object.fromEntries(MOCK_FOLLOWINGS.map(u => [u.id, true]))
+  );
+
+  // Track followers list
+  const [followers, setFollowers] = useState(MOCK_FOLLOWERS);
 
   const handleEditBio = useCallback(() => {
     setTempBio(bio);
@@ -45,24 +53,50 @@ export default function MyBioMenu({ bio, onBioChange }) {
     setIsEditingBio(false);
   }, [bio]);
 
+  const handleToggleFollow = useCallback((userId) => {
+    setFollowingStates(prev => {
+      const newState = !prev[userId];
+      const wasFollowing = prev[userId];
+
+      // Update followings count
+      if (wasFollowing && !newState) {
+        // Unfollowing
+        onStatsChange?.({ ...stats, followings: stats.followings - 1 });
+      } else if (!wasFollowing && newState) {
+        // Following again
+        onStatsChange?.({ ...stats, followings: stats.followings + 1 });
+      }
+
+      return { ...prev, [userId]: newState };
+    });
+
+    // TODO: API call to follow/unfollow user
+    console.log("Toggled follow for user:", userId);
+  }, [stats, onStatsChange]);
+
+  const handleRemoveFollower = useCallback((userId) => {
+    setFollowers(prev => prev.filter(f => f.id !== userId));
+    onStatsChange?.({ ...stats, followers: stats.followers - 1 });
+
+    // TODO: API call to remove follower
+    console.log("Removed follower:", userId);
+  }, [stats, onStatsChange]);
+
   const handleUserClick = useCallback((username) => {
     navigate(`/profile/${username}`);
   }, [navigate]);
 
   const renderContent = useMemo(() => {
     switch (activeTab) {
-      case "about":
-        return null;
-
       case "plans":
         return MOCK_PLANS.length > 0 ? (
-          <div className="my-bio-grid">
+          <div className="my-content-grid">
             {MOCK_PLANS.map((plan) => (
-              <div key={plan.id} className="plan-card">
-                <div className="plan-card-image">📋</div>
-                <div className="plan-card-content">
-                  <div className="plan-card-title">{plan.title}</div>
-                  <div className="plan-card-meta">
+              <div key={plan.id} className="my-plan-card">
+                <div className="my-plan-card-image">📋</div>
+                <div className="my-plan-card-content">
+                  <div className="my-plan-card-title">{plan.title}</div>
+                  <div className="my-plan-card-meta">
                     {plan.stages} stages • {plan.tasks} tasks
                   </div>
                 </div>
@@ -70,7 +104,7 @@ export default function MyBioMenu({ bio, onBioChange }) {
             ))}
           </div>
         ) : (
-          <div className="my-bio-empty">
+          <div className="my-empty-state">
             <p>No plans yet</p>
             <span>Start creating plans to see them here</span>
           </div>
@@ -78,13 +112,13 @@ export default function MyBioMenu({ bio, onBioChange }) {
 
       case "saved":
         return MOCK_SAVED.length > 0 ? (
-          <div className="my-bio-grid">
+          <div className="my-content-grid">
             {MOCK_SAVED.map((plan) => (
-              <div key={plan.id} className="plan-card">
-                <div className="plan-card-image">📋</div>
-                <div className="plan-card-content">
-                  <div className="plan-card-title">{plan.title}</div>
-                  <div className="plan-card-meta">
+              <div key={plan.id} className="my-plan-card">
+                <div className="my-plan-card-image">📋</div>
+                <div className="my-plan-card-content">
+                  <div className="my-plan-card-title">{plan.title}</div>
+                  <div className="my-plan-card-meta">
                     {plan.stages} stages • {plan.tasks} tasks
                   </div>
                 </div>
@@ -92,7 +126,7 @@ export default function MyBioMenu({ bio, onBioChange }) {
             ))}
           </div>
         ) : (
-          <div className="my-bio-empty">
+          <div className="my-empty-state">
             <p>No saved plans</p>
             <span>Save plans to see them here</span>
           </div>
@@ -100,21 +134,30 @@ export default function MyBioMenu({ bio, onBioChange }) {
 
       case "followings":
         return (
-          <div className="my-bio-users-grid">
+          <div className="my-content-grid">
             {MOCK_FOLLOWINGS.map((user) => (
-              <div
-                key={user.id}
-                className="user-card"
-                onClick={() => handleUserClick(user.username)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="user-card-avatar">
+              <div key={user.id} className="my-user-card">
+                <div
+                  className="my-user-card-avatar my-user-card-clickable"
+                  onClick={() => handleUserClick(user.username)}
+                >
                   {user.username.charAt(0).toUpperCase()}
                 </div>
-                <div className="user-card-name">{user.username}</div>
-                <div className="user-card-stats">
-                  {user.plans} plans • {user.followers} followers
+                <div
+                  className="my-user-card-info my-user-card-clickable"
+                  onClick={() => handleUserClick(user.username)}
+                >
+                  <div className="my-user-card-name">{user.username}</div>
+                  <div className="my-user-card-stats">
+                    {user.plans} plans • {user.followers} followers
+                  </div>
                 </div>
+                <button
+                  className={`my-user-unfollow-btn ${!followingStates[user.id] ? 'my-user-follow-btn' : ''}`}
+                  onClick={() => handleToggleFollow(user.id)}
+                >
+                  {followingStates[user.id] ? 'Unfollow' : 'Follow'}
+                </button>
               </div>
             ))}
           </div>
@@ -122,21 +165,31 @@ export default function MyBioMenu({ bio, onBioChange }) {
 
       case "followers":
         return (
-          <div className="my-bio-users-grid">
-            {MOCK_FOLLOWERS.map((user) => (
-              <div
-                key={user.id}
-                className="user-card"
-                onClick={() => handleUserClick(user.username)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="user-card-avatar">
+          <div className="my-content-grid">
+            {followers.map((user) => (
+              <div key={user.id} className="my-user-card">
+                <div
+                  className="my-user-card-avatar my-user-card-clickable"
+                  onClick={() => handleUserClick(user.username)}
+                >
                   {user.username.charAt(0).toUpperCase()}
                 </div>
-                <div className="user-card-name">{user.username}</div>
-                <div className="user-card-stats">
-                  {user.plans} plans • {user.followers} followers
+                <div
+                  className="my-user-card-info my-user-card-clickable"
+                  onClick={() => handleUserClick(user.username)}
+                >
+                  <div className="my-user-card-name">{user.username}</div>
+                  <div className="my-user-card-stats">
+                    {user.plans} plans • {user.followers} followers
+                  </div>
                 </div>
+                <button
+                  className="my-user-remove-btn"
+                  onClick={() => handleRemoveFollower(user.id)}
+                  title="Remove follower"
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
@@ -145,82 +198,71 @@ export default function MyBioMenu({ bio, onBioChange }) {
       default:
         return null;
     }
-  }, [activeTab, handleUserClick]);
+  }, [activeTab, followingStates, followers, handleToggleFollow, handleRemoveFollower, handleUserClick]);
 
   return (
-    <div className="my-bio-menu">
-      <div className="my-bio-tabs">
-        <button
-          className={`my-bio-tab ${activeTab === "about" ? "active" : ""}`}
-          onClick={() => setActiveTab("about")}
-        >
-          About me
-          <span className="my-bio-tab-badge">NEW</span>
-        </button>
-        <button
-          className={`my-bio-tab ${activeTab === "plans" ? "active" : ""}`}
-          onClick={() => setActiveTab("plans")}
-        >
-          Plans
-        </button>
-        <button
-          className={`my-bio-tab ${activeTab === "saved" ? "active" : ""}`}
-          onClick={() => setActiveTab("saved")}
-        >
-          Saved
-        </button>
-        <button
-          className={`my-bio-tab ${activeTab === "followings" ? "active" : ""}`}
-          onClick={() => setActiveTab("followings")}
-        >
-          Followings
-        </button>
-        <button
-          className={`my-bio-tab ${activeTab === "followers" ? "active" : ""}`}
-          onClick={() => setActiveTab("followers")}
-        >
-          Followers
-        </button>
+    <div className="my-bio-menu-container">
+      <div className="my-bio-section">
+        <div className="my-bio-box">
+          <div className="my-bio-title">About me</div>
+          {isEditingBio ? (
+            <>
+              <textarea
+                className="my-bio-input"
+                value={tempBio}
+                onChange={(e) => setTempBio(e.target.value)}
+                placeholder="Write something about yourself..."
+                maxLength={500}
+                autoFocus
+              />
+              <div className="my-bio-actions">
+                <button className="my-bio-save-btn" onClick={handleSaveBio}>
+                  Save
+                </button>
+                <button className="my-bio-cancel-btn" onClick={handleCancelBio}>
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="my-bio-text">{bio || "No bio yet"}</p>
+              <button className="my-bio-edit-btn" onClick={handleEditBio}>
+                Edit
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="my-bio-content">
-        {activeTab === "about" && (
-          <div className="my-bio-about-box">
-            <div className="my-bio-about-title">About me</div>
-
-            {isEditingBio ? (
-              <>
-                <textarea
-                  className="my-bio-about-input"
-                  value={tempBio}
-                  onChange={(e) => setTempBio(e.target.value)}
-                  placeholder="Write something about yourself..."
-                  maxLength={500}
-                  autoFocus
-                />
-                <div className="my-bio-about-actions">
-                  <button className="my-bio-save-btn" onClick={handleSaveBio}>
-                    Save
-                  </button>
-                  <button className="my-bio-cancel-btn" onClick={handleCancelBio}>
-                    Cancel
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="my-bio-about-text">
-                  {bio || '"This is bio"'}
-                </p>
-                <button className="my-bio-edit-btn" onClick={handleEditBio}>
-                  Edit
-                </button>
-              </>
-            )}
-          </div>
-        )}
-
-        <div>{renderContent}</div>
+      <div className="my-content-section">
+        <div className="my-content-tabs">
+          <button
+            className={`my-content-tab ${activeTab === "plans" ? "active" : ""}`}
+            onClick={() => setActiveTab("plans")}
+          >
+            Plans
+          </button>
+          <button
+            className={`my-content-tab ${activeTab === "saved" ? "active" : ""}`}
+            onClick={() => setActiveTab("saved")}
+          >
+            Saved
+          </button>
+          <button
+            className={`my-content-tab ${activeTab === "followings" ? "active" : ""}`}
+            onClick={() => setActiveTab("followings")}
+          >
+            Followings
+          </button>
+          <button
+            className={`my-content-tab ${activeTab === "followers" ? "active" : ""}`}
+            onClick={() => setActiveTab("followers")}
+          >
+            Followers
+          </button>
+        </div>
+        <div className="my-content-area">{renderContent}</div>
       </div>
     </div>
   );

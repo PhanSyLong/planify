@@ -12,6 +12,7 @@ build/
 # OS
 .DS_Store
 
+<<<<<<< HEAD
 HELP.md
 *target/
 .mvn/wrapper/maven-wrapper.jar
@@ -41,3 +42,6 @@ HELP.md
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+=======
+*target/
+>>>>>>> b1b6a5ee0d0ca0408fad574366f63cffecf87d6c

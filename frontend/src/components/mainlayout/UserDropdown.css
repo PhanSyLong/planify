@@ -11,8 +11,11 @@
   width: 320px;
   max-width: 95vw;                    /* ← prevent overflow on small screens */
   background: white;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  user-select: none;
 
   container-type: inline-size;
   animation: fadeSlide 0.18s ease-out;
@@ -43,7 +46,7 @@
   left: auto !important;
 }
 
-/* animation matches Notification & Language */
+/* Animation matches other dropdowns */
 @keyframes fadeSlide {
   from {
     opacity: 0;
@@ -75,15 +78,18 @@
 .user-dd-avatar.fallback {
   background: linear-gradient(135deg, #2563eb, #7c3aed);
   color: white;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
+  font-size: 20px;
 }
 
 .user-dd-info strong {
   display: block;
   font-size: 15px;
   color: #111827;
+  font-weight: 600;
 }
 
 .user-dd-info span {
@@ -107,14 +113,19 @@
   cursor: pointer;
   font-size: 14px;
   color: #1f2937;
+  transition: background-color 0.15s ease;
 }
 
 .user-dd-list button:hover {
-  background: #f9fafb;
+  background-color: #f9fafb;
 }
 
 .user-dd-list button.danger {
   color: #dc2626;
+}
+
+.user-dd-list button.danger:hover {
+  background-color: #fee;
 }
 
 /* ===== Container responsive ===== */

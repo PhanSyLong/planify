@@ -2,7 +2,6 @@ import { NavLink } from "react-router-dom";
 import { useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMagnifyingGlass,
   faBell,
   faUser,
   faGlobe,
@@ -17,8 +16,6 @@ import LanguageDropdown from "./LanguageDropdown";
 import "./Header.css";
 
 export default function Header() {
-  const [searchValue, setSearchValue] = useState("");
-
   const [openPopup, setOpenPopup] = useState(null);
   // "user" | "notif" | "lang" | null
 
@@ -35,16 +32,6 @@ export default function Header() {
       <NavLink to="/home" className="app-header-logo">
         <img src={Logo} alt="Planify Logo" />
       </NavLink>
-
-      {/* Search */}
-      <div className="app-header-search">
-        <FontAwesomeIcon icon={faMagnifyingGlass} className="icon" />
-        <input
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          placeholder="Search plans, users..."
-        />
-      </div>
 
       {/* Actions */}
       <div className="app-header-actions">

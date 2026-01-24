@@ -40,7 +40,7 @@ const PlanInfo = ({ planData, updatePlanData }) => {
 
       updatePlanData({
         imageFile: file,
-        imageUrl: URL.createObjectURL(file), 
+        imageUrl: URL.createObjectURL(file),
       })
     }
   }, [updatePlanData]);

@@ -12,21 +12,23 @@ import MyPlan from "./pages/MyPlan";
 import SavedPlan from "./pages/SavedPlan";
 import Commu from "./pages/ExplorePage";
 import Add from "./pages/CreatePlan";
-import About from "./pages/AboutUs";
+import About from "./pages/AboutUs.jsx";
 
 // Profile Pages
 import MyProfile from "./pages/MyProfile";
 import OtherUser from "./pages/OtherUser";
 
 //plan
-import ViewPlan from "./components/plans/ViewPlan";
-import ViewMyPlan from "./components/plans/ViewMyPlan";
+import ViewPlan from "./components/plans/ViewPlan.jsx";
+import ViewMyPlan from "./components/plans/ViewMyPlan.jsx";
 import UserView from "./components/users/UserView";
-import Notification from "./components/mainlayout/Notification"
+import Notification from "./components/mainlayout/Notification.jsx"
 import "./App.css";
 
+//fork
+import ForkPlan from "./components/fork&edit/ForkPlan.jsx"
 //
-import Admin from "./pages/Admin";
+import Admin from "./pages/Admin.jsx";
 
 export default function App() {
   return (
@@ -36,6 +38,7 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/add" element={<Add />} />
 
+
           {/* Profile Routes */}
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/profile/:username" element={<OtherUser />} />
@@ -44,9 +47,11 @@ export default function App() {
           <Route path="/myplan" element={<MyPlan />} />
           <Route path="/myplan/plans/:id" element={<ViewMyPlan />} />
 
+
           {/* Saved Plan Routes */}
           <Route path="/saved" element={<SavedPlan />} />
           <Route path="/saved/plans/:id" element={<ViewPlan />} />
+          <Route path="/plans/:id/fork" element={<ForkPlan />} />
 
           {/* Community/Explore Routes */}
           <Route path="/commu" element={<Commu />} />

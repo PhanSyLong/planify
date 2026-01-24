@@ -1,15 +1,6 @@
-import { useState, useCallback } from "react";
 import "./UserAvatar.css";
 
-export default function UserAvatar({ username, stats, avatar }) {
-  const [isFollowing, setIsFollowing] = useState(false);
-
-  const handleFollowClick = useCallback(() => {
-    setIsFollowing(!isFollowing);
-    // TODO: Call API to follow/unfollow
-    console.log(isFollowing ? "Unfollowed" : "Followed", username);
-  }, [isFollowing, username]);
-
+export default function UserAvatar({ username, stats, avatar, isFollowing, onFollowToggle }) {
   const initial = username.charAt(0).toUpperCase();
 
   return (
@@ -45,7 +36,7 @@ export default function UserAvatar({ username, stats, avatar }) {
         <div className="user-avatar-actions">
           <button
             className={`user-avatar-follow-btn ${isFollowing ? "following" : ""}`}
-            onClick={handleFollowClick}
+            onClick={onFollowToggle}
           >
             {isFollowing ? "Following" : "Follow"}
           </button>

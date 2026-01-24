@@ -1,3 +1,5 @@
+//httpAuth.js
+
 import axios from 'axios';
 
 const httpAuth = axios.create({

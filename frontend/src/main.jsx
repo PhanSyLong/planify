@@ -5,9 +5,9 @@ import "./index.css";
 import { PlansProvider } from "./context/PlanContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  // <React.StrictMode>
+  <React.StrictMode>
     <PlansProvider>
       <App />
     </PlansProvider>
-  // </React.StrictMode>
+  </React.StrictMode>
 );
