@@ -11,10 +11,6 @@ export const uploadImage = async(file) => {
 			"Content-Type": "multipart/form-data",
 			Authorization: `Bearer ${token}`,
 		},
-<<<<<<< HEAD
-		withCredentials: true,
-=======
         withCredentials: true,
->>>>>>> b1b6a5ee0d0ca0408fad574366f63cffecf87d6c
 	});
 };

@@ -2,77 +2,6 @@
 .my-bio-menu-container {
   container-type: inline-size;
   container-name: mybiomenu;
-<<<<<<< HEAD
-}
-
-/* Tabs */
-.my-bio-tabs {
-  display: flex;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.my-bio-tab {
-  flex: 1;
-  padding: 14px 0;
-  background: none;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  color: #8e8e8e;
-  cursor: pointer;
-  position: relative;
-  height: auto;
-}
-
-.my-bio-tab:hover {
-  color: #262626;
-  background: none;
-}
-
-.my-bio-tab.active {
-  color: #262626;
-}
-
-.my-bio-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #262626;
-}
-
-.my-bio-tab-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #0095f6;
-  color: white;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 6px;
-}
-
-/* Content */
-.my-bio-content {
-  padding: 24px;
-}
-
-/* About Me Box */
-.my-bio-about-box {
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  height: fit-content;
-}
-
-.my-bio-about-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #262626;
-  margin-bottom: 8px;
-=======
   display: grid;
   grid-template-columns: 2fr 4fr;
   gap: 0;
@@ -105,7 +34,6 @@
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
->>>>>>> b1b6a5ee0d0ca0408fad574366f63cffecf87d6c
 }
 
 .my-bio-title {
