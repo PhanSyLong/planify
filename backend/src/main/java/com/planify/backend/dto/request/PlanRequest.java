@@ -14,6 +14,7 @@ public class PlanRequest {
     String description;
     String visibility;
     String status;
+    long duration;
     String picture;
     LocalDateTime reminderAt;
     LocalDateTime expiredAt;

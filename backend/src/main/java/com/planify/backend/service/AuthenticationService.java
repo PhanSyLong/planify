@@ -142,7 +142,7 @@ public class AuthenticationService {
     }
 
     //Hàm logout
-    public void logout(LogoutRequest request) throws ParseException , JOSEException {
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
         try {
             var signToken = verifyToken(request.getToken(), true);
 

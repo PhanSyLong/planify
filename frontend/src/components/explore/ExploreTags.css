@@ -1,0 +1,267 @@
+/* ExploreTags.css */
+
+.tags-box {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+/* ========== PINNED TAGS SECTION ========== */
+.pinned-tags {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pinned-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pinned-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ========== AVAILABLE TAGS SECTION ========== */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ========== TAG STYLES ========== */
+.tag {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  white-space: nowrap;
+}
+
+.tag:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+}
+
+.tag:active {
+  transform: translateY(0);
+}
+
+.tag:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* ========== PINNED TAG STYLES ========== */
+.tag.pinned {
+  background: #002765 !important;
+  color: white !important;
+  border: none !important;
+  padding-right: 36px !important;
+  position: relative;
+  box-shadow: 0 3px 9px rgba(79, 70, 229, 0.3);
+}
+
+
+.tag.pinned strong {
+  font-weight: 700;
+}
+
+/* ========== UNPIN BUTTON ========== */
+.unpin-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.unpin-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.unpin-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(0.95);
+}
+
+.unpin-btn:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-tags {
+  text-align: center;
+  padding: 30px 16px;
+  color: #94a3b8;
+}
+
+.empty-tags p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .tags-box {
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+
+  .pinned-tags {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .pinned-label {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .pinned-tags-list,
+  .tags-container {
+    gap: 8px;
+  }
+
+  .tag {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+
+  .tag.pinned {
+    padding-right: 34px !important;
+  }
+
+  .unpin-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    right: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tags-box {
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+
+  .pinned-tags-list,
+  .tags-container {
+    gap: 6px;
+  }
+
+  .tag {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .tag.pinned {
+    padding-right: 32px !important;
+  }
+
+  .unpin-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+  }
+
+  .empty-tags {
+    padding: 20px 12px;
+  }
+
+  .empty-tags p {
+    font-size: 13px;
+  }
+}
+
+/* ========== ACCESSIBILITY ========== */
+.tag:focus,
+.unpin-btn:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* ========== ANIMATION ========== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tag {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* ========== DARK MODE SUPPORT (OPTIONAL) ========== */
+@media (prefers-color-scheme: dark) {
+  .tags-box {
+    background: #1e293b;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.3);
+  }
+
+  .pinned-tags {
+    border-bottom-color: #002765;
+  }
+
+  .pinned-label {
+    color: #94a3b8;
+  }
+
+  .tag {
+    background: #334155;
+    color: #e2e8f0;
+    border-color: #475569;
+  }
+
+  .tag:hover {
+    background: #3730a3;
+    border-color: #4f46e5;
+    color: #e0e7ff;
+  }
+
+  .empty-tags p {
+    color: #64748b;
+  }
+}

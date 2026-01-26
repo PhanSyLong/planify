@@ -4,11 +4,7 @@ import com.planify.backend.model.Plan;
 import jakarta.persistence.LockModeType;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import org.springframework.data.jpa.repository.Lock;
-
-import org.springframework.data.jpa.repository.Modifying;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,7 +14,6 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull Integer> {
-
     @Query("SELECT p FROM Plan p WHERE p.id = :planId")
     Plan findPlanById(@Param("planId") Integer planId);
 
@@ -53,9 +48,5 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
             "JOIN tp.tag t " +
             "WHERE t.tagName IN :tagNames")
     List<Plan> findByTagNames(@Param("tagNames") List<String> tagNames);
-
-    @Modifying
-    @Query(value = "UPDATE plan SET duration = :duration WHERE id = :planId", nativeQuery = true)
-    void updateDuration(@Param("planId") Integer planId, @Param("duration") Long duration);
 
 }

@@ -1,0 +1,31 @@
+.weekly-chart {
+  width: 860px;
+  height: 350px;
+}
+
+.weekly-chart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.weekly-chart__header button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.button{
+  text-color:
+}
+
+.weekly-chart__header button:hover {
+  background: #f1f5f9;
+}
+
+.weekly-chart__canvas {
+  height: 300px;
+}

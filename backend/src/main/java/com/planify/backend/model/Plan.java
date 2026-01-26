@@ -39,7 +39,7 @@ public class Plan {
     String status;
 
     @Column(nullable = false)
-    long duration;
+    Long duration;
 
     String picture;
 
@@ -50,12 +50,6 @@ public class Plan {
     @UpdateTimestamp
     @Column(name="updated_date", nullable = false)
     LocalDateTime updatedAt;
-
-    @Column(name="started_at")
-    LocalDateTime started_at;
-
-    @Column(name="completed_at")
-    LocalDateTime completed_at;
 
     @Column
     LocalDateTime reminderAt;

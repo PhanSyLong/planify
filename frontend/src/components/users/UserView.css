@@ -1,0 +1,138 @@
+.userview-page {
+  width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+/* Profile Header Section */
+.profile-header-section {
+  display: flex;
+  gap: 80px;
+  padding: 40px 40px 30px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+/* Profile Info */
+.profile-info-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.profile-name-row h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 400;
+  color: #262626;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.follow-btn {
+  padding: 8px 20px;
+  border: 1px solid #0095f6;
+  border-radius: 8px;
+  background: transparent;
+  color: #0095f6;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.follow-btn.following {
+  background: #0095f6;
+  color: white;
+  border-color: #0095f6;
+}
+
+.follow-btn:hover {
+  opacity: 0.9;
+}
+
+.message-btn {
+  padding: 8px 16px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background: white;
+  color: #262626;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.message-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Stats (giống MyProfile) */
+.profile-stats {
+  display: flex;
+  gap: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.stat-item:hover {
+  opacity: 0.7;
+}
+
+.stat-number {
+  font-size: 20px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .userview-page {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .profile-header-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .profile-name-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .profile-stats {
+    justify-content: center;
+  }
+}

@@ -1,11 +1,8 @@
 package com.planify.backend.controller;
 
 import com.planify.backend.dto.request.PlanRequest;
-import com.planify.backend.dto.request.PlanUpdateRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.PlanResponse;
-import com.planify.backend.dto.response.ProgressResponse;
-import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.PlanMapper;
 import com.planify.backend.model.Plan;
 import com.planify.backend.service.PlanService;
@@ -18,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +50,6 @@ public class PlanController {
     @GetMapping("/plans/{planId}")
     ResponseEntity<ApiResponse<PlanResponse>> getPlanById(@PathVariable Integer planId) {
         Plan plan = planService.getPlanById(planId);
-
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<PlanResponse>builder()
@@ -96,43 +91,10 @@ public class PlanController {
                         .build());
     }
 
-    // New: PATCH endpoint to partially update a plan
     @PatchMapping("/plans/{planId}")
-    ResponseEntity<ApiResponse<PlanResponse>> updatePlanPartial(@PathVariable Integer planId, @RequestBody PlanUpdateRequest request) {
-        Plan updated = planService.updatePlanPartial(planId, request);
-        PlanResponse resp = planMapper.toResponse(updated);
+    ResponseEntity<ApiResponse<PlanResponse>> updatePlan(@PathVariable Integer planId, @RequestBody PlanRequest request) {
+        Plan plan = planService.updatePlan(planId, request);
 
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.<PlanResponse>builder()
-                        .code(HttpStatus.OK.value())
-                        .result(resp)
-                        .build());
-    }
-
-    @GetMapping("/plans/{planId}/progress")
-    ResponseEntity<ApiResponse<ProgressResponse>> getPlanProgress(@PathVariable Integer planId) {
-        ProgressResponse progress = planService.computeProgress(planId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.<ProgressResponse>builder()
-                        .code(HttpStatus.OK.value())
-                        .result(progress)
-                        .build());
-    }
-
-    @PatchMapping("/plans/{planId}/start")
-    ResponseEntity<ApiResponse<PlanResponse>> startPlan(@PathVariable Integer planId) {
-        Plan plan = planService.startPlan(planId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.<PlanResponse>builder()
-                        .code(HttpStatus.OK.value())
-                        .result(planMapper.toResponse(plan))
-                        .build());
-    }
-
-    @PatchMapping("/plans/{planId}/complete")
-    ResponseEntity<ApiResponse<PlanResponse>> completePlan(@PathVariable Integer planId) {
-        Plan plan = planService.completePlan(planId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<PlanResponse>builder()
                         .code(HttpStatus.OK.value())
