@@ -1,3 +1,4 @@
+// auth.js
 import httpPublic from './httpPublic';
 import httpAuth from './httpAuth';
 
@@ -7,5 +8,12 @@ export const authApi = {
   refresh: (token) => httpPublic.post('/auth/refresh', { token }),
 
   me: () => httpAuth.get('/users/myInfo'),
-  logout: (token) => httpAuth.post('/auth/logout', { token }),
+
+  // Improved logout
+  logout: (token) => {
+    if (token) {
+      return httpAuth.post('/auth/logout', { token });
+    }
+    return httpAuth.post('/auth/logout'); // fallback: empty body
+  },
 };

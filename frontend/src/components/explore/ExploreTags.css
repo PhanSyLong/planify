@@ -1,4 +1,4 @@
-/* ExploreTags.css */
+/* ExploreTags.css - Container Query Optimized */
 
 .tags-box {
   width: 100%;
@@ -9,7 +9,7 @@
   margin-bottom: 24px;
 }
 
-/* ========== PINNED TAGS SECTION ========== */
+/* Pinned Tags Section */
 .pinned-tags {
   margin-bottom: 12px;
   padding-bottom: 12px;
@@ -31,14 +31,14 @@
   gap: 10px;
 }
 
-/* ========== AVAILABLE TAGS SECTION ========== */
+/* Available Tags */
 .tags-container {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-/* ========== TAG STYLES ========== */
+/* Tag Styles */
 .tag {
   background: #f1f5f9;
   color: #475569;
@@ -50,8 +50,8 @@
   border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
   user-select: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .tag:hover {
@@ -71,22 +71,21 @@
   outline-offset: 2px;
 }
 
-/* ========== PINNED TAG STYLES ========== */
+/* Pinned Tag */
 .tag.pinned {
-  background: #002765 !important;
-  color: white !important;
-  border: none !important;
-  padding-right: 36px !important;
+  background: #002765;
+  color: white;
+  border: none;
+  padding-right: 36px;
   position: relative;
-  box-shadow: 0 3px 9px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 3px 9px rgba(0, 39, 101, 0.3);
 }
-
 
 .tag.pinned strong {
   font-weight: 700;
 }
 
-/* ========== UNPIN BUTTON ========== */
+/* Unpin Button */
 .unpin-btn {
   position: absolute;
   right: 6px;
@@ -123,7 +122,7 @@
   outline-offset: 2px;
 }
 
-/* ========== EMPTY STATE ========== */
+/* Empty State */
 .empty-tags {
   text-align: center;
   padding: 30px 16px;
@@ -136,8 +135,8 @@
   font-weight: 500;
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 768px) {
+/* Container Query Responsive */
+@container main (max-width: 768px) {
   .tags-box {
     padding: 12px;
     margin-bottom: 20px;
@@ -164,7 +163,7 @@
   }
 
   .tag.pinned {
-    padding-right: 34px !important;
+    padding-right: 34px;
   }
 
   .unpin-btn {
@@ -175,7 +174,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@container main (max-width: 480px) {
   .tags-box {
     padding: 10px;
     margin-bottom: 16px;
@@ -193,7 +192,7 @@
   }
 
   .tag.pinned {
-    padding-right: 32px !important;
+    padding-right: 32px;
   }
 
   .unpin-btn {
@@ -208,60 +207,5 @@
 
   .empty-tags p {
     font-size: 13px;
-  }
-}
-
-/* ========== ACCESSIBILITY ========== */
-.tag:focus,
-.unpin-btn:focus {
-  outline: 2px solid #6366f1;
-  outline-offset: 2px;
-}
-
-/* ========== ANIMATION ========== */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.tag {
-  animation: slideIn 0.2s ease-out;
-}
-
-/* ========== DARK MODE SUPPORT (OPTIONAL) ========== */
-@media (prefers-color-scheme: dark) {
-  .tags-box {
-    background: #1e293b;
-    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.3);
-  }
-
-  .pinned-tags {
-    border-bottom-color: #002765;
-  }
-
-  .pinned-label {
-    color: #94a3b8;
-  }
-
-  .tag {
-    background: #334155;
-    color: #e2e8f0;
-    border-color: #475569;
-  }
-
-  .tag:hover {
-    background: #3730a3;
-    border-color: #4f46e5;
-    color: #e0e7ff;
-  }
-
-  .empty-tags p {
-    color: #64748b;
   }
 }

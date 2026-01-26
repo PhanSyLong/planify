@@ -1,101 +1,156 @@
-/* src/components/users/UserList.css */
+/* UserList.css - Container Query Optimized */
 
 .userlist-wrapper {
   width: 100%;
-  min-height: 100vh;
+  max-width: 900px;
+  margin: 24px auto 0;
   background: white;
-  padding-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 .userlist-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
+  padding: 24px;
 }
 
 .userlist-header {
-  margin-bottom: 32px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 24px;
   gap: 16px;
 }
 
 .back-btn {
   background: none;
   border: none;
-  font-size: 28px;
+  color: #5b5fef;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  color: #333;
-  padding: 8px;
-  border-radius: 12px;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+  height: auto;
+  flex-shrink: 0;
 }
 
 .back-btn:hover {
-  background: #eee;
+  color: #4338ca;
+  text-decoration: underline;
+  background: none;
+}
+
+.back-btn:active {
+  background: none;
 }
 
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1e293b;
   margin: 0;
   flex: 1;
 }
 
 .search-box {
   position: relative;
-  max-width: 500px;
-  width: 100%;
+  width: 300px;
+  max-width: 100%;
+  flex-shrink: 0;
 }
 
 .search-input {
   width: 100%;
-  padding: 14px 48px 14px 20px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 50px;
-  outline: none;
+  padding: 10px 40px 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
-  border-color: #007bff;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .search-icon {
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  color: #888;
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
   pointer-events: none;
 }
 
 .userlist-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 198px); /* 180px card + 18px gap */
-  gap: 24px 18px; /* vertical 24px, horizontal 18px */
-  justify-content: center; /* căn giữa nếu hàng chưa đầy */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
 }
 
 .user-card-wrapper {
-  width: 180px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
 }
 
 .no-results {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px 20px;
-  font-size: 20px;
-  color: #777;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 16px;
   font-weight: 500;
+}
+
+/* Container Query Responsive */
+@container main (max-width: 768px) {
+  .userlist-wrapper {
+    margin: 20px 16px 0;
+  }
+
+  .userlist-container {
+    padding: 20px;
+  }
+
+  .userlist-header {
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .search-box {
+    width: 100%;
+    order: 3;
+  }
+
+  .userlist-grid {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@container main (max-width: 480px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .back-btn {
+    font-size: 14px;
+  }
+
+  .userlist-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 }

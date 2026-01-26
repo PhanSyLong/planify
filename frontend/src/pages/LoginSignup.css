@@ -1,0 +1,615 @@
+/* Login/Signup Page Container */
+
+/* Main container */
+.container {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background-color: #fff;
+}
+
+/* Form containers */
+.form-container {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.7s ease-in-out, opacity 0.4s ease-in-out;
+  background-color: white;
+  z-index: 2;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-container input {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.form-container button {
+  margin-top: 20px;
+  padding: 12px;
+  background: #0b2c59;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.form-container button:hover {
+  background: #133c7a;
+}
+
+.form-container button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Positioning */
+.login-container {
+  left: 0;
+  transform: translateX(0);
+}
+
+.signup-container {
+  right: 0;
+  transform: translateX(0);
+}
+
+/* Cover */
+.cover {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background: #0b2c59;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: left 0.7s ease-in-out;
+  z-index: 1;
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cover h2 {
+  font-size: 2rem;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Active state */
+.container.active .cover {
+  left: 0;
+  border-radius: 20px 0 0 20px;
+}
+
+/* Form visibility & animation */
+.container .login-container {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.container .signup-container {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+.container.active .login-container {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.container.active .signup-container {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Password wrapper & eye icon */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  box-sizing: border-box;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  color: #666;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+}
+
+/* Links */
+p a {
+  color: #0b2c59;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* TOAST NOTIFICATIONS */
+.toasts {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 300px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s ease-out;
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.toast.success {
+  background-color: #27ae60;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* MODAL SUCCESS */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #27ae60;
+  font-size: 1.8rem;
+}
+
+.modal-content p {
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 1rem;
+}
+
+.modal-content button {
+  padding: 12px 32px;
+  background: #0b2c59;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.modal-content button:hover {
+  background: #133c7a;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* Main container */
+.auth-container {
+  position: relative;
+  width: 800px;
+  max-width: 100%;
+  height: 500px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+}
+
+/* Form containers */
+.form-container {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.7s ease-in-out, opacity 0.4s ease-in-out;
+  background-color: white;
+  z-index: 2;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 350px;
+}
+
+.form-container h1 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #0b2c59;
+}
+
+.form-container input {
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  font-size: 14px;
+}
+
+.form-container input:focus {
+  border-color: #0b2c59;
+  box-shadow: 0 0 0 3px rgba(11, 44, 89, 0.1);
+}
+
+.form-container button[type="submit"] {
+  margin-top: 20px;
+  padding: 12px;
+  background: #0b2c59;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+  height: auto;
+}
+
+.form-container button[type="submit"]:hover {
+  background: #133c7a;
+}
+
+.form-container button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #0b2c59;
+}
+
+.form-container p {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.form-container p a {
+  color: #0b2c59;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.form-container p a:hover {
+  text-decoration: underline;
+}
+
+/* Positioning */
+.login-container {
+  left: 0;
+  transform: translateX(0);
+}
+
+.signup-container {
+  right: 0;
+  transform: translateX(0);
+}
+
+/* Cover */
+.auth-cover {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background: #0b2c59;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: left 0.7s ease-in-out;
+  z-index: 1;
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.auth-cover h2 {
+  font-size: 2rem;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Active state */
+.auth-container.active .auth-cover {
+  left: 0;
+  border-radius: 20px 0 0 20px;
+}
+
+/* Form visibility & animation */
+.auth-container .login-container {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.auth-container .signup-container {
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+.auth-container.active .login-container {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.auth-container.active .signup-container {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Password wrapper & eye icon */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  margin: 0;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  color: #666;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+}
+
+/* TOAST NOTIFICATIONS */
+.toasts {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 300px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.4s ease-out;
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.toast.success {
+  background-color: #27ae60;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* MODAL SUCCESS */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #27ae60;
+  font-size: 1.8rem;
+}
+
+.modal-content p {
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modal-content button {
+  padding: 12px 32px;
+  background: #0b2c59;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.3s;
+  height: auto;
+}
+
+.modal-content button:hover {
+  background: #133c7a;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-container {
+    width: 100%;
+    height: auto;
+    min-height: 600px;
+    flex-direction: column;
+  }
+
+  .form-container {
+    width: 100%;
+    position: relative;
+    padding: 30px 20px;
+  }
+
+  .auth-cover {
+    display: none;
+  }
+
+  .auth-container .signup-container {
+    opacity: 1;
+    transform: translateX(0);
+    display: none;
+  }
+
+  .auth-container.active .login-container {
+    display: none;
+  }
+
+  .auth-container.active .signup-container {
+    display: flex;
+  }
+
+  .auth-container .login-container {
+    display: flex;
+  }
+}
+
+@media (max-width: 500px) {
+  .toast {
+    min-width: 250px;
+    font-size: 0.85rem;
+  }
+
+  .toasts {
+    right: 10px;
+    left: 10px;
+  }
+}

@@ -1,69 +1,78 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+//mainlayout
+import MainLayout from "./layouts/MainLayout";
+
+//logsign
+import LogSign from "./pages/LoginSignup";
+
 //sidebar
-import Home from "./pages/Home.jsx";
-import MainLayout from "./layouts/MainLayout.jsx";
-import MyPlan from "./pages/MyPlan.jsx";
-import Saved from "./pages/SavedPlan.jsx";
-import Commu from "./pages/ExplorePage.jsx";
-import Add from "./pages/CreatePlan.jsx";
-import About from "./pages/About.jsx";
+import Home from "./pages/Home";
+import MyPlan from "./pages/MyPlan";
+import SavedPlan from "./pages/SavedPlan";
+import Commu from "./pages/ExplorePage";
+import Add from "./pages/CreatePlan";
+import About from "./pages/AboutUs.jsx";
 
-//header
-import MyProfile from "./pages/MyProfile.jsx";
+// Profile Pages
+import MyProfile from "./pages/MyProfile";
+import OtherUser from "./pages/OtherUser";
 
-//other
-import LoginSignup from "./pages/LoginSignup.jsx"
-import Admin from "./pages/Admin.jsx";
-import Notifications from "./components/header/Notification.jsx";
-
-//view
-import ViewPlan from "./components/myPlan/ViewPlan.jsx"
-import ViewMyPlan from "./components/myPlan/ViewMyPlan.jsx"
+//plan
+import ViewPlan from "./components/plans/ViewPlan.jsx";
+import ViewMyPlan from "./components/plans/ViewMyPlan.jsx";
 import UserView from "./components/users/UserView";
+import Notification from "./components/mainlayout/Notification.jsx"
+import "./App.css";
 
-function App() {
+//fork
+import ForkPlan from "./components/fork&edit/ForkPlan.jsx"
+//
+import Admin from "./pages/Admin.jsx";
+
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginSignup />} />
-
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
-
-          {/* Nested routes for plans with context */}
-          <Route path="/myplan">
-            <Route index element={<MyPlan />} />
-            <Route path="plans/:id" element={<ViewMyPlan/>} />
-          </Route>
-
-          <Route path="/saved">
-            <Route index element={<Saved />} />
-            <Route path="plans/:id" element={<ViewPlan />} />
-          </Route>
-
-          <Route path="/commu">
-            <Route index element={<Commu />} />
-            <Route path="plans/:id" element={<ViewPlan />} />
-          </Route>
-
           <Route path="/add" element={<Add />} />
-          <Route path="/myprofile" element={<MyProfile />} />
-          <Route path="/about" element={<About/>} />
 
-          {/* Fallback: direct access still works */}
+
+          {/* Profile Routes */}
+          <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/profile/:username" element={<OtherUser />} />
+
+          {/* MyPlan Routes */}
+          <Route path="/myplan" element={<MyPlan />} />
+          <Route path="/myplan/plans/:id" element={<ViewMyPlan />} />
+
+
+          {/* Saved Plan Routes */}
+          <Route path="/saved" element={<SavedPlan />} />
+          <Route path="/saved/plans/:id" element={<ViewPlan />} />
+          <Route path="/plans/:id/fork" element={<ForkPlan />} />
+
+          {/* Community/Explore Routes */}
+          <Route path="/commu" element={<Commu />} />
+          <Route path="/commu/plans/:id" element={<ViewPlan />} />
+
+          {/* General Plan View (fallback) */}
           <Route path="/plans/:id" element={<ViewPlan />} />
 
-          <Route path="/users/:userId" element={<UserView />} />
+          {/* User Profile View (legacy) */}
+          <Route path="/users/:id" element={<UserView />} />
 
-          {/*Notification */}
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/notifications" element={<Notification/>} />
         </Route>
 
+        <Route path="/" element={<LogSign />} />
+
         <Route path="/admin" element={<Admin />} />
+
+
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

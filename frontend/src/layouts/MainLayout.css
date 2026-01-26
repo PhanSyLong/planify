@@ -1,29 +1,74 @@
-/* layouts/MainLayout.css */
-
-.app-root {
-  display: flex;
-  height: 100vh;
-  background: #fafafa;
-  color: #1a1a1a;
-  font-family: Inter, Arial, sans-serif;
-  overflow: hidden;
-}
-
-.main-column {
+.layout-root {
   display: flex;
   flex-direction: column;
+  height: 100vh;
+}
+
+/* Header consumes fixed height */
+.layout-body {
   flex: 1;
-  min-width: 0;
+  display: flex;
   overflow: hidden;
 }
 
-/* Responsive shell behavior */
-@media (max-width: 900px) {
-  .app-root {
-    flex-direction: column;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  .main-column {
-    width: 100%;
-  }
+/* =========================
+   BUTTON BASELINE
+   ========================= */
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 16px;
+
+  border-radius: 9999px;
+  border: none;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+
+  background-color: #2563eb;
+
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+
+/* =========================
+   ICON BASELINE
+   ========================= */
+
+/* Generic icon rule */
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Icon inside button */
+button .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 🔑 MAIN CONTAINER */
+.layout-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+
+  container-type: inline-size;
+  container-name: main;
 }

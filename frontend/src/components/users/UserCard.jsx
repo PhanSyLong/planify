@@ -1,26 +1,38 @@
-import React from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import './UserCard.css';
 
 const UserCard = ({ user, onFollowToggle }) => {
-  const [isFollowing, setIsFollowing] = React.useState(user.isFollowing || false);
+  const [isFollowing, setIsFollowing] = useState(user.isFollowing || false);
 
-  const handleFollow = (e) => {
-    e.preventDefault(); // Prevent navigation when clicking button
+  const handleFollow = useCallback((e) => {
+    e.preventDefault();
     e.stopPropagation();
 
-    setIsFollowing(!isFollowing);
+    setIsFollowing(prev => !prev);
     if (onFollowToggle) {
       onFollowToggle(user.id, !isFollowing);
     }
-  };
+  }, [user.id, isFollowing, onFollowToggle]);
+
+  const initials = useMemo(() => {
+    return user.name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }, [user.name]);
 
   return (
-    // Trong return của UserCard
     <div className="user-card">
-      <Link to={`/users/${user.id}`} className="user-card-link"> {/* ← Đổi thành /users/:id */}
+      <Link to={`/users/${user.id}`} className="user-card-link">
         <div className="user-avatar">
-          {/* ... avatar code ... */}
+          {user.avatar ? (
+            <img src={user.avatar} alt={user.name} />
+          ) : (
+            <div className="avatar-placeholder">{initials}</div>
+          )}
         </div>
 
         <div className="user-info">
@@ -46,4 +58,4 @@ const UserCard = ({ user, onFollowToggle }) => {
   );
 };
 
-export default UserCard;
+export default React.memo(UserCard);

@@ -1,0 +1,104 @@
+.task-wrapper {
+  container-type: inline-size;
+  container-name: task;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@container task (max-width: 500px) {
+  .task-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.task-header h3 {
+  font-size: clamp(16px, 3cqi, 20px);
+  color: #002765;
+  flex: 1;
+}
+
+.delete-task-btn {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.delete-task-btn:hover {
+  background-color: #b91c1c;
+}
+
+@container task (max-width: 500px) {
+  .delete-task-btn {
+    width: 100%;
+  }
+}
+
+/* Card container */
+.task-card {
+  background: #e8e9eb;
+  border-radius: 16px;
+  padding: clamp(14px, 3cqi, 20px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+/* Each field */
+.task-field {
+  margin-bottom: 16px;
+}
+
+.task-field:last-child {
+  margin-bottom: 0;
+}
+
+.task-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #002765;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.task-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  background: #f5f6f7;
+}
+
+.task-field input:focus {
+  border-color: #4e085f;
+  box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
+}
+
+/* Duration */
+.duration-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duration-input input {
+  width: 100px;
+}
+
+@container task (max-width: 400px) {
+  .duration-input input {
+    width: 80px;
+  }
+}
+
+.duration-unit {
+  font-size: 14px;
+  color: #555;
+}

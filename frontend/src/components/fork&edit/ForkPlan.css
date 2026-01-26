@@ -1,0 +1,156 @@
+/* ForkPlan.css - Full standalone CSS based on CreatePlan/EditPlan patterns */
+
+.createplan-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 32px 60px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.createplan-header {
+  width: 100%;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.createplan-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #002765;
+  margin: 0;
+}
+
+.fork-notice {
+  margin-top: 12px;
+  padding: 12px 20px;
+  background-color: #e6f0ff;
+  border-left: 5px solid #153677;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #002765;
+  line-height: 1.5;
+}
+
+.fork-notice strong {
+  color: #153677;
+  font-weight: 600;
+}
+
+.createplan-content {
+  width: 100%;
+  background: #f8f9fa;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* Action Buttons */
+.createplan-actions {
+  width: 100%;
+  padding: 16px 0;
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid #eee;
+}
+
+.review-btn,
+.create-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 44px;
+  min-width: 120px;
+}
+
+.review-btn {
+  background-color: #edeef0;
+  color: #333;
+}
+
+.create-btn {
+  background-color: #153677;
+  color: #ffffff;
+}
+
+.review-btn:hover,
+.create-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.review-btn:active,
+.create-btn:active {
+  opacity: 0.8;
+  transform: translateY(0);
+}
+
+/* Reuse PlanInfo styles if needed (but usually in separate PlanInfo.css) */
+.plan-title-card,
+.planinfo-card,
+.image-upload,
+.planinfo-right,
+.categories-section,
+.stage-list {
+  /* These are defined in PlanInfo.css - import or copy if needed */
+}
+
+/* Container Query Responsive */
+@container main (max-width: 768px) {
+  .createplan-page {
+    padding: 20px 16px 50px;
+  }
+
+  .createplan-header h1 {
+    font-size: 24px;
+  }
+
+  .createplan-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .review-btn,
+  .create-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .fork-notice {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+}
+
+@container main (max-width: 480px) {
+  .createplan-page {
+    padding: 16px 12px 40px;
+  }
+
+  .createplan-header h1 {
+    font-size: 20px;
+  }
+
+  .createplan-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .review-btn,
+  .create-btn {
+    width: 100%;
+  }
+
+  .fork-notice {
+    font-size: 13px;
+  }
+}
