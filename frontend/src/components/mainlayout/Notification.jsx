@@ -1,96 +1,64 @@
-import { useState, useMemo, useCallback } from 'react';
+// src/pages/Notifications.jsx
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Notification.css';
-
-// Using the same fake data (you can later replace with real data from API/context)
-const fakeNotifications = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    avatar: "https://i.pravatar.cc/48?u=sarah",
-    action: "commented on your post",
-    message: "This looks amazing! 🔥",
-    time: "5m ago",
-    read: false,
-    link: "/plans/123"
-  },
-  {
-    id: 2,
-    name: "Michael Park",
-    avatar: "https://i.pravatar.cc/48?u=michael",
-    action: "liked your photo",
-    time: "28m ago",
-    read: false,
-    link: "/commu"
-  },
-  {
-    id: 3,
-    name: "Emma Thompson",
-    avatar: "https://i.pravatar.cc/48?u=emma",
-    action: "started following you",
-    time: "2h ago",
-    read: true,
-    link: "/profile/emma123"
-  },
-  {
-    id: 4,
-    name: "Alex Kim",
-    avatar: "https://i.pravatar.cc/48?u=alex",
-    action: "mentioned you in a comment",
-    message: "@vu check this out!",
-    time: "1d ago",
-    read: true
-  },
-  {
-    id: 5,
-    name: "Project Team",
-    avatar: "https://i.pravatar.cc/48?u=team",
-    action: "added a new task to",
-    message: "Website Redesign 2026",
-    time: "2d ago",
-    read: true
-  },
-  {
-    id: 6,
-    name: "Lisa Wong",
-    avatar: "https://i.pravatar.cc/48?u=lisa",
-    action: "shared your project",
-    time: "3d ago",
-    read: true
-  },
-  {
-    id: 7,
-    name: "David Lee",
-    avatar: "https://i.pravatar.cc/48?u=david",
-    action: "invited you to collaborate",
-    time: "4d ago",
-    read: false
-  }
-];
+import './Notification.css'; // we'll create this next
 
 const Notifications = () => {
-  const [filter, setFilter] = useState('all');
-  const navigate = useNavigate();
+    const [filter, setFilter] = useState('all');
+    const [notifications, setNotifications] = useState([]);
+    const navigate = useNavigate();
 
-  const unreadCount = useMemo(() => {
-    return fakeNotifications.filter(n => !n.read).length;
-  }, []);
+    useEffect(() => {
+        const es = new EventSource(
+            "http://localhost:8080/planify/notifications/stream",
+            { withCredentials: true }
+        );
 
-  const displayedNotifications = useMemo(() => {
-    return fakeNotifications.filter(notif =>
-      filter === 'all' || !notif.read
+        es.onopen = () => {
+            console.log(" ✅ SSE connected");
+        };
+
+        es.addEventListener("notification", (e) => {
+            const data = JSON.parse(e.data);
+
+            console.log(" RAW SSE DATA:", data);
+            // map backend → frontend model
+            const notif = {
+                id: data.id,
+                planId: data.planIdd,
+                name: data.title,
+                action: data.type,
+                message: data.messageText,
+                time: "just now",
+                read: false,
+                link: `/plans/${data.planId}`
+            };
+
+
+            //  UI realtime
+            setNotifications(prev => [notif, ...prev]);
+        });
+
+        // error -> close SSE
+        es.onerror = (err) => {
+            console.error("❌ SSE error", err);
+            es.close();
+        };
+
+        //  Cleanup when reload / unmount
+        return () => {
+            console.log(" SSE is cleanup");
+            es.close();
+        };
+    }, []);
+
+
+    const displayedNotifications = notifications.filter(
+        notif => filter === 'all' || !notif.read
     );
-  }, [filter]);
 
-  const handleNotificationClick = useCallback((notification) => {
-    if (notification.link) {
-      navigate(notification.link);
-    }
-  }, [navigate]);
+    const unreadCount = notifications.filter(n => !n.read).length;
 
-  const handleFilterChange = useCallback((newFilter) => {
-    setFilter(newFilter);
-  }, []);
 
   return (
     <div className="notifications-page">
@@ -104,17 +72,13 @@ const Notifications = () => {
       <div className="notifications-filters">
         <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-          onClick={() => handleFilterChange('all')}
-          type="button"
-          aria-label="Show all notifications"
+          onClick={() => setFilter('all')}
         >
           All
         </button>
         <button
           className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
-          onClick={() => handleFilterChange('unread')}
-          type="button"
-          aria-label={`Show unread notifications (${unreadCount})`}
+          onClick={() => setFilter('unread')}
         >
           Unread ({unreadCount})
         </button>
@@ -134,23 +98,10 @@ const Notifications = () => {
             <div
               key={notif.id}
               className={`notification-item ${!notif.read ? 'unread' : ''}`}
-              onClick={() => handleNotificationClick(notif)}
-              style={{ cursor: notif.link ? 'pointer' : 'default' }}
-              role={notif.link ? 'button' : undefined}
-              tabIndex={notif.link ? 0 : undefined}
-              onKeyDown={(e) => {
-                if (notif.link && (e.key === 'Enter' || e.key === ' ')) {
-                  e.preventDefault();
-                  handleNotificationClick(notif);
-                }
-              }}
+              onClick={() => notif.link && navigate(notif.link)}
+              style={notif.link ? { cursor: 'pointer' } : {}}
             >
-              <img
-                src={notif.avatar}
-                alt={`${notif.name}'s avatar`}
-                className="avatar"
-                loading="lazy"
-              />
+              <img src={notif.avatar} alt={notif.name} className="avatar" />
               <div className="content">
                 <p className="main-text">
                   <strong>{notif.name}</strong> {notif.action}
@@ -158,7 +109,7 @@ const Notifications = () => {
                 </p>
                 <span className="time">{notif.time}</span>
               </div>
-              {!notif.read && <div className="unread-dot" aria-label="Unread notification" />}
+              {!notif.read && <div className="unread-dot" />}
             </div>
           ))
         )}
