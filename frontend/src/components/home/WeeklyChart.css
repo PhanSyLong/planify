@@ -1,6 +1,10 @@
 .weekly-chart {
-  width: 860px;
+  width: 100%;
   height: 350px;
+
+  /* Make this a container */
+  container-type: inline-size;
+  container-name: weekly-chart;
 }
 
 .weekly-chart__header {
@@ -10,22 +14,24 @@
   margin-bottom: 12px;
 }
 
-.weekly-chart__header button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  cursor: pointer;
+/* Button – global rule already applies */
+.weekly-chart__header .button {
+  width: 36px;
+  height: 36px;
 }
 
-.button{
-  text-color:
-}
-
-.weekly-chart__header button:hover {
-  background: #f1f5f9;
-}
-
+/* Chart area */
 .weekly-chart__canvas {
   height: 300px;
+}
+
+/* ---------- Container Query ---------- */
+@container weekly-chart (max-width: 500px) {
+  .weekly-chart__header {
+    font-size: 14px;
+  }
+
+  .weekly-chart__canvas {
+    height: 240px;
+  }
 }

@@ -1,11 +1,14 @@
+/* UserView.css - Container Query Optimized */
+
 .userview-page {
-  width: 900px;
+  width: 100%;
+  max-width: 900px;
   margin: 0 auto;
   background: #ffffff;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
-/* Profile Header Section */
+/* Profile Header */
 .profile-header-section {
   display: flex;
   gap: 80px;
@@ -49,7 +52,8 @@
   color: #0095f6;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  height: 40px;
 }
 
 .follow-btn.following {
@@ -60,6 +64,10 @@
 
 .follow-btn:hover {
   opacity: 0.9;
+}
+
+.follow-btn:active {
+  opacity: 0.8;
 }
 
 .message-btn {
@@ -73,13 +81,18 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  height: 40px;
 }
 
 .message-btn:hover {
   background: #f0f0f0;
 }
 
-/* Stats (giống MyProfile) */
+.message-btn:active {
+  background: #e0e0e0;
+}
+
+/* Stats */
 .profile-stats {
   display: flex;
   gap: 40px;
@@ -90,7 +103,7 @@
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease;
 }
 
 .stat-item:hover {
@@ -108,23 +121,37 @@
   color: #8e8e8e;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .userview-page {
-    width: 100%;
-    padding: 0 20px;
-  }
+/* Loading */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 16px;
+  color: #64748b;
+}
 
+/* Container Query Responsive */
+@container main (max-width: 768px) {
   .profile-header-section {
     flex-direction: column;
     align-items: center;
     gap: 30px;
     text-align: center;
+    padding: 30px 20px;
+  }
+
+  .profile-info-section {
+    align-items: center;
   }
 
   .profile-name-row {
     flex-direction: column;
     align-items: center;
+  }
+
+  .profile-name-row h2 {
+    font-size: 24px;
   }
 
   .action-buttons {
@@ -134,5 +161,39 @@
 
   .profile-stats {
     justify-content: center;
+    gap: 30px;
+  }
+}
+
+@container main (max-width: 480px) {
+  .profile-header-section {
+    gap: 20px;
+    padding: 20px 16px;
+  }
+
+  .profile-name-row h2 {
+    font-size: 20px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .follow-btn,
+  .message-btn {
+    width: 100%;
+  }
+
+  .profile-stats {
+    gap: 20px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 13px;
   }
 }

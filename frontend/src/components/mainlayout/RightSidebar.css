@@ -1,0 +1,36 @@
+.right-sidebar {
+  width: 260px;
+  background: #f5f7fa;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 1px solid #e6e6e6;
+  overflow-y: auto;
+}
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.performance {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.performance-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Container query */
+@container main (max-width: 1000px) {
+  .right-sidebar {
+    display: none;
+  }
+}

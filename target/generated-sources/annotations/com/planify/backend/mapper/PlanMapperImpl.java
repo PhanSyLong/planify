@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-18T02:26:17+0700",
+    date = "2026-01-27T00:07:31+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
 )
 @Component
@@ -29,9 +29,6 @@ public class PlanMapperImpl implements PlanMapper {
         planRequest.setDescription( plan.getDescription() );
         planRequest.setVisibility( plan.getVisibility() );
         planRequest.setStatus( plan.getStatus() );
-        if ( plan.getDuration() != null ) {
-            planRequest.setDuration( plan.getDuration() );
-        }
         planRequest.setPicture( plan.getPicture() );
         planRequest.setReminderAt( plan.getReminderAt() );
         planRequest.setExpiredAt( plan.getExpiredAt() );
@@ -55,9 +52,7 @@ public class PlanMapperImpl implements PlanMapper {
         planResponse.description( plan.getDescription() );
         planResponse.visibility( plan.getVisibility() );
         planResponse.status( plan.getStatus() );
-        if ( plan.getDuration() != null ) {
-            planResponse.duration( plan.getDuration().intValue() );
-        }
+        planResponse.duration( plan.getDuration() );
         planResponse.picture( plan.getPicture() );
 
         return planResponse.build();
@@ -95,7 +90,6 @@ public class PlanMapperImpl implements PlanMapper {
         if ( request.getStatus() != null ) {
             targetPlan.setStatus( request.getStatus() );
         }
-        targetPlan.setDuration( request.getDuration() );
         if ( request.getPicture() != null ) {
             targetPlan.setPicture( request.getPicture() );
         }

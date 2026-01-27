@@ -1,0 +1,13 @@
+.today-pie {
+  width: 190px;
+  height: 190px;
+  margin: 0 auto;
+}
+
+/* Container query */
+@container main (max-width: 400px) {
+  .today-pie {
+    width: 150px;
+    height: 150px;
+  }
+}

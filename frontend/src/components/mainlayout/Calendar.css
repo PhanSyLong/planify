@@ -1,0 +1,69 @@
+.calendar {
+  background: #111;
+  width: 260px;
+  height: 300px;
+  padding: 14px;
+  border-radius: 14px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.btn {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+.month-year {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 11px;
+  color: #ccc;
+}
+
+.days {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.days div {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.days .today {
+  background: orangered;
+  color: white;
+}
+
+.days .fade {
+  color: #555;
+}
+
+/* Container query */
+@container main (max-width: 400px) {
+  .calendar {
+    width: 100%;
+  }
+}

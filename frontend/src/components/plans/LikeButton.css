@@ -1,0 +1,74 @@
+/* LikeButton.css */
+
+.like-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  padding: 0;
+}
+
+.like-btn:hover {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  background: white;
+}
+
+.like-btn:active {
+  transform: translateY(-2px) scale(1.05);
+  background: white;
+}
+
+.like-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.4);
+  outline-offset: 2px;
+}
+
+.bookmark-icon {
+  font-size: 18px;
+  color: #94a3b8;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.like-btn.saved .bookmark-icon {
+  color: #1e293b;
+  animation: bookmarkPop 0.5s ease-in-out;
+}
+
+@keyframes bookmarkPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.like-btn.saved {
+  animation: pulseShadow 1.8s infinite alternate;
+}
+
+@keyframes pulseShadow {
+  from { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); }
+  to { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28); }
+}
+
+@container main (max-width: 480px) {
+  .like-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .bookmark-icon {
+    font-size: 16px;
+  }
+}

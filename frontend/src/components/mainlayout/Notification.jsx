@@ -25,7 +25,7 @@ const Notifications = () => {
             // map backend → frontend model
             const notif = {
                 id: data.id,
-                planId: data.planIdd,
+                planId: data.planId,
                 name: data.title,
                 action: data.type,
                 message: data.messageText,
@@ -33,7 +33,6 @@ const Notifications = () => {
                 read: false,
                 link: `/plans/${data.planId}`
             };
-
 
             //  UI realtime
             setNotifications(prev => [notif, ...prev]);
@@ -101,7 +100,9 @@ const Notifications = () => {
               onClick={() => notif.link && navigate(notif.link)}
               style={notif.link ? { cursor: 'pointer' } : {}}
             >
-              <img src={notif.avatar} alt={notif.name} className="avatar" />
+                {notif.avatar && (
+                    <img src={notif.avatar} alt={notif.name} className="avatar" />
+                )}
               <div className="content">
                 <p className="main-text">
                   <strong>{notif.name}</strong> {notif.action}

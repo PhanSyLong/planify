@@ -9,6 +9,7 @@ export const createPlan = async(plan) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };
 
@@ -19,6 +20,7 @@ export const deletePlan = async(planId) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };
 
@@ -29,6 +31,7 @@ export const updatePlan = async(planId, plan) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };
 
@@ -39,6 +42,7 @@ export const getPlanByName = (name) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };
 
@@ -49,6 +53,7 @@ export const getPlanById = (id) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };
 
@@ -59,5 +64,6 @@ export const getAllPlans = async() => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
     });
 };

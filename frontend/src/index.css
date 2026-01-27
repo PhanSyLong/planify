@@ -37,6 +37,7 @@ button {
   user-select: none;
 
   background-color: #2563eb;
+  color: white;
 
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }

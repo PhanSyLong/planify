@@ -1,22 +1,20 @@
 package com.planify.backend.model;
 
 import jakarta.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
-@EntityListeners(AuditingEntityListener.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "stage")
+@Table(name="stage")
 public class Stage {
 
     @Id
@@ -25,7 +23,7 @@ public class Stage {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false)
-    Plan plan;
+    Plan plan_id;
 
     @Column(nullable = false, length = 120)
     String title;
@@ -33,11 +31,19 @@ public class Stage {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    Integer duration;
+    int duration;
 
     @CreatedDate
     LocalDateTime created_date;
 
     @LastModifiedDate
     LocalDateTime updated_date;
+
+    @Column(name="started_at")
+    LocalDateTime started_at;
+
+    @Column(name="completed_at")
+    LocalDateTime completed_at;
+
+
 }

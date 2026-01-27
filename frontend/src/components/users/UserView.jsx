@@ -1,71 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Để lấy userId từ URL
-import AvatarCard from "../myProfile/MyAvatar"; // Reuse avatar
-import BioAndMenu from "../myProfile/MyBioMenu"; // Reuse bio section (chỉ view, không edit)
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import "./UserView.css"; // CSS riêng
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import AvatarCard from '../profiles/MyAvatar';
+import BioAndMenu from '../profiles/MyBioMenu';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import './UserView.css';
 
-export default function UserView() {
-  const { userId } = useParams(); // Lấy ID từ URL: /users/:userId
+const MOCK_USER_DATA = {
+  'user-1': {
+    name: 'Emma Johnson',
+    bio: 'IELTS 8.5 | Official Examiner & Mentor. Helping students achieve Band 7+!',
+    avatar: null,
+    stats: { plans: 18, followings: 320, followers: 2450 },
+    isFollowing: false,
+  },
+  'user-2': {
+    name: 'Alex Chen',
+    bio: 'TOEFL 115+ | 12 years teaching experience',
+    avatar: null,
+    stats: { plans: 14, followings: 280, followers: 1890 },
+    isFollowing: true,
+  },
+  'user-3': {
+    name: 'Sarah Williams',
+    bio: 'Helping students reach Band 7+ since 2015',
+    avatar: null,
+    stats: { plans: 22, followings: 450, followers: 3200 },
+    isFollowing: false,
+  },
+};
 
-  // Demo data - sau này fetch từ API dựa trên userId
-  const [userData, setUserData] = useState({
-    name: "Emma Johnson",
-    bio: "IELTS 8.5 | Official Examiner & Mentor. Helping students achieve Band 7+!",
-    avatar: null, // Có thể là URL ảnh
-    stats: {
-      plans: 18,
-      followings: 320,
-      followers: 2450,
-    },
-    isFollowing: false, // Trạng thái follow của bạn với user này
-  });
+const UserView = () => {
+  const { id } = useParams();
 
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Simulate fetch user data
   useEffect(() => {
-    // TODO: Thay bằng API call thực tế
-    // fetch(`/api/users/${userId}`).then(res => res.json()).then(setUserData)
-    setTimeout(() => {
-      setLoading(false);
-    }, 800);
-  }, [userId]);
+    let isMounted = true;
 
-  const handleFollowToggle = () => {
-    setUserData((prev) => ({
+    const fetchUserData = async () => {
+      setLoading(true);
+
+      try {
+        // TODO: Replace with actual API call
+        // const response = await fetch(`/api/users/${id}`);
+        // const data = await response.json();
+
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        if (isMounted) {
+          const mockUser = MOCK_USER_DATA[id] || MOCK_USER_DATA['user-1'];
+          setUserData(mockUser);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchUserData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  const handleFollowToggle = useCallback(() => {
+    setUserData(prev => ({
       ...prev,
       isFollowing: !prev.isFollowing,
+      stats: {
+        ...prev.stats,
+        followers: prev.isFollowing
+          ? prev.stats.followers - 1
+          : prev.stats.followers + 1
+      }
     }));
-    // TODO: Gọi API để update follow
-  };
+    // TODO: Call API to update follow status
+  }, []);
+
+  const handleMessage = useCallback(() => {
+    console.log('Message user:', id);
+    // TODO: Implement messaging
+  }, [id]);
 
   if (loading) {
     return <div className="loading">Loading profile...</div>;
+  }
+
+  if (!userData) {
+    return <div className="loading">User not found</div>;
   }
 
   return (
     <div className="userview-page">
       {/* Profile Header */}
       <div className="profile-header-section">
-        <AvatarCard avatarUrl={userData.avatar} name={userData.name} /> {/* Reuse, chỉ view */}
+        <AvatarCard avatarUrl={userData.avatar} name={userData.name} />
 
         <div className="profile-info-section">
-          {/* Tên + Nút Follow */}
+          {/* Name + Action Buttons */}
           <div className="profile-name-row">
             <h2>{userData.name}</h2>
 
             <div className="action-buttons">
               <button
-                className={`follow-btn ${userData.isFollowing ? "following" : ""}`}
+                className={`follow-btn ${userData.isFollowing ? 'following' : ''}`}
                 onClick={handleFollowToggle}
               >
-                {userData.isFollowing ? "Following" : "Follow"}
+                {userData.isFollowing ? 'Following' : 'Follow'}
               </button>
 
-              <button className="message-btn">
-                <FontAwesomeIcon icon={faEnvelope} />
+              <button className="message-btn" onClick={handleMessage}>
+                <FontAwesomeIcon icon={faEnvelope} className="icon" />
                 Message
               </button>
             </div>
@@ -79,7 +130,7 @@ export default function UserView() {
             </div>
             <div className="stat-item">
               <span className="stat-number">{userData.stats.followings}</span>
-              <span className="stat-label">Followings</span>
+              <span className="stat-label">Following</span>
             </div>
             <div className="stat-item">
               <span className="stat-number">{userData.stats.followers}</span>
@@ -89,8 +140,10 @@ export default function UserView() {
         </div>
       </div>
 
-      {/* Bio và Menu (chỉ view, không edit) */}
+      {/* Bio and Menu (view only) */}
       <BioAndMenu bio={userData.bio} isViewOnly={true} />
     </div>
   );
-}
+};
+
+export default UserView;
