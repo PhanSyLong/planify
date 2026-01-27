@@ -36,7 +36,7 @@ export default function WeeklyChart() {
   function getMockData() {
     return {
       done: [40, 50, 60, 70, 65, 55, 45],
-      undone: [40, 30, 25, 20, 25, 30, 35],
+      Incomplete: [40, 30, 25, 20, 25, 30, 35],
       cancel: [20, 20, 15, 10, 10, 15, 20],
     };
   }
@@ -61,8 +61,8 @@ export default function WeeklyChart() {
             stack: "weekly",
           },
           {
-            label: "Undone",
-            data: data.undone,
+            label: "Incomplete",
+            data: data.Incomplete,
             stack: "weekly",
           },
           {
