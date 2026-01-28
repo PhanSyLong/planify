@@ -56,7 +56,7 @@ const ViewPlan = () => {
   const { plans, getCachedPlanById } = usePlans();
   const loading = !plans.length;
   // const plan = MOCK_PLANS['plan-1'];
-    const plan = getCachedPlanById(Number(id));
+  const plan = getCachedPlanById(Number(id));
   const error = !loading && !plan ? "Plan not found" : null;
   
   console.log("Viewing plan: ", plan)
@@ -187,7 +187,7 @@ const ViewPlan = () => {
                         <strong>Subtasks:</strong>
                         <ul>
                           {(task.subtasks || []).map((sub, i) => (
-                            <li key={i}>{sub}</li>
+                            <li key={i}>{sub.title}</li>
                           ))}
                         </ul>
                       </div>
