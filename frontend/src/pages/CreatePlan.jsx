@@ -20,7 +20,7 @@ const CreatePlan = () => {
         status: 'incompleted',
         duration: 0,
         imageFile: null,
-        reviewUrl: null,
+        reviewUrl: '',
         stages: [{
             tempId: crypto.randomUUID(),
             planId: crypto.randomUUID(),
@@ -38,7 +38,7 @@ const CreatePlan = () => {
                     title: '',
                     description: '',
                     duration: 0,
-                    status: '',
+                    status: 'incompleted',
                     daysLeft: 0,
                     startedAt: '',
                     completedAt: '',
@@ -61,7 +61,7 @@ const CreatePlan = () => {
 
     const handleCreate = useCallback( async() => {
         const { title, description, imageFile} = planData;
-
+        
         if (!title.trim()) {
             alert("Please enter a plan title");
             return;
@@ -74,7 +74,7 @@ const CreatePlan = () => {
                 reviewUrl = imgResponse.data.result;
                 console.log("Uploaded picture path:", reviewUrl);
             }
-
+            
             const planResponse = await createPlan({
                 title: title,
                 description: description,
@@ -107,26 +107,13 @@ const CreatePlan = () => {
                     taskEntries.push({ stageTempId: stage.tempId, task});
                 });
             });
-            console.log("taskEntries: ", taskEntries)
-            
-            console.log("Creating tasks payload:", taskEntries.map(e => ({
-                stageId: stageIdMap[e.stageTempId],
-                description: e.task.description
-                })));
-
 
             const taskResponses = await Promise.all(
             taskEntries.map(({ stageTempId, task }) => {
-                console.log("Creating task:", {
-                    stageTempId,
-                    stageId: stageIdMap[stageTempId],
-                    task
-                });
-
                 return createTask({
                     stageId: stageIdMap[stageTempId],
                     // title: task.title,
-                    description: task.description,
+                    description: task.title,
                 });
             })
             );
@@ -136,7 +123,6 @@ const CreatePlan = () => {
             taskEntries.forEach((entry, index) => {
                 taskIdMap[entry.task.tempId] = taskResponses[index].data.result.id;
             });
-            console.log(":saokdaiskdis", taskIdMap)
 
 
             const subtaskEntries = [];
@@ -152,7 +138,8 @@ const CreatePlan = () => {
                     createSubtask({
                         taskId: taskIdMap[taskTempId],
                         title: subtask.title,
-                        description: subtask.description,
+                        description: subtask.title,
+                        status: subtask.status,
                     })
                 )
             );

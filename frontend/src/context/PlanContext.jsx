@@ -1,19 +1,47 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPlanById, getAllPlans } from "../api/plan"; 
 import { getStagesByPlanId } from "../api/stage"
 import { getTasksByPlanId } from "../api/task";
 import { getSubtasksByPlanId } from "../api/subtask";
+import { authApi } from "../api/auth";
 
-const PlansContext = createContext();
+const PlanContext = createContext();
 
 export function PlansProvider({ children }) {
   const [plans, setPlans] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-	console.log("Get all plans");
-    getAllPlans()
-      .then(res => setPlans(res.data.result))
-      .catch(err => console.error("Error fetching plans:", err));
+    const fetchPlans = async () => {
+      try {
+        console.log("Getting all plans");
+
+        const res = await getAllPlans();
+        // console.log("All unhydrated plans:", res.data.result);
+
+        const plans = await Promise.all(
+          res.data.result.map(plan => hydratePlan(plan.id))
+        );
+
+        // console.log("Hydrated plans:", plans);
+        setPlans(plans);
+      } catch (err) {
+        if (err?.response?.status === 401) {
+          if (localStorage.accessToken) {
+            console.log("User session expired");
+          } else {
+            console.log("No token found");
+          }
+          authApi.logout();
+          navigate('/');
+        } else {
+          console.error("Error fetching plans:", err);
+        }
+      }
+    };
+
+    fetchPlans();
   }, []);
 
   const addPlan = (newPlan) => {
@@ -37,7 +65,6 @@ export function PlansProvider({ children }) {
       getSubtasksByPlanId(planId)
     ]);
 
-    console.log(tasksRes)
     const plan = planRes.data.result;
     const stages = stagesRes.data.result;
     const tasks = tasksRes.data.result;
@@ -72,12 +99,12 @@ export function PlansProvider({ children }) {
   };
 
   return (
-    <PlansContext.Provider value={{ plans, addPlan, getCachedPlanById, hydratePlan }}>
+    <PlanContext.Provider value={{ plans, addPlan, getCachedPlanById, hydratePlan }}>
       {children}
-    </PlansContext.Provider>
+    </PlanContext.Provider>
   );
 }
 
 export function usePlans() {
-  return useContext(PlansContext);
+  return useContext(PlanContext);
 }

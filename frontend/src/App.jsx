@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
 //mainlayout
 import MainLayout from "./layouts/MainLayout";
@@ -30,47 +30,56 @@ import ForkPlan from "./components/fork&edit/ForkPlan.jsx"
 //
 import Admin from "./pages/Admin.jsx";
 
+
+import { PlansProvider } from "./context/PlanContext";
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/add" element={<Add />} />
+          <Route
+            element={
+              <PlansProvider>
+                <Outlet/>
+              </PlansProvider>
+            }>
+            <Route path="/home" element={<Home />} />
+            <Route path="/add" element={<Add />} />
 
 
-          {/* Profile Routes */}
-          <Route path="/myprofile" element={<MyProfile />} />
-          <Route path="/profile/:username" element={<OtherUser />} />
+            {/* Profile Routes */}
+            <Route path="/myprofile" element={<MyProfile />} />
+            <Route path="/profile/:username" element={<OtherUser />} />
 
-          {/* MyPlan Routes */}
-          <Route path="/myplan" element={<MyPlan />} />
-          <Route path="/myplan/plans/:id" element={<ViewMyPlan />} />
+            {/* MyPlan Routes */}
+            <Route path="/myplan" element={<MyPlan />} />
+            <Route path="/myplan/plans/:id" element={<ViewMyPlan />} />
 
 
-          {/* Saved Plan Routes */}
-          <Route path="/saved" element={<SavedPlan />} />
-          <Route path="/saved/plans/:id" element={<ViewPlan />} />
-          <Route path="/plans/:id/fork" element={<ForkPlan />} />
+            {/* Saved Plan Routes */}
+            <Route path="/saved" element={<SavedPlan />} />
+            <Route path="/saved/plans/:id" element={<ViewPlan />} />
+            <Route path="/plans/:id/fork" element={<ForkPlan />} />
 
-          {/* Community/Explore Routes */}
-          <Route path="/commu" element={<Commu />} />
-          <Route path="/commu/plans/:id" element={<ViewPlan />} />
+            {/* Community/Explore Routes */}
+            <Route path="/commu" element={<Commu />} />
+            <Route path="/commu/plans/:id" element={<ViewPlan />} />
 
-          {/* General Plan View (fallback) */}
-          <Route path="/plans/:id" element={<ViewPlan />} />
+            {/* General Plan View (fallback) */}
+            <Route path="/plans/:id" element={<ViewPlan />} />
 
-          {/* User Profile View (legacy) */}
-          <Route path="/users/:id" element={<UserView />} />
+            {/* User Profile View (legacy) */}
+            <Route path="/users/:id" element={<UserView />} />
 
-          <Route path="/about" element={<About />} />
-          <Route path="/notifications" element={<Notification/>} />
-        </Route>
+            <Route path="/about" element={<About />} />
+            <Route path="/notifications" element={<Notification/>} />
+          </Route>
 
+          <Route path="/admin" element={<Admin />} />
+
+          </Route>
         <Route path="/" element={<LogSign />} />
-
-        <Route path="/admin" element={<Admin />} />
-
 
       </Routes>
     </BrowserRouter>

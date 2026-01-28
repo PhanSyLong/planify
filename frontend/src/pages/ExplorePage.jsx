@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ExploreHeader from '../components/explore/ExploreHeader';
 import ExploreTags from '../components/explore/ExploreTags';
 import Carousel from '../components/plans/Carousel';
@@ -6,6 +6,7 @@ import UserCarousel from '../components/users/UserCarousel';
 import PlanList from '../components/plans/PlanList';
 import UserList from '../components/users/UserList';
 import './ExplorePage.css';
+import { usePlans } from '../context/PlanContext';
 
 const MOCK_PLANS = [
   { id: 'plan-1', title: 'IELTS Speaking Mastery', duration: '8 weeks • Advanced', category: 'english', isPublic: true },
@@ -32,35 +33,21 @@ const ExplorePage = () => {
   const [explorePlans, setExplorePlans] = useState([]);
   const [exploreUsers, setExploreUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { plans } = usePlans();
 
   useEffect(() => {
-    let isMounted = true;
+    if (!plans) return;
 
-    const fetchExploreData = async () => {
       setLoading(true);
 
-      try {
-        await new Promise(resolve => setTimeout(resolve, 600));
+      const timer = setTimeout(() => {
+        setExplorePlans(plans);
+        setExploreUsers(MOCK_USERS);
+        setLoading(false);
+      }, 600);
 
-        if (isMounted) {
-          setExplorePlans(MOCK_PLANS);
-          setExploreUsers(MOCK_USERS);
-        }
-      } catch (error) {
-        console.error('Error fetching explore data:', error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchExploreData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      return () => clearTimeout(timer);
+    }, [plans]);
 
   const handlePinTag = useCallback((tag) => {
     setPinnedTags(prev => {
