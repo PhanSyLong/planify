@@ -27,7 +27,17 @@ const Stage = ({ stage, stageNumber, updateStage, deleteStage }) => {
   const addTask = useCallback(() => {
     updateStage({
       ...stage,
-      tasks: [...stage.tasks, { title: "", description: "", duration: 0, subtasks: [] }],
+      tasks: [...stage.tasks, { 
+        tempId: crypto.randomUUID(),
+        description: "", 
+        subtasks: [{
+          tempId: crypto.randomUUID(),
+          title: '',
+          description: '',
+          duration: 0,
+          status: '',
+        }]
+      }],
     });
   }, [stage, updateStage]);
 

@@ -138,8 +138,9 @@ const CreatePlan = () => {
                     createSubtask({
                         taskId: taskIdMap[taskTempId],
                         title: subtask.title,
-                        description: subtask.title,
-                        status: subtask.status,
+                        description: subtask.description,
+                        duration: parseInt(subtask.duration, 10) || 0,
+                        status: subtask.status || 'incompleted',
                     })
                 )
             );

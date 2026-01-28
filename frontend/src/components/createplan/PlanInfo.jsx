@@ -55,7 +55,22 @@ const PlanInfo = ({ planData, updatePlanData }) => {
 
   const addStage = useCallback(() => {
     updatePlanData({
-      stages: [...planData.stages, { title: '', description: '', tasks: [] }]
+      stages: [...planData.stages, { 
+        tempId: crypto.randomUUID(),
+        title: '', 
+        description: '', 
+        tasks: [{
+          tempId: crypto.randomUUID(),
+          description: '',
+          subtasks: [{
+            tempId: crypto.randomUUID(),
+            title: '',
+            description: '',
+            duration: 0,
+            status: '',
+          }]
+        }]
+      }]
     });
   }, [planData.stages, updatePlanData]);
 

@@ -13,12 +13,13 @@ const Subtask = ({ subtasks, setSubtasks }) => {
       return;
     }
 
-    const duration = newDuration.trim() === "" ? "0" : newDuration.trim();
+    const duration = newDuration.trim() === "" ? 0 : parseInt(newDuration.trim(), 10) || 0;
 
     const newItem = {
       title,
       description: newDescription.trim(),
       duration,
+      status: '',
     };
 
     setSubtasks([...subtasks, newItem]);
