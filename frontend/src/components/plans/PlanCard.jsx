@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import httpPublic from '../../api/httpPublic';
 import LikeButton from './LikeButton';
 import './PlanCard.css';
 
 const PlanCard = ({ item }) => {
+  console.log("items1: ", `${httpPublic.defaults.baseURL}${item.picture}`)
   const location = useLocation();
 
   // Memoize the path calculation
@@ -18,7 +20,13 @@ const PlanCard = ({ item }) => {
   return (
     <div className="plan-card">
       <Link to={planPath} className="plan-card-link">
-        <div className="card-image" />
+        <div className="card-image">
+          {item.picture ? (
+              <img src={`${httpPublic.defaults.baseURL}${item.picture}`} alt={item.title} />
+            ) : (
+              <div className="placeholder-image"></div>
+            )}
+        </div>
         <div className="card-info">
           <h3 className="plan-title">{item.title}</h3>
           <p className="plan-duration">{item.duration}</p>

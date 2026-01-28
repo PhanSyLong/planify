@@ -52,7 +52,7 @@ const Carousel = ({ title, items, type, onViewMore }) => {
     transform: `translateX(-${offset * ITEM_TOTAL_WIDTH}px)`
   }), [offset]);
 
-  if (!items || items.length === 0) {
+  if (!items) {  // Not appearing only when items doesn't exists, not when there's no items
     return null;
   }
 
