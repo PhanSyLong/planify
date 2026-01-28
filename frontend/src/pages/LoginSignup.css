@@ -1,8 +1,12 @@
 /* Login/Signup Page Container */
 
 /* Main container */
+
 .container {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 800px;
   height: 500px;
   display: flex;
@@ -10,6 +14,7 @@
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   background-color: #fff;
+  margin: 0 auto
 }
 
 /* Form containers */

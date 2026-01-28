@@ -1,3 +1,5 @@
+// PlanList.jsx – full updated code (only class name changed)
+
 import React, { useState, useMemo, useCallback } from 'react';
 import PlanCard from './PlanCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -66,7 +68,8 @@ const PlanList = ({ plans = [], initialPlans, isFullView = false, fullViewTitle,
           </div>
         </div>
 
-        <div className="planlist-grid">
+        {/* ──── Only this line changed ──── */}
+        <div className="plan-grid">
           {filteredItems.length > 0 ? (
             filteredItems.map(item => (
               <div key={item.id} className="plan-card-wrapper">

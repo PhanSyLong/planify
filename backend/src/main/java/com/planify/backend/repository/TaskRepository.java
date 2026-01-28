@@ -15,6 +15,9 @@ public interface TaskRepository extends JpaRepository<@NonNull Task, @NonNull In
     @Query("select t from Task t where t.stage_id.id = :stageId")
     List<Task> findAllTask(@Param("stageId") @NonNull Integer stageId);
 
+    @Query("SELECT t from Task t WHERE t.stage_id.plan_id.id = :planId")
+    List<Task> findAllTaskByPlanId(@Param("planId") @NonNull Integer planId);
+
     @Query("select t from Task t where t.id = :taskId and t.stage_id.id = :stageId")
     Task findTaskByIdAndStageId(@Param("taskId") @NonNull Integer taskId, @Param("stageId") @NonNull Integer stageId);
 

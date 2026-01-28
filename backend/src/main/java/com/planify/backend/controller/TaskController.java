@@ -59,6 +59,17 @@ public class TaskController {
                         .build());
     }
 
+    @GetMapping("/plans/{planId}/tasks")
+    ResponseEntity<ApiResponse<List<TaskResponse>>> getTasksByPlanId(@PathVariable Integer planId){
+        List<Task> tasks = taskService.getTasksByPlanId(planId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<TaskResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(taskMapper.toResponseList(tasks))
+                        .build());
+    }
+
     @GetMapping("/plans/{planId}/{stageId}/tasks")
     ResponseEntity<ApiResponse<List<TaskResponse>>> getAllTasks(@PathVariable Integer planId, @PathVariable Integer stageId){
         List<Task> tasks = taskService.getAllTasksByStageId(stageId, planId);

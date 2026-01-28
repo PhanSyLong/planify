@@ -119,6 +119,10 @@ public class SubtaskService {
         return subtask;
     }
 
+    public List<Subtask> getSubtasksByPlanId(Integer planId) {
+        return subtaskRepository.findAllSubtaskByPlanId(planId);
+    }
+
     public List<Subtask> getAllSubtasks(Integer taskId, Integer stageId, Integer planId){
         Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
         if (task == null){

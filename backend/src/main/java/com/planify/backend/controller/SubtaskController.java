@@ -72,6 +72,17 @@ public class SubtaskController {
                         .build());
     }
 
+    @GetMapping("/plans/{planId}/subtasks")
+    ResponseEntity<ApiResponse<List<SubtaskResponse>>> getSubtasksByPlanId(@PathVariable Integer planId){
+        List<Subtask> subtasks = subtaskService.getSubtasksByPlanId(planId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<List<SubtaskResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(subtaskMapper.toResponseList(subtasks))
+                        .build());
+    }
+
     @GetMapping("/plans/{planId}/{stageId}/{taskId}/subtasks")
     ResponseEntity<ApiResponse<List<SubtaskResponse>>> getAllSubtasks(@PathVariable Integer planId, @PathVariable Integer stageId, @PathVariable Integer taskId){
         List<Subtask> subtasks = subtaskService.getAllSubtasks(taskId, stageId, planId);

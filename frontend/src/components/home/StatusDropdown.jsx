@@ -15,7 +15,6 @@ export default function StatusDropdown({
       aria-label="Task status"
     >
       <option value="INCOMPLETE">Incomplete</option>
-      <option value="IN_PROGRESS">In progress</option>
       <option value="DONE">Done</option>
       <option value="CANCELLED">Cancel</option>
     </select>

@@ -11,7 +11,7 @@ const MOCK_PLANS = {
   'my-recent-1': {
     title: 'Morning Workout Routine',
     description: 'Build a sustainable morning habit.',
-    imageUrl: null,
+    reviewUrl: null,
     categories: ['Fitness', 'Health'],
     stages: [
       {
@@ -44,7 +44,7 @@ const MOCK_PLANS = {
   'my-progress-1': {
     title: 'Learn React Advanced',
     description: 'Master advanced React concepts.',
-    imageUrl: null,
+    reviewUrl: null,
     categories: ['Programming', 'Web Development', 'React'],
     stages: [
       {
@@ -77,7 +77,7 @@ const MOCK_PLANS = {
   'my-all-1': {
     title: 'Healthy Meal Planning',
     description: 'Plan nutritious meals for better health.',
-    imageUrl: null,
+    reviewUrl: null,
     categories: ['Nutrition', 'Health'],
     stages: [
       {
@@ -110,7 +110,7 @@ const MOCK_PLANS = {
   'plan-1': {
     title: 'IELTS Speaking Mastery',
     description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking.',
-    imageUrl: null,
+    reviewUrl: null,
     categories: ['Language', 'Exam', 'English'],
     stages: [
       {
@@ -369,8 +369,8 @@ const ViewMyPlan = () => {
       <div className="viewplan-main">
         <div className="viewplan-sidebar">
           <div className="viewplan-image">
-            {plan.imageUrl ? (
-              <img src={plan.imageUrl} alt={plan.title} />
+            {plan.reviewUrl ? (
+              <img src={`${plan.reviewUrl}`} alt={plan.title} />
             ) : (
               <div className="placeholder-image">
                 <div className="landscape-icon"></div>

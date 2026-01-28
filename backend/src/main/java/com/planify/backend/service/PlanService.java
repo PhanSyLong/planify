@@ -46,7 +46,10 @@ public class PlanService {
         plan.setVisibility(request.getVisibility());
         plan.setStatus(request.getStatus());
 
-        plan.setPicture(request.getPicture().replace(" ", "_"));
+        String requestPicture = request.getPicture();
+        if (requestPicture != null) {
+            plan.setPicture(request.getPicture().replace(" ", "_"));
+        }
         plan.setReminderAt(request.getReminderAt());
         plan.setOwner(userRepository.findById(jwtUserContext.getCurrentUserId())
                 .orElseThrow(() -> new RuntimeException("Owner not found")));

@@ -12,7 +12,7 @@ export default function TodayPieChart() {
     chartInstance.current = new Chart(chartRef.current, {
       type: "doughnut",
       data: {
-        labels: ["Cancel", "Done", "Undone"],
+        labels: ["Cancel", "Done", "Incomplete"],
         datasets: [{
           data: [30, 50, 100],
           backgroundColor: [

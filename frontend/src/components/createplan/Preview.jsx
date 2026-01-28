@@ -40,9 +40,9 @@ const PreviewModal = ({ planData, onClose }) => {
           <h2>{planData.title || 'Untitled Plan'}</h2>
         </div>
 
-        {planData.imageUrl && (
+        {planData.reviewUrl && (
           <img
-            src={planData.imageUrl}
+            src={planData.reviewUrl}
             alt={planData.title || 'Plan'}
             className="preview-image"
           />

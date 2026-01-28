@@ -28,7 +28,6 @@ public class ImageService {
         Path filePath = uploadPath.resolve(fileName.replace(" ", "_"));
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        System.out.println("/uploads/" + fileName.replace(" ", "_"));
         return "/uploads/" + fileName;
     }
 }

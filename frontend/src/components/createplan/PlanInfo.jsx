@@ -40,14 +40,14 @@ const PlanInfo = ({ planData, updatePlanData }) => {
 
       updatePlanData({
         imageFile: file,
-        imageUrl: URL.createObjectURL(file),
+        reviewUrl: URL.createObjectURL(file),
       })
     }
   }, [updatePlanData]);
 
   const handleRemoveImage = useCallback((e) => {
     e.stopPropagation();
-    updatePlanData({ imageUrl: null });
+    updatePlanData({ reviewUrl: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -107,9 +107,10 @@ const PlanInfo = ({ planData, updatePlanData }) => {
             onClick={(e) => e.stopPropagation()}  // Fix prompting twice
             onChange={handleImageChange}
           />
-          {planData.imageUrl ? (
+          {planData.reviewUrl ? (
             <>
-              <img src={planData.imageUrl} alt="Plan preview" className="image-preview" />
+            {/* <p>{`${httpPublic.defaults.baseURL}${planData.reviewUrl}`}</p> */}
+              <img src={`${planData.reviewUrl}`} alt="Plan preview" className="image-preview" />
               <button className="image-remove-btn" onClick={handleRemoveImage}>
                 ×
               </button>

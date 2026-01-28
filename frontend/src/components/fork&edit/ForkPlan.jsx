@@ -9,7 +9,7 @@ const MOCK_PLANS = {
   'plan-1': {
     title: 'IELTS Speaking Mastery',
     description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
-    imageUrl: null,
+    reviewUrl: null,
     categories: ['Language', 'Exam', 'English'],
     stages: [
       {
@@ -58,7 +58,7 @@ const ForkPlan = () => {
     description: '',
     categories: [],
     stages: [{ title: '', description: '', tasks: [] }],
-    imageUrl: null,
+    reviewUrl: null,
   });
   const [showPreview, setShowPreview] = useState(false);
 
@@ -83,7 +83,7 @@ const ForkPlan = () => {
         setPlanData({
           ...foundPlan,
           title: `Copy of ${foundPlan.title}`,
-          // imageUrl: foundPlan.imageUrl, // keep original image (or set null if you prefer)
+          // reviewUrl: foundPlan.reviewUrl, // keep original image (or set null if you prefer)
         });
       } catch (err) {
         console.error(err);

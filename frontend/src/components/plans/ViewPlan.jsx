@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import LikeButton from './LikeButton';        // ← Đã thêm import
 import './ViewPlan.css';
+import { usePlans } from '../../context/PlanContext';
+import httpPublic from '../../api/httpPublic';
 
 const MOCK_PLANS = {
   'plan-1': {
     title: 'IELTS Speaking Mastery',
     description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
-    imageUrl: null,
+    previewUrl: null,
     categories: ['Language', 'Exam', 'English'],
     stages: [
       {
@@ -48,50 +50,16 @@ const ViewPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [plan, setPlan] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);   // ← Thêm state này
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchPlan = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        await new Promise(resolve => setTimeout(resolve, 600));
-
-        const foundPlan = MOCK_PLANS[id];
-
-        if (isMounted) {
-          if (!foundPlan) {
-            setError('Plan not found');
-          } else {
-            setPlan(foundPlan);
-            // TODO: Sau này có thể load trạng thái bookmark thật từ API/localStorage
-          }
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError('Failed to load plan');
-          console.error(err);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPlan();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
-
+  
+  const { plans, getCachedPlanById } = usePlans();
+  const loading = !plans.length;
+  // const plan = MOCK_PLANS['plan-1'];
+  const plan = getCachedPlanById(Number(id));
+  const error = !loading && !plan ? "Plan not found" : null;
+  
+  console.log("Viewing plan: ", plan)
   const handleForkClick = useCallback(() => {
     console.log('Fork Plan clicked - feature in development');
     navigate(`/plans/${id}/fork`);
@@ -154,8 +122,8 @@ const ViewPlan = () => {
       <div className="viewplan-main">
         <div className="viewplan-sidebar">
           <div className="viewplan-image">
-            {plan.imageUrl ? (
-              <img src={plan.imageUrl} alt={plan.title} />
+            {plan.picture ? (
+              <img src={`${httpPublic.defaults.baseURL}${plan.picture}`} alt={plan.title} />
             ) : (
               <div className="placeholder-image">
                 <div className="landscape-icon"></div>
@@ -172,7 +140,7 @@ const ViewPlan = () => {
             <div className="info-section">
               <strong>Tags</strong>
               <div className="category-tags">
-                {plan.categories.map((cat, i) => (
+                {(plan.categories || []).map((cat, i) => (
                   <span key={i} className="category-tag">
                     {cat}
                   </span>
@@ -183,7 +151,7 @@ const ViewPlan = () => {
         </div>
 
         <div className="viewplan-stages">
-          {plan.stages.map((stage, stageIdx) => (
+          {(plan.stages || []).map((stage, stageIdx) => (
             <div key={stageIdx} className="viewplan-stage">
               <div className="stage-header">
                 <h3 className="stage-title">
@@ -196,7 +164,7 @@ const ViewPlan = () => {
               )}
 
               <div className="stage-tasks">
-                {stage.tasks.map((task, taskIdx) => (
+                {(stage.tasks || []).map((task, taskIdx) => (
                   <div key={taskIdx} className="viewplan-task">
                     <div className="task-header">
                       <h4 className="task-title">
@@ -214,12 +182,12 @@ const ViewPlan = () => {
                       </p>
                     )}
 
-                    {task.subtasks?.length > 0 && (
+                    {(task.subtasks?.length || 0) > 0 && (
                       <div className="subtasks">
                         <strong>Subtasks:</strong>
                         <ul>
-                          {task.subtasks.map((sub, i) => (
-                            <li key={i}>{sub}</li>
+                          {(task.subtasks || []).map((sub, i) => (
+                            <li key={i}>{sub.title}</li>
                           ))}
                         </ul>
                       </div>
@@ -230,7 +198,7 @@ const ViewPlan = () => {
             </div>
           ))}
 
-          {plan.stages.length === 0 && (
+          {(plan.stages || []).length === 0 && (
             <p className="no-stages">No stages defined yet.</p>
           )}
         </div>

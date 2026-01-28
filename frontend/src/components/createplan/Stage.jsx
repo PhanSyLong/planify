@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import Task from "./Task";
 import "./Stage.css";
 
@@ -11,13 +11,6 @@ const Stage = ({ stage, stageNumber, updateStage, deleteStage }) => {
     updateStage({ ...stage, description: e.target.value });
   }, [stage, updateStage]);
 
-  const addTask = useCallback(() => {
-    updateStage({
-      ...stage,
-      tasks: [...stage.tasks, { title: '', description: '', duration: '', subtasks: [] }]
-    });
-  }, [stage, updateStage]);
-
   const updateTask = useCallback((index, updatedTask) => {
     const newTasks = [...stage.tasks];
     newTasks[index] = updatedTask;
@@ -27,9 +20,21 @@ const Stage = ({ stage, stageNumber, updateStage, deleteStage }) => {
   const deleteTask = useCallback((index) => {
     updateStage({
       ...stage,
-      tasks: stage.tasks.filter((_, i) => i !== index)
+      tasks: stage.tasks.filter((_, i) => i !== index),
     });
   }, [stage, updateStage]);
+
+  const addTask = useCallback(() => {
+    updateStage({
+      ...stage,
+      tasks: [...stage.tasks, { title: "", description: "", duration: 0, subtasks: [] }],
+    });
+  }, [stage, updateStage]);
+
+  // Tính tổng duration của stage từ tất cả tasks
+  const computedStageDuration = useMemo(() => {
+    return stage.tasks.reduce((sum, task) => sum + Number(task.duration || 0), 0);
+  }, [stage.tasks]);
 
   return (
     <div className="stage-wrapper">
@@ -40,14 +45,13 @@ const Stage = ({ stage, stageNumber, updateStage, deleteStage }) => {
         </button>
       </div>
 
-      {/* Stage Card */}
       <div className="stage-card">
         <div className="stage-field">
           <label>Title</label>
           <input
             type="text"
             placeholder="Enter stage title"
-            value={stage.title}
+            value={stage.title || ""}
             onChange={handleTitleChange}
           />
         </div>
@@ -57,20 +61,32 @@ const Stage = ({ stage, stageNumber, updateStage, deleteStage }) => {
           <input
             type="text"
             placeholder="Enter stage description"
-            value={stage.description}
+            value={stage.description || ""}
             onChange={handleDescriptionChange}
           />
         </div>
+
+        <div className="stage-field duration-field">
+          <label>Duration</label>
+          <div className="duration-input">
+            <input
+              type="number"
+              value={computedStageDuration}
+              readOnly
+              disabled
+            />
+            <span className="duration-unit">days</span>
+          </div>
+        </div>
       </div>
 
-      {/* Task Sections */}
       <div className="task-section">
         {stage.tasks.map((task, index) => (
           <Task
             key={index}
             task={task}
             taskNumber={index + 1}
-            updateTask={(updatedTask) => updateTask(index, updatedTask)}
+            updateTask={(updated) => updateTask(index, updated)}
             deleteTask={() => deleteTask(index)}
           />
         ))}

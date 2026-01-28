@@ -1,12 +1,11 @@
-//  /pages/About.jsx
 import React from 'react';
-import './About.css';  // Tạo file About.css bên cạnh để chứa CSS
+import './AboutUs.css';
 
 const About = () => {
   return (
     <div className="about-page">
       {/* Hero Section */}
-      <section className="hero text-center">
+      <section className="hero">
         <h1 className="hero-title">About Planify</h1>
         <p className="hero-subtitle">
           Turning learning intentions into real achievements — one plan at a time.
@@ -15,7 +14,7 @@ const About = () => {
 
       {/* Our Story */}
       <section className="section story">
-        <div className="container">
+        <div className="about-container">
           <div className="grid two-columns reverse-on-mobile">
             <div className="story-text">
               <h2 className="section-title">Our Story</h2>
@@ -30,7 +29,7 @@ const About = () => {
                 and a supportive community.
               </p>
               <p>
-                That's why we created <strong>Planify</strong> — a blend of “Plan” and “Simplify.”
+                That's why we created <strong>Planify</strong> — a blend of "Plan" and "Simplify."
               </p>
             </div>
             <div className="story-image text-center">
@@ -39,7 +38,6 @@ const About = () => {
                 alt="Planify Team"
                 className="image-rounded shadow"
               />
-              {/* Thay bằng ảnh nhóm thực tế của các bạn */}
             </div>
           </div>
         </div>
@@ -47,7 +45,7 @@ const About = () => {
 
       {/* Mission, Vision, Values */}
       <section className="section cards bg-light">
-        <div className="container">
+        <div className="about-container">
           <div className="grid three-columns">
             <div className="card text-center">
               <div className="card-icon">🎯</div>
@@ -76,7 +74,7 @@ const About = () => {
 
       {/* Features */}
       <section className="section features">
-        <div className="container">
+        <div className="about-container">
           <h2 className="section-title text-center">What Makes Planify Special</h2>
           <div className="grid two-columns">
             <div className="feature-item">
@@ -89,7 +87,7 @@ const About = () => {
               <strong>📊 Honest Analytics:</strong> Daily, weekly, and overall performance insights
             </div>
             <div className="feature-item">
-              <strong>🌐 Community Sharing:</strong> Explore, like, and adopt proven plans from others
+              <strong>🌍 Community Sharing:</strong> Explore, like, and adopt proven plans from others
             </div>
           </div>
         </div>
@@ -97,17 +95,12 @@ const About = () => {
 
       {/* Footer / CTA */}
       <section className="section cta text-center bg-light">
-        <div className="container">
+        <div className="about-container">
           <p className="lead">
             Planify is proudly developed by a passionate team of students as part of <strong>Group Project B3</strong>,<br />
             using modern technologies: React.js, Spring Boot, MySQL, and Agile methodology.
           </p>
-          <p className="mt-4">
-            Ready to simplify your learning journey?<br /><br />
-            <a href="/LoginSignup" className="btn-primary">
-              Join Planify Today
-            </a>
-          </p>
+
         </div>
       </section>
     </div>

@@ -41,7 +41,6 @@ public class TaskService {
 //        task.setDuration(taskRequest.getDuration());
 
         task.setStage_id(stage);
-
         return taskRepository.save(task);
     }
 
@@ -79,6 +78,10 @@ public class TaskService {
         }
 
         return findTaskByIdAndStageIdHelper(taskId, stageId);
+    }
+
+    public List<Task> getTasksByPlanId(Integer planId){
+        return taskRepository.findAllTaskByPlanId(planId);
     }
 
     // Helper to work around method name conflict in patch: call repository properly

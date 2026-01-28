@@ -1,9 +1,128 @@
-/* PlanCard.css - Container Query Optimized */
+/* PlanList.css - Container Query Optimized, aligned with UserList style */
+
+.planlist-wrapper {
+  width: 100%;
+  max-width: 1200px;           /* ← wider container like userlist */
+  margin: 24px auto 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.planlist-container {
+  padding: 24px;
+}
+
+.planlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #5b5fef;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  color: #4338ca;
+  text-decoration: underline;
+  background: none;
+}
+
+.back-btn:active {
+  background: none;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  flex: 1;
+}
+
+.search-box {
+  position: relative;
+  width: 300px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* ────────────────────────────────────────────────
+   Main plan card grid — most important change
+───────────────────────────────────────────────── */
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.plan-card-wrapper {
+  display: flex;
+  justify-content: center;
+  /* helps center cards when row doesn't fill completely */
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ────────────────────────────────────────────────
+   Individual plan card (original classes preserved)
+───────────────────────────────────────────────── */
 
 .plan-card {
   position: relative;
-  width: 240px;
-  flex-shrink: 0;
+  width: 100%;                  /* ← changed: now fills wrapper */
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -60,10 +179,50 @@
   z-index: 5;
 }
 
-/* Container Query Responsive */
+/* ────────────────────────────────────────────────
+   Container Queries — similar breakpoints & behavior
+───────────────────────────────────────────────── */
+
+@container main (max-width: 768px) {
+  .planlist-wrapper {
+    margin: 20px 16px 0;
+  }
+
+  .planlist-container {
+    padding: 20px;
+  }
+
+  .planlist-header {
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .search-box {
+    width: 100%;
+    order: 3;
+  }
+
+  .plan-grid {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
 @container main (max-width: 480px) {
-  .plan-card {
-    width: 200px;
+  .page-title {
+    font-size: 20px;
+  }
+
+  .back-btn {
+    font-size: 14px;
+  }
+
+  .plan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
   }
 
   .card-image {
