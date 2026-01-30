@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import httpPublic from '../../api/httpPublic';
 import LikeButton from './LikeButton';
 import './PlanCard.css';
 
 const PlanCard = ({ item }) => {
-  console.log("items1: ", `${httpPublic.defaults.baseURL}${item.picture}`)
   const location = useLocation();
 
   // Memoize the path calculation
@@ -34,7 +33,10 @@ const PlanCard = ({ item }) => {
       </Link>
 
       <div className="like-button-wrapper">
-        <LikeButton itemId={item.id} />
+        <LikeButton 
+          itemId={item.id} 
+          type='plan'
+        />
       </div>
     </div>
   );

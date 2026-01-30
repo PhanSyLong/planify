@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import LikeButton from './LikeButton';        // ← Đã thêm import
+import LikeButton from './LikeButton.jsx';        // ← Đã thêm import
 import './ViewPlan.css';
 import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import httpPublic from '../../api/httpPublic';
@@ -59,20 +59,13 @@ const ViewPlan = () => {
   
   // console.log("Viewing plan: ", fullPlan)
   const handleForkClick = useCallback(() => {
-    console.log('Fork Plan clicked - feature in development');
+        console.log('Fork Plan clicked - feature in development');
     navigate(`/plans/${id}/fork`);
   }, [id, navigate]);
 
   const handleGoBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-
-  // Handler cho LikeButton
-  const handleBookmarkToggle = useCallback((key, newValue) => {
-    setIsBookmarked(newValue);
-    console.log(`Plan ${id} bookmark toggled: ${newValue ? 'saved' : 'removed'}`);
-    // TODO: Gọi API lưu bookmark hoặc lưu vào localStorage/context
-  }, [id]);
 
   if (hydrateIsLoading) {
     return (
@@ -100,18 +93,13 @@ const ViewPlan = () => {
         </button>
 
         <div className="viewplan-actions">
-
-
           <button className="btn-fork" onClick={handleForkClick}>
             Fork Plan
           </button>
           <LikeButton
-            itemId={id}
-            type="plan"
-            isLiked={isBookmarked}
-            onToggle={handleBookmarkToggle}
+            itemId={Number(id)}
+            type='plan'
           />
-
         </div>
       </div>
 
