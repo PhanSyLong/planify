@@ -20,10 +20,6 @@ export const useBookmarks = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // useEffect(() => {
-  //   console.log('bookmarks from API:', bookmarksQuery.data);
-  // }, [bookmarksQuery.data]);
-
   // 🔹 Toggle mutation (optimistic)
   const toggleMutation = useMutation({
     mutationFn: ({ planId, isSaved }) => {

@@ -12,7 +12,7 @@ import MyPlan from "./pages/MyPlan";
 import SavedPlan from "./pages/SavedPlan";
 import Commu from "./pages/ExplorePage";
 import Add from "./pages/CreatePlan";
-import About from "./pages/AboutUs.jsx";
+import About from "./pages/About.jsx";
 
 // Profile Pages
 import MyProfile from "./pages/MyProfile";

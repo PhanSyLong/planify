@@ -12,7 +12,6 @@ const LikeButton = ({ itemId, type = 'plan' }) => {
 
   const isSaved = isBookmarked(itemId);
   const isDisabled = togglingId === itemId;
-  console.log("bookmarks: ", bookmarks)
 
   const handleToggle = useCallback((e) => {
     e.preventDefault();

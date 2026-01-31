@@ -75,7 +75,7 @@ const ViewPlan = () => {
   if (isError || !fullPlan) {
     return (
       <div className="viewplan-error">
-        <h2>{error.message || 'Plan not found'}</h2>
+        <h2>{'Plan not found (Status code: ' + error.message.match(/\d+/g) + ')'}</h2>
         <button onClick={handleGoBack}>Go Back</button>
       </div>
     );
