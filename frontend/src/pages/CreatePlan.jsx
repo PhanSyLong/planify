@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import PlanInfo from "../components/createplan/PlanInfo";
-import PreviewModal from "../components/createplan/PreviewModal.jsx";
+import PreviewModal from "../components/createplan/Preview.jsx";
 import { createPlan } from "../api/plan";
 import { createTask } from "../api/task";
 import { createSubtask } from "../api/subtask";
