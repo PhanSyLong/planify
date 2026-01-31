@@ -2,21 +2,24 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { followApi } from "../../api/follow";
 import UserCard from "../users/UserCard";
+import { usePlans } from "../../queries/usePlans";
 
 import "./MyBioMenu.css";
 
-// Giữ mock data cho Public Plans
-const MOCK_PUBLIC_PLANS = [
-];
-
 export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
   const [activeTab, setActiveTab] = useState("public-plans");
-
+  
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
-
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const {data: plans, isLoading: isLoadingPlans } = usePlans();
+  const publicPlans = useMemo(() => {
+    if (isLoadingPlans) return [];
+    return plans.filter(plan => plan.ownerId === Number(userId) && plan.visibility == "public")
+  }); 
 
   // Fetch chỉ khi có userId thật và tab phù hợp
   useEffect(() => {
@@ -77,11 +80,12 @@ export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
       return <div className="my-empty-state error">{error}</div>;
     }
 
+    console.log("plans", publicPlans)
     switch (activeTab) {
       case "public-plans":
-        return MOCK_PUBLIC_PLANS.length > 0 ? (
+        return publicPlans.length > 0 ? (
           <div className="my-content-grid">
-            {MOCK_PUBLIC_PLANS.map((plan) => (
+            {publicPlans.map((plan) => (
               <div key={plan.id} className="my-plan-card">
                 <div className="my-plan-card-image">📋</div>
                 <div className="my-plan-card-content">

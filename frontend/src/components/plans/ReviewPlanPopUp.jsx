@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './ReviewPlanPopup.css';
+import './ReviewPlanPopUp.css';
 
 const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
   const popupRef = useRef(null);
