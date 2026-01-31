@@ -11,58 +11,6 @@
   overflow: hidden;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* =========================
-   BUTTON BASELINE
-   ========================= */
-
-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  height: 40px;
-  padding: 0 16px;
-
-  border-radius: 9999px;
-  border: none;
-
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-
-  cursor: pointer;
-  user-select: none;
-
-  background-color: #2563eb;
-
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-
-/* =========================
-   ICON BASELINE
-   ========================= */
-
-/* Generic icon rule */
-.icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-/* Icon inside button */
-button .icon {
-  width: 16px;
-  height: 16px;
-}
-
 /* 🔑 MAIN CONTAINER */
 .layout-content {
   flex: 1;

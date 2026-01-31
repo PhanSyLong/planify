@@ -1,59 +1,61 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import FollowButton from './FollowButton';
 import './UserCard.css';
 
 const UserCard = ({ user, onFollowToggle }) => {
-  const [isFollowing, setIsFollowing] = useState(user.isFollowing || false);
+  if (!user || !user.id) {
+    console.warn('UserCard received invalid user:', user);
+    return null;
+  }
 
-  const handleFollow = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
 
-    setIsFollowing(prev => !prev);
-    if (onFollowToggle) {
-      onFollowToggle(user.id, !isFollowing);
-    }
-  }, [user.id, isFollowing, onFollowToggle]);
+  const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : 'User');
 
   const initials = useMemo(() => {
-    return user.name
-      .split(' ')
-      .map(n => n[0])
+    const source = user.name || user.username || user.email || 'User';
+    if (typeof source !== 'string' || !source.trim()) return '??';
+    return source
+      .trim()
+      .split(/\s+/)
+      .map(p => p[0]?.toUpperCase() || '')
       .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  }, [user.name]);
+      .slice(0, 2) || '??';
+  }, [user.name, user.username, user.email]);
+
+  const showEmail = user.email && user.email !== `${displayName.toLowerCase()}@example.com`;
 
   return (
     <div className="user-card">
-      <Link to={`/users/${user.id}`} className="user-card-link">
+      <Link to={`/profile/${user.id}`} className="user-card-link">
         <div className="user-avatar">
           {user.avatar ? (
-            <img src={user.avatar} alt={user.name} />
+            <img
+              src={user.avatar}
+              alt={displayName}
+              onError={e => (e.target.src = '/default-avatar.png')}
+            />
           ) : (
             <div className="avatar-placeholder">{initials}</div>
           )}
         </div>
 
         <div className="user-info">
-          <h3 className="user-name">{user.name}</h3>
-          {user.description && (
-            <p className="user-description">{user.description}</p>
-          )}
-          <div className="user-stats">
-            <span>{user.followers || 0} followers</span>
-            {' • '}
-            <span>{user.plans || 0} plans</span>
-          </div>
+          <h3 className="user-name">{displayName}</h3>
+          {showEmail && <p className="user-email">{user.email}</p>}
+          {/* Bỏ phần user-stats */}
         </div>
       </Link>
 
-      <button
-        className={`follow-btn ${isFollowing ? 'following' : ''}`}
-        onClick={handleFollow}
-      >
-        {isFollowing ? 'Following' : 'Follow'}
-      </button>
+      <FollowButton
+        userId={user.id}
+        initialIsFollowing={user.isFollowing || false}
+        size="small"
+        className="user-card-follow-btn"
+        onToggle={(newFollowing) => {
+          onFollowToggle?.(user.id, newFollowing);
+        }}
+      />
     </div>
   );
 };

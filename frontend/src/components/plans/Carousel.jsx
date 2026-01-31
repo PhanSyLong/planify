@@ -1,3 +1,5 @@
+// Carousel.jsx – full updated version
+
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PlanCard from './PlanCard';
 import ViewMoreButton from './ViewMoreButton';
@@ -5,91 +7,92 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import './Carousel.css';
 
-const CARD_WIDTH = 240;
 const GAP = 18;
-const ITEM_TOTAL_WIDTH = CARD_WIDTH + GAP;
 
 const Carousel = ({ title, items, type, onViewMore }) => {
   const [offset, setOffset] = useState(0);
-  const [visibleItems, setVisibleItems] = useState(5);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [itemWidth, setItemWidth] = useState(240);
   const wrapperRef = useRef(null);
+  const trackRef = useRef(null);
 
-  // Calculate visible items
   useEffect(() => {
-    const calculateVisible = () => {
-      if (wrapperRef.current) {
-        const width = wrapperRef.current.offsetWidth;
-        const calculated = Math.floor(width / ITEM_TOTAL_WIDTH);
-        setVisibleItems(Math.max(1, calculated));
-      }
+    const calculateLayout = () => {
+      if (!wrapperRef.current || !trackRef.current || items.length === 0) return;
+
+      const containerWidth = wrapperRef.current.offsetWidth;
+      const firstCard = trackRef.current.querySelector('.plan-card');
+      const measured = firstCard ? firstCard.offsetWidth : 240;
+
+      setItemWidth(measured);
+      const totalWidth = measured + GAP;
+      const visible = Math.floor(containerWidth / totalWidth);
+      setVisibleCount(Math.max(1, visible));
     };
 
-    calculateVisible();
+    calculateLayout();
 
-    const resizeObserver = new ResizeObserver(calculateVisible);
-    if (wrapperRef.current) {
-      resizeObserver.observe(wrapperRef.current);
-    }
+    const resizeObserver = new ResizeObserver(calculateLayout);
+    if (wrapperRef.current) resizeObserver.observe(wrapperRef.current);
+
+    // Re-measure after content loads
+    const timer = setTimeout(calculateLayout, 150);
 
     return () => {
       resizeObserver.disconnect();
+      clearTimeout(timer);
     };
-  }, []);
+  }, [items.length, items]); // depend on items to re-calc when data changes
 
-  const maxOffset = useMemo(() => Math.max(0, items.length - visibleItems), [items.length, visibleItems]);
+  const maxOffset = Math.max(0, items.length - visibleCount);
   const hasPrev = offset > 0;
   const hasNext = offset < maxOffset;
 
   const handlePrevious = useCallback(() => {
-    setOffset(prev => Math.max(0, prev - 1));
+    setOffset((prev) => Math.max(0, prev - 1));
   }, []);
 
   const handleNext = useCallback(() => {
-    setOffset(prev => Math.min(maxOffset, prev + 1));
+    setOffset((prev) => Math.min(maxOffset, prev + 1));
   }, [maxOffset]);
 
-  const trackStyle = useMemo(() => ({
-    transform: `translateX(-${offset * ITEM_TOTAL_WIDTH}px)`
-  }), [offset]);
+  const trackStyle = useMemo(
+    () => ({
+      transform: `translateX(-${offset * (itemWidth + GAP)}px)`,
+    }),
+    [offset, itemWidth]
+  );
 
-  if (!items || items.length === 0) {
-    return null;
-  }
+  if (!items || items.length === 0) return null;
 
   return (
     <div className="carousel-box">
       <div className="section-header">
         <h3 className="section-title">{title}</h3>
-        {onViewMore && items.length > visibleItems && (
+        {onViewMore && items.length > visibleCount && (
           <ViewMoreButton onClick={onViewMore} />
         )}
       </div>
 
       <div className="carousel" data-has-prev={hasPrev} data-has-next={hasNext}>
         {hasPrev && (
-          <button
-            className="nav-btn left"
-            onClick={handlePrevious}
-            aria-label="Previous"
-          >
+          <button className="nav-btn left" onClick={handlePrevious} aria-label="Previous">
             <FontAwesomeIcon icon={faAngleLeft} size="2x" className="icon" />
           </button>
         )}
 
         {hasNext && (
-          <button
-            className="nav-btn right"
-            onClick={handleNext}
-            aria-label="Next"
-          >
+          <button className="nav-btn right" onClick={handleNext} aria-label="Next">
             <FontAwesomeIcon icon={faAngleRight} size="2x" className="icon" />
           </button>
         )}
 
         <div className="carousel-wrapper" ref={wrapperRef}>
-          <div className="carousel-track" style={trackStyle}>
+          <div className="carousel-track" ref={trackRef} style={trackStyle}>
             {items.map((item) => (
-              <PlanCard key={item.id} item={item} type={type} />
+              <div key={item.id} style={{ flexShrink: 0 }}>
+                <PlanCard item={item} type={type} />
+              </div>
             ))}
           </div>
         </div>

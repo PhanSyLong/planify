@@ -8,11 +8,12 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   z-index: 1000;
-  animation: fadeSlide 0.18s ease-out;
+  animation: languageDropdownSlide 0.18s ease-out;
   user-select: none;
 }
 
-@keyframes fadeSlide {
+/* Animation riêng cho language dropdown */
+@keyframes languageDropdownSlide {
   from {
     opacity: 0;
     transform: translateY(-6px);

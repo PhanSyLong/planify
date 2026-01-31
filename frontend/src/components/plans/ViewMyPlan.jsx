@@ -320,18 +320,46 @@ const ViewMyPlan = () => {
   }
 
   if (isEditing) {
+    // Create a version of the plan with subtasks as strings for EditPlan compatibility
+    const editedPlan = {
+      ...plan,
+      stages: plan.stages.map(stage => ({
+        ...stage,
+        tasks: stage.tasks.map(task => ({
+          ...task,
+          subtasks: task.subtasks ? task.subtasks.map(sub => sub.text) : []
+        }))
+      }))
+    };
+
     return (
       <>
         <EditPlan
-          plan={plan}
-          setPlan={setPlan}
+          plan={editedPlan}
+          setPlan={(newPlan) => {
+            // Map back the edited texts to the original subtask objects, preserving status/deadline/etc.
+            setPlan(prev => {
+              const updated = { ...prev };
+              updated.stages = newPlan.stages.map((newStage, sIdx) => ({
+                ...newStage,
+                tasks: newStage.tasks.map((newTask, tIdx) => ({
+                  ...newTask,
+                  subtasks: newTask.subtasks.map((newSubText, stIdx) => ({
+                    ... (prev.stages[sIdx]?.tasks[tIdx]?.subtasks[stIdx] || {}),
+                    text: newSubText
+                  }))
+                }))
+              }));
+              return updated;
+            });
+          }}
           onPreview={handlePreview}
           onSave={handleSave}
           onCancel={handleCancel}
         />
         {showPreview && (
           <PreviewModal
-            planData={plan}
+            planData={editedPlan}
             onClose={() => setShowPreview(false)}
           />
         )}
@@ -430,7 +458,7 @@ const ViewMyPlan = () => {
                     )}
 
                     {task.subtasks?.length > 0 && (
-                      <div className="subtasks">
+                      <div className="view_subtasks">
                         <strong>Subtasks:</strong>
                         <ul>
                           {task.subtasks.map((subtask, subtaskIdx) => (

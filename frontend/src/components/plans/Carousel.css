@@ -1,7 +1,9 @@
+/* carousel.css */
+
 .carousel-box {
   background: white;
   border-radius: 16px;
-  padding: 16px 20px; /* Reduced vertical padding from 20px to 16px */
+  padding: 16px 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   margin: 0 auto 28px;
   overflow: hidden;
@@ -12,28 +14,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0; /* Reduced from 16px to 12px */
+  margin-bottom: 12px;
   gap: 12px;
+  flex-wrap: nowrap; /* Đảm bảo không xuống dòng */
 }
 
 .section-title {
-  font-size: 12px;
+  font-size: 20px;
   font-weight: 600;
-  margin: 0;
+  margin: 0 !important; /* Thêm !important để chắc chắn */
   padding: 0;
   color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis; /* Thêm ... nếu text quá dài */
   flex: 1;
+  min-width: 0; /* Quan trọng: cho phép flex item co lại */
 }
 
 .view-more-btn {
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .carousel {
   position: relative;
-  margin: 0 -20px;
+  margin: 0 0px;
+  padding: 0 0;
 }
 
 .carousel-wrapper {
@@ -42,7 +49,7 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 0 20px;
+  padding: 10px 0;
 }
 
 .carousel-wrapper::-webkit-scrollbar {
@@ -57,6 +64,12 @@
   min-width: 100%;
   transition: transform 0.55s cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
+  align-items: stretch;
+}
+
+.carousel-track > * {
+  flex-shrink: 0;
+  height: 100%;
 }
 
 /* Fade gradients */
@@ -141,7 +154,7 @@
 /* Container Query Responsive */
 @container main (max-width: 768px) {
   .carousel-box {
-    padding: 12px 16px; /* Adjusted vertical padding */
+    padding: 12px 16px;
   }
 
   .section-title {
@@ -158,13 +171,13 @@
   }
 
   .section-header {
-    margin-bottom: 10px; /* Adjusted */
+    margin-bottom: 10px;
   }
 }
 
 @container main (max-width: 480px) {
   .carousel-box {
-    padding: 8px 12px; /* Further reduced vertical padding */
+    padding: 8px 12px;
   }
 
   .section-title {
@@ -187,6 +200,6 @@
   }
 
   .section-header {
-    margin-bottom: 8px; /* Adjusted */
+    margin-bottom: 8px;
   }
 }

@@ -38,10 +38,11 @@ const PlanInfo = ({ planData, updatePlanData }) => {
         return;
       }
 
-      updatePlanData({
-        imageFile: file,
-        imageUrl: URL.createObjectURL(file),
-      })
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        updatePlanData({ imageUrl: event.target.result });
+      };
+      reader.readAsDataURL(file);
     }
   }, [updatePlanData]);
 
@@ -104,7 +105,6 @@ const PlanInfo = ({ planData, updatePlanData }) => {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onClick={(e) => e.stopPropagation()}  // Fix prompting twice
             onChange={handleImageChange}
           />
           {planData.imageUrl ? (

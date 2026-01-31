@@ -65,55 +65,6 @@
   overflow-y: auto;
 }
 
-.review-summary {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-  padding: 20px 0;
-}
-
-.summary-circle {
-  text-align: center;
-}
-
-.circle-progress {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: conic-gradient(
-    #22c55e 0% calc(var(--progress) * 1%),
-    #e5e7eb calc(var(--progress) * 1%) 100%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-}
-
-.circle-progress::before {
-  content: '';
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: white;
-}
-
-.percentage {
-  position: relative;
-  z-index: 1;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.summary-label {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
 .review-stats {
   display: flex;
   flex-direction: column;

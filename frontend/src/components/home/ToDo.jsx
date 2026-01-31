@@ -21,7 +21,7 @@ const MOCK_TASKS = [
   {
     id: 3,
     title: "Subtask này dài 1 dòng thôi",
-    status: "IN_PROGRESS",
+    status: "INCOMPLETE",
     plan: { id: 2, name: "Plan B" },
   },
 ];

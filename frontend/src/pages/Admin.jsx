@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { usersApi } from "../api/users";
+import { useNavigate } from "react-router-dom"; // ← Thêm để dùng navigate
+import { usersApi } from "../api/user";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+
+import { authApi } from "../api/auth";
 
 /* ================= STYLES ================= */
 const cardStyle = {
@@ -72,6 +75,8 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
 /* ================= MAIN COMPONENT ================= */
 export default function Admin() {
+  const navigate = useNavigate(); // ← Thêm để điều hướng
+
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
@@ -189,11 +194,25 @@ export default function Admin() {
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+  const handleLogout = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+      return;
+    }
+
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      // Xóa token trước
       localStorage.removeItem("accessToken");
       localStorage.removeItem("role");
-      window.location.href = "/"; // Quay về trang login
+      localStorage.removeItem("refreshToken");
+      if (accessToken && accessToken !== "null") {
+        await authApi.logout(accessToken).catch(() => {
+        });
+      }
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      navigate("/");
     }
   };
 
@@ -317,7 +336,7 @@ export default function Admin() {
                       <span style={badgeStyle}>{u.role}</span>
                     </td>
                     <td style={{ padding: "12px 10px", display: "flex", gap: 8, justifyContent: "center" }}>
-                      <button style={btnBase} onClick={() => openEditModal(u)}>
+                      <button style={{ ...btnBase, color: "#111111" }} onClick={() => openEditModal(u)}>
                         Sửa
                       </button>
                       <button

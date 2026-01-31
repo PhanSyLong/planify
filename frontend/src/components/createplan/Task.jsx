@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import Subtask from "./Subtask";
 import "./Task.css";
 
@@ -7,20 +7,24 @@ const Task = ({ task, taskNumber, updateTask, deleteTask }) => {
     updateTask({ ...task, title: e.target.value });
   }, [task, updateTask]);
 
-  const handleDescriptionChange = useCallback((e) => {
-    updateTask({ ...task, description: e.target.value });
+  const handleSubtasksChange = useCallback((newSubtasks) => {
+    // Tính duration mới = tổng của tất cả subtasks
+    const totalDuration = newSubtasks.reduce(
+      (sum, sub) => sum + Number(sub.duration || 0),
+      0
+    );
+
+    updateTask({
+      ...task,
+      subtasks: newSubtasks,
+      duration: totalDuration,           // tự động cập nhật
+    });
   }, [task, updateTask]);
 
-  const handleDurationChange = useCallback((e) => {
-    const value = e.target.value;
-    if (value === '' || parseInt(value) >= 0) {
-      updateTask({ ...task, duration: value });
-    }
-  }, [task, updateTask]);
-
-  const handleSubtasksChange = useCallback((subtasks) => {
-    updateTask({ ...task, subtasks });
-  }, [task, updateTask]);
+  // Hoặc dùng useMemo nếu muốn hiển thị mà không lưu vào state
+  const computedDuration = useMemo(() => {
+    return task.subtasks.reduce((sum, sub) => sum + Number(sub.duration || 0), 0);
+  }, [task.subtasks]);
 
   return (
     <div className="task-wrapper">
@@ -31,46 +35,34 @@ const Task = ({ task, taskNumber, updateTask, deleteTask }) => {
         </button>
       </div>
 
-      {/* Task Card */}
       <div className="task-card">
         <div className="task-field">
           <label>Title</label>
           <input
             type="text"
             placeholder="Enter task title"
-            value={task.title}
+            value={task.title || ""}
             onChange={handleTitleChange}
           />
         </div>
 
-        <div className="task-field">
-          <label>Description</label>
-          <input
-            type="text"
-            placeholder="Enter task description"
-            value={task.description}
-            onChange={handleDescriptionChange}
-          />
-        </div>
-
-        <div className="task-field">
+        {/* Duration của task: hiển thị tổng, có thể read-only */}
+        <div className="task-field duration-field">
           <label>Duration</label>
           <div className="duration-input">
             <input
               type="number"
-              min="0"
-              placeholder="0"
-              value={task.duration}
-              onChange={handleDurationChange}
+              value={computedDuration}           // hoặc task.duration nếu bạn lưu
+              readOnly
+              disabled
             />
-            <span className="duration-unit">Days</span>
+            <span className="duration-unit">days</span>
           </div>
         </div>
       </div>
 
-      {/* Subtask Section */}
       <Subtask
-        subtasks={task.subtasks}
+        subtasks={task.subtasks || []}
         setSubtasks={handleSubtasksChange}
       />
     </div>

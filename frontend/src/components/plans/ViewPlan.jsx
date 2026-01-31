@@ -59,7 +59,6 @@ const ViewPlan = () => {
     const fetchPlan = async () => {
       setLoading(true);
       setError(null);
-
       try {
         await new Promise(resolve => setTimeout(resolve, 600));
 

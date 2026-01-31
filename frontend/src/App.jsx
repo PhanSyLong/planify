@@ -41,7 +41,7 @@ export default function App() {
 
           {/* Profile Routes */}
           <Route path="/myprofile" element={<MyProfile />} />
-          <Route path="/profile/:username" element={<OtherUser />} />
+          <Route path="/profile/:id" element={<OtherUser />} />
 
           {/* MyPlan Routes */}
           <Route path="/myplan" element={<MyPlan />} />
@@ -63,7 +63,8 @@ export default function App() {
           {/* User Profile View (legacy) */}
           <Route path="/users/:id" element={<UserView />} />
 
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={<About/>} />
+
           <Route path="/notifications" element={<Notification/>} />
         </Route>
 

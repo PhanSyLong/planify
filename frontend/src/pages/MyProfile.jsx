@@ -1,49 +1,84 @@
-import { useState, useCallback } from "react";
+// src/pages/MyProfile.jsx
+import { useState, useEffect } from "react";
 import MyAvatar from "../components/profiles/MyAvatar";
 import MyBioMenu from "../components/profiles/MyBioMenu";
+import { authApi } from "../api/auth";
 import "./MyProfile.css";
 
 export default function MyProfile() {
-  const [avatar, setAvatar] = useState(null);
-  const [bio, setBio] = useState("Passionate developer and fitness enthusiast. Love creating useful apps!");
+  const [userData, setUserData] = useState(null);
+  const [myId, setMyId] = useState(null);          // ← lưu ID thật của user hiện tại
   const [stats, setStats] = useState({
-    followings: 15,
-    followers: 5,
-    plans: 12
+    followings: 0,
+    followers: 0,
+    plans: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleAvatarChange = useCallback((newAvatar) => {
-    setAvatar(newAvatar);
-    // TODO: Upload to backend
-    console.log("Avatar changed");
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await authApi.me();
+        console.log("API /users/myInfo response:", response); // debug
+
+        const result = response?.data?.result;
+        if (!result || !result.id) {
+          throw new Error("Không tìm thấy thông tin user hoặc ID");
+        }
+
+        setUserData(result);
+        setMyId(result.id); // Lưu ID để truyền xuống MyBioMenu
+
+        setStats({
+          followings: Number(result.followings) || 0,
+          followers: Number(result.followers) || 0,
+          plans: Number(result.plans) || 0,
+        });
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Lỗi fetch profile:", err);
+        console.error("Error detail:", err.response?.data);
+        setError("Không thể tải thông tin profile. Vui lòng đăng nhập lại.");
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
   }, []);
 
-  const handleBioChange = useCallback((newBio) => {
-    setBio(newBio);
-    // TODO: Save to backend
-    console.log("Bio updated:", newBio);
-  }, []);
+  const handleStatsChange = (updater) => {
+    setStats((prev) => {
+      if (typeof updater === "function") {
+        return updater(prev);
+      }
+      return { ...prev, ...updater };
+    });
+  };
 
-  const handleStatsChange = useCallback((newStats) => {
-    setStats(newStats);
-    // TODO: Update stats in backend
-    console.log("Stats updated:", newStats);
-  }, []);
+  if (loading) {
+    return <div className="loading">Đang tải thông tin profile...</div>;
+  }
+
+  if (error || !userData || myId === null) {
+    return <div className="error">{error || "Không tìm thấy thông tin người dùng"}</div>;
+  }
 
   return (
     <div className="myprofile-page">
       <MyAvatar
-        username="Choi1505"
+        username={userData.username || "User"}
+        email={userData.email || ""}
+        avatar={userData.avatar}
         stats={stats}
-        avatar={avatar}
-        onAvatarChange={handleAvatarChange}
       />
 
       <MyBioMenu
-        bio={bio}
-        onBioChange={handleBioChange}
+        bio={userData.bio || "Chưa có tiểu sử"}
         stats={stats}
         onStatsChange={handleStatsChange}
+        userId={myId}                     // ← Truyền ID thật xuống đây
       />
     </div>
   );

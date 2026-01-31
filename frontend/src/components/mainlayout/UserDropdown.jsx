@@ -41,20 +41,25 @@ export default function UserMenuPopup({
     onClose();
   };
 
-  const handleLogout = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      if (token) {
-        await authApi.logout(token);
+    // UserDropdown.jsx
+    const handleLogout = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        // XÓA TOKEN TRƯỚC KHI GỌI API
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        if (accessToken && accessToken !== "null") {
+          await authApi.logout(accessToken).catch(() => {
+          });
+        }
+        navigate("/");
+      } catch (error) {
+        console.error("Logout error:", error);
+        navigate("/");
+      } finally {
+        onClose();
       }
-      localStorage.removeItem("token");
-      navigate("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      onClose();
-    }
-  };
+    };
 
   if (!isOpen) return null;
 

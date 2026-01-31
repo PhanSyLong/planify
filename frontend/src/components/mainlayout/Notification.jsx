@@ -2,85 +2,21 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Notification.css';
 
-// Using the same fake data (you can later replace with real data from API/context)
-const fakeNotifications = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    avatar: "https://i.pravatar.cc/48?u=sarah",
-    action: "commented on your post",
-    message: "This looks amazing! 🔥",
-    time: "5m ago",
-    read: false,
-    link: "/plans/123"
-  },
-  {
-    id: 2,
-    name: "Michael Park",
-    avatar: "https://i.pravatar.cc/48?u=michael",
-    action: "liked your photo",
-    time: "28m ago",
-    read: false,
-    link: "/commu"
-  },
-  {
-    id: 3,
-    name: "Emma Thompson",
-    avatar: "https://i.pravatar.cc/48?u=emma",
-    action: "started following you",
-    time: "2h ago",
-    read: true,
-    link: "/profile/emma123"
-  },
-  {
-    id: 4,
-    name: "Alex Kim",
-    avatar: "https://i.pravatar.cc/48?u=alex",
-    action: "mentioned you in a comment",
-    message: "@vu check this out!",
-    time: "1d ago",
-    read: true
-  },
-  {
-    id: 5,
-    name: "Project Team",
-    avatar: "https://i.pravatar.cc/48?u=team",
-    action: "added a new task to",
-    message: "Website Redesign 2026",
-    time: "2d ago",
-    read: true
-  },
-  {
-    id: 6,
-    name: "Lisa Wong",
-    avatar: "https://i.pravatar.cc/48?u=lisa",
-    action: "shared your project",
-    time: "3d ago",
-    read: true
-  },
-  {
-    id: 7,
-    name: "David Lee",
-    avatar: "https://i.pravatar.cc/48?u=david",
-    action: "invited you to collaborate",
-    time: "4d ago",
-    read: false
-  }
-];
-
-const Notifications = () => {
+// Expect notifications to be passed from parent / context / api
+const Notifications = ({ notifications = [] }) => {
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
 
   const unreadCount = useMemo(() => {
-    return fakeNotifications.filter(n => !n.read).length;
-  }, []);
+    return notifications.filter(n => !n.read).length;
+  }, [notifications]);
 
   const displayedNotifications = useMemo(() => {
-    return fakeNotifications.filter(notif =>
-      filter === 'all' || !notif.read
-    );
-  }, [filter]);
+    if (filter === 'unread') {
+      return notifications.filter(n => !n.read);
+    }
+    return notifications;
+  }, [notifications, filter]);
 
   const handleNotificationClick = useCallback((notification) => {
     if (notification.link) {

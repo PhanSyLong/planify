@@ -28,6 +28,10 @@
 .delete-stage-btn {
   background-color: #dc2626;
   color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .delete-stage-btn:hover {
@@ -80,6 +84,28 @@
   box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
 }
 
+/* Duration field */
+/* Duration */
+.duration-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duration-input input {
+  width: 100px;
+}
+
+@container task (max-width: 400px) {
+  .duration-input input {
+    width: 80px;
+  }
+}
+
+.duration-unit {
+  font-size: 14px;
+  color: #555;
+}
 /* Task section */
 .task-section {
   margin-top: 16px;
@@ -90,6 +116,11 @@
   margin-top: 16px;
   background-color: #153677;
   color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
 .add-task-btn:hover {

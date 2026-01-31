@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './ReviewPlanPopUp.css';
+import './ReviewPlanPopup.css';
 
 const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
   const popupRef = useRef(null);
@@ -48,9 +48,7 @@ const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
     incomplete = 0,
   } = reviewData || {};
 
-  const completionRate = totalSubtasks > 0
-    ? Math.round((completedOnTime / totalSubtasks) * 100)
-    : 0;
+
 
   return (
     <>
@@ -64,14 +62,7 @@ const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
         </div>
 
         <div className="review-content">
-          <div className="review-summary">
-            <div className="summary-circle">
-              <div className="circle-progress" style={{ '--progress': completionRate }}>
-                <span className="percentage">{completionRate}%</span>
-              </div>
-              <p className="summary-label">Completion Rate</p>
-            </div>
-          </div>
+
 
           <div className="review-stats">
             <div className="stat-item total">

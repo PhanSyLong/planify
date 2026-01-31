@@ -22,13 +22,13 @@ const UserList = ({
   }, []);
 
   const filteredUsers = useMemo(() => {
-    if (!searchTerm) return userData;
+    if (!searchTerm.trim()) return userData;
 
-    const search = searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase().trim();
     return userData.filter((user) => {
-      const name = (user?.name || '').toLowerCase();
-      const description = (user?.description || '').toLowerCase();
-      return name.includes(search) || description.includes(search);
+      const username = (user?.username || '').toLowerCase();
+      const email = (user?.email || '').toLowerCase();
+      return username.includes(search) || email.includes(search);
     });
   }, [userData, searchTerm]);
 
@@ -46,14 +46,14 @@ const UserList = ({
                 <FontAwesomeIcon icon={faArrowLeft} className="icon" />
                 Back
               </button>
-              <h1 className="page-title">{fullViewTitle}</h1>
+              <h1 className="page-title">{fullViewTitle || 'Teachers'}</h1>
             </>
           )}
 
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search teachers..."
+              placeholder="Search by username or email..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="search-input"

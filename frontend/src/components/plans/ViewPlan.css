@@ -348,3 +348,62 @@
     width: 100%;
   }
 }
+
+/* ==================== LIKE BUTTON IN HEADER ==================== */
+.viewplan-actions .like-btn {
+  position: static !important;
+  width: auto;
+  height: auto;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 1rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.viewplan-actions .like-btn:hover {
+  background: #f1f5f9 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.viewplan-actions .bookmark-icon {
+  font-size: 22px;
+  color: #64748b;
+}
+
+.viewplan-actions .like-btn.saved .bookmark-icon {
+  color: #3b82f6;           /* hoặc màu bạn thích: #e11d48, #f59e0b, ... */
+}
+
+.viewplan-actions .like-btn:hover .bookmark-icon {
+  color: #1e40af;
+}
+
+/* Nút Fork Plan */
+.btn-fork {
+  padding: 10px 20px;
+  background: #6366f1;          /* Indigo - bạn có thể đổi thành #3498db nếu thích */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  height: 42px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.btn-fork:hover {
+  background: #4f46e5;
+}
+
+.btn-fork:active {
+  background: #4338ca;
+}
