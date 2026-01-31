@@ -1,73 +1,90 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import LikeButton from './LikeButton.jsx';        // ← Đã thêm import
 import './ViewPlan.css';
 import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import httpPublic from '../../api/httpPublic';
+import { forkPlan } from '../../api/plan';
 
-const MOCK_PLANS = {
-  'plan-1': {
-    title: 'IELTS Speaking Mastery',
-    description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
-    previewUrl: null,
-    categories: ['Language', 'Exam', 'English'],
-    stages: [
-      {
-        title: 'Week 1-2: Fluency & Coherence',
-        description: 'Build confidence and natural speaking flow.',
-        tasks: [
-          {
-            title: 'Daily Topic Practice',
-            description: 'Speak on 3 Part 1 topics every day.',
-            duration: '14',
-            subtasks: ['Record yourself', 'Note new vocabulary', 'Self-evaluate fluency'],
-          },
-          {
-            title: 'Long Turn Practice',
-            description: 'Practice Part 2 cue cards.',
-            duration: '14',
-            subtasks: ['Time yourself (2 min)', 'Use linking words'],
-          },
-        ],
-      },
-      {
-        title: 'Week 3-4: Lexical Resource',
-        description: 'Expand vocabulary and use idiomatic language.',
-        tasks: [
-          {
-            title: 'Themed Vocabulary Lists',
-            description: 'Learn 20 new words/phrases per theme.',
-            duration: '14',
-            subtasks: ['Environment', 'Technology', 'Education', 'Health'],
-          },
-        ],
-      },
-    ],
-  },
-};
+// const MOCK_PLANS = {
+//   'plan-1': {
+//     title: 'IELTS Speaking Mastery',
+//     description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
+//     previewUrl: null,
+//     categories: ['Language', 'Exam', 'English'],
+//     stages: [
+//       {
+//         title: 'Week 1-2: Fluency & Coherence',
+//         description: 'Build confidence and natural speaking flow.',
+//         tasks: [
+//           {
+//             title: 'Daily Topic Practice',
+//             description: 'Speak on 3 Part 1 topics every day.',
+//             duration: '14',
+//             subtasks: ['Record yourself', 'Note new vocabulary', 'Self-evaluate fluency'],
+//           },
+//           {
+//             title: 'Long Turn Practice',
+//             description: 'Practice Part 2 cue cards.',
+//             duration: '14',
+//             subtasks: ['Time yourself (2 min)', 'Use linking words'],
+//           },
+//         ],
+//       },
+//       {
+//         title: 'Week 3-4: Lexical Resource',
+//         description: 'Expand vocabulary and use idiomatic language.',
+//         tasks: [
+//           {
+//             title: 'Themed Vocabulary Lists',
+//             description: 'Learn 20 new words/phrases per theme.',
+//             duration: '14',
+//             subtasks: ['Environment', 'Technology', 'Education', 'Health'],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// };
 
 const ViewPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // const [plan, setPlan] = useState(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);   // ← Thêm state này
+  const { data: fullPlan, isLoading, error, isError } = useHydratedPlan(id);
+  const [toasts, setToasts] = useState([]);
 
-  const { data: fullPlan, hydrateIsLoading } = useHydratedPlan(id);  
-  // const plan = MOCK_PLANS['plan-1'];
-  const error = !hydrateIsLoading && !fullPlan ? "Plan not found" : null;
-  
+  const addToast = (type, message) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message }]);
+
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
   // console.log("Viewing plan: ", fullPlan)
-  const handleForkClick = useCallback(() => {
-        console.log('Fork Plan clicked - feature in development');
-    navigate(`/plans/${id}/fork`);
+  const handleForkClick = useCallback(async() => {
+    try {
+      const res = await forkPlan(id);
+      const newPlan = res.data.result;
+  
+      addToast("success", `Forking successful!`);
+      navigate(`/plans/${newPlan.id}`);
+
+    } catch (err) {
+      console.error("Fork error: ", err);
+      addToast("error",
+        err.response?.data?.message || err.message || "Forking failed!"
+      );
+    }
   }, [id, navigate]);
 
   const handleGoBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
-  if (hydrateIsLoading) {
+  if (isLoading) {
     return (
       <div className="viewplan-loading">
         <div className="spinner" role="status" aria-label="Loading"></div>
@@ -76,16 +93,25 @@ const ViewPlan = () => {
     );
   }
 
-  if (error || !fullPlan) {
+  if (isError || !fullPlan) {
     return (
       <div className="viewplan-error">
-        <h2>{error || 'Plan not found'}</h2>
+        <h2>{error.message || 'Plan not found'}</h2>
         <button onClick={handleGoBack}>Go Back</button>
       </div>
     );
   }
 
   return (
+    <>
+    {/* Toast notifications */}
+      <div className="toasts">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast ${toast.type}`}>
+            {toast.message}
+          </div>
+        ))}
+      </div>
     <div className="viewplan-container">
       <div className="viewplan-header">
         <button className="viewplan-back-btn" onClick={handleGoBack}>
@@ -190,6 +216,7 @@ const ViewPlan = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

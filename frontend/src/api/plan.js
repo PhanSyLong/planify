@@ -35,17 +35,6 @@ export const updatePlan = async(planId, plan) => {
     });
 };
 
-export const getPlanByName = (name) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.get(`${API_URL}/plans/${name}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
-
 export const getPlanById = (id) => {
     const token = localStorage.getItem("accessToken");
     return axios.get(`${API_URL}/plans/${id}`, {
@@ -116,6 +105,28 @@ export const getBookmarkers = async(planId) => {
 export const forkPlan = async(planId) => {
     const token = localStorage.getItem("accessToken");
     return await axios.post(`${API_URL}/plans/${planId}/fork`, null, {  // axios.post/put/patch requires a body arg
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const getPlanForks = async(planId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.get(`${API_URL}/plans/${planId}/forks`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const getForkOrigin = async(planId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.get(`${API_URL}/plans/${planId}/fork_origin`, {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

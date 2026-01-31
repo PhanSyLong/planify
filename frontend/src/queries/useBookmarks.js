@@ -4,7 +4,6 @@ import {
   bookmark,
   unbookmark,
 } from "../api/plan";
-import { useEffect } from "react";
 
 export const useBookmarks = () => {
   const queryClient = useQueryClient();
@@ -13,7 +12,7 @@ export const useBookmarks = () => {
   const bookmarksQuery = useQuery({
     queryKey: ['bookmarks'],
     queryFn: async() => {
-      const currentUserId = localStorage.getItem("userId");
+      const currentUserId = Number(localStorage.getItem("userId"));
       const res = await getBookmarkedPlans(currentUserId);
       return res.data.result;
     },
@@ -21,9 +20,9 @@ export const useBookmarks = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  useEffect(() => {
-    console.log('bookmarks from API:', bookmarksQuery.data);
-  }, [bookmarksQuery.data]);
+  // useEffect(() => {
+  //   console.log('bookmarks from API:', bookmarksQuery.data);
+  // }, [bookmarksQuery.data]);
 
   // 🔹 Toggle mutation (optimistic)
   const toggleMutation = useMutation({

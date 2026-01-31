@@ -5,7 +5,6 @@ import com.planify.backend.dto.request.PlanUpdateRequest;
 import com.planify.backend.dto.response.ApiResponse;
 import com.planify.backend.dto.response.PlanResponse;
 import com.planify.backend.dto.response.ProgressResponse;
-import com.planify.backend.dto.response.TimingResponse;
 import com.planify.backend.mapper.PlanMapper;
 import com.planify.backend.model.Plan;
 import com.planify.backend.service.PlanService;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,7 +45,6 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<Void>builder()
                         .code(HttpStatus.OK.value())
-                        .message("Plan removed successfully")
                         .build());
     }
 

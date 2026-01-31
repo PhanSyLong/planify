@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getAllPlans } from "../api/plan";
 
 export const usePlans = () => {
-	return useQuery({
+	const plansQuery = useQuery({
 		queryKey: ['plans'],
 		queryFn: async() => {
 			const res = await getAllPlans();
@@ -10,4 +10,10 @@ export const usePlans = () => {
 		},
 		staleTime: 5 * 60 * 1000
 	});
+
+	return {
+		data: plansQuery.data ?? [],
+		isLoading: plansQuery.isLoading,
+		error: plansQuery.error,
+	};
 };

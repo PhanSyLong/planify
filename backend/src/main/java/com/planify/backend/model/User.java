@@ -46,6 +46,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Bookmark> planBookmarkers = new HashSet<>();
 
-    @OneToMany(mappedBy = "adoptedUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "adopter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<ForkedPlan> forkUsers = new HashSet<>();
 }
