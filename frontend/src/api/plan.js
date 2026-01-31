@@ -113,6 +113,18 @@ export const forkPlan = async(planId) => {
     });
 };
 
+
+export const addForkRecord = async(originalId, adoptedId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.post(`${API_URL}/plans/${originalId}/fork_to/${adoptedId}`, null, {  // axios.post/put/patch requires a body arg
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
 export const getPlanForks = async(planId) => {
     const token = localStorage.getItem("accessToken");
     return await axios.get(`${API_URL}/plans/${planId}/forks`, {

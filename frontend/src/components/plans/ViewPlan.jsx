@@ -1,26 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import LikeButton from './LikeButton.jsx';        // ← Đã thêm import
 import './ViewPlan.css';
 import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import httpPublic from '../../api/httpPublic';
-import { forkPlan } from '../../api/plan';
 
 const ViewPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const { data: fullPlan, isLoading, error, isError } = useHydratedPlan(id);
-  const [toasts, setToasts] = useState([]);
-
-  const addToast = (type, message) => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, type, message }]);
-
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 4000);
-  };
 
   const trackRecentPlan = (plan) => {
     const raw = localStorage.getItem("recentPlans");
@@ -44,19 +32,8 @@ const ViewPlan = () => {
 
   // console.log("Viewing plan: ", fullPlan)
   const handleForkClick = useCallback(async() => {
-    try {
-      const res = await forkPlan(id);
-      const newPlan = res.data.result;
-
-      addToast("success", `Forking successful!`);
-      navigate(`/plans/${newPlan.id}`);
-
-    } catch (err) {
-      console.error("Fork error: ", err);
-      addToast("error",
-        err.response?.data?.message || err.message || "Forking failed!"
-      );
-    }
+    // console.log('Fork Plan clicked - feature in development');
+    navigate(`/plans/${id}/fork`);
   }, [id, navigate]);
 
   const handleGoBack = useCallback(() => {
@@ -82,15 +59,6 @@ const ViewPlan = () => {
   }
 
   return (
-    <>
-    {/* Toast notifications */}
-      <div className="toasts">
-        {toasts.map((toast) => (
-          <div key={toast.id} className={`toast ${toast.type}`}>
-            {toast.message}
-          </div>
-        ))}
-      </div>
     <div className="viewplan-container">
       <div className="viewplan-header">
         <button className="viewplan-back-btn" onClick={handleGoBack}>
@@ -208,7 +176,6 @@ const ViewPlan = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

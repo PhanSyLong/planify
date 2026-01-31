@@ -1,8 +1,11 @@
 package com.planify.backend.controller;
 
 import com.planify.backend.dto.request.ApiResponse;
+import com.planify.backend.dto.response.ForkedPlanResponse;
 import com.planify.backend.dto.response.PlanResponse;
+import com.planify.backend.mapper.ForkedPlanMapper;
 import com.planify.backend.mapper.PlanMapper;
+import com.planify.backend.model.ForkedPlan;
 import com.planify.backend.model.Plan;
 import com.planify.backend.service.ForkedPlanService;
 import lombok.AccessLevel;
@@ -23,6 +26,7 @@ import java.util.List;
 public class ForkedPlanController {
     ForkedPlanService forkedPlanService;
     PlanMapper planMapper;
+    private final ForkedPlanMapper forkedPlanMapper;
 
     @PostMapping("/plans/{planId}/fork")
     ResponseEntity<ApiResponse<PlanResponse>> forkPlan(@PathVariable Integer planId) {
@@ -32,6 +36,17 @@ public class ForkedPlanController {
                 .body(ApiResponse.<PlanResponse>builder()
                         .code(HttpStatus.CREATED.value())
                         .result(planMapper.toResponse(adoptedPlan))
+                        .build());
+    }
+
+    @PostMapping("/plans/{originalPlanId}/fork_to/{adoptedPlanId}")
+    ResponseEntity<ApiResponse<ForkedPlanResponse>> addForkRecord(@PathVariable Integer originalPlanId, @PathVariable Integer adoptedPlanId) {
+        ForkedPlan forkedPlan = forkedPlanService.addForkRecord(originalPlanId, adoptedPlanId);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.<ForkedPlanResponse>builder()
+                        .code(HttpStatus.CREATED.value())
+                        .result(forkedPlanMapper.toResponse(forkedPlan))
                         .build());
     }
 

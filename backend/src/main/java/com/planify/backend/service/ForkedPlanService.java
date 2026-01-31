@@ -50,12 +50,24 @@ public class ForkedPlanService {
         PlanRequest adoptedPlanRequest = planMapper.toRequest(originalPlan);
         Plan adoptedPlan = planService.addPlan(adoptedPlanRequest);
 
-        ForkedPlan forkedPlan = new ForkedPlan();
-        forkedPlan.setOriginalPlan(originalPlan);
-        forkedPlan.setAdopter(currentUser);
-        forkedPlan.setAdoptedPlan(adoptedPlan);
-        forkedPlanRepository.save(forkedPlan);
+        addForkRecord(planId, adoptedPlan.getId());
         return adoptedPlan;
+    }
+
+    public ForkedPlan addForkRecord(Integer originalPlanId, Integer adoptedPlanId) {
+        ForkedPlan forkedPlan = new ForkedPlan();
+
+        Plan originalPlan = planRepository.findById(originalPlanId)
+                .orElseThrow(() -> new RuntimeException("Original plan not found!"));
+        Plan adoptedPlan = planRepository.findById(adoptedPlanId)
+                .orElseThrow(() -> new RuntimeException("Adopted plan not found!"));
+        User adopter = userRepository.findById(jwtUserContext.getCurrentUserId())
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        forkedPlan.setOriginalPlan(originalPlan);
+        forkedPlan.setAdoptedPlan(adoptedPlan);
+        forkedPlan.setAdopter(adopter);
+        return forkedPlanRepository.save(forkedPlan);
     }
 
     public List<Plan> getForks(Integer originalPlanId) {

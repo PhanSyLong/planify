@@ -4,18 +4,16 @@ import { getTasksByPlanId } from "../api/task";
 import { getSubtasksByPlanId } from "../api/subtask";
 
 export const hydratePlan = async (planId) => {
-	const originalPlan = (await getForkOrigin(planId)).data.result;	// For plan forks
-	const id = originalPlan ? originalPlan.id : planId;
 	const [
 	  planRes, 
 	  stagesRes,
 	  tasksRes,
 	  subtasksRes
 	] = await Promise.all([
-	  getPlanById(id),
-	  getStagesByPlanId(id),
-	  getTasksByPlanId(id),
-	  getSubtasksByPlanId(id)
+	  getPlanById(planId),
+	  getStagesByPlanId(planId),
+	  getTasksByPlanId(planId),
+	  getSubtasksByPlanId(planId)
 	]);
 
 	const plan = planRes.data.result;
