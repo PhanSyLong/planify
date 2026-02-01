@@ -3,16 +3,25 @@ import Stage from '../createplan/Stage';
 import httpPublic from '../../api/httpPublic';
 import './EditPlanInfo.css';
 
-const CATEGORIES = [
-  'Study', 'Work', 'Personal', 'Health', 'Fitness',
-  'Language', 'Exam', 'Project'
-];
+const TAG_GROUPS = {
+  subject: [
+    "Math", "Physics", "Chemistry", "Literature", "English",
+    "Biology", "History", "Geography", "Computer Science"
+  ],
+  certificate: [
+    "IELTS", "TOEIC", "VSTEP", "SAT", "IELTS UKVI", "TOPIK"
+  ],
+  other: [
+    "Soft Skills", "Programming", "Design", "Marketing", "Foreign Languages"
+  ],
+};
 
 const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
   const [planTitle, setPlanTitle] = useState(initialPlan.title || '');
   const [planDescription, setPlanDescription] = useState(initialPlan.description || '');
   const [planPicture, setPlanPicture] = useState(initialPlan.picture || null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [showCategories, setShowCategories] = useState(false);
   const [stages, setStages] = useState(
     initialPlan.stages?.length > 0
       ? initialPlan.stages.map(stage => ({ ...stage }))
@@ -142,21 +151,36 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
           </div>
 
           <div className="categories-section">
-            <button className="categories-btn" type="button">
-              Categories ({selectedCategories.length})
+            <button
+              className="categories-btn"
+              type="button"
+              onClick={() => setShowCategories(!showCategories)}
+            >
+              {showCategories ? 'Hide Categories' : 'Select Categories'}
+              {selectedCategories.length > 0 && ` (${selectedCategories.length})`}
             </button>
 
-            <div className="categories-popup">
-              {CATEGORIES.map(cat => (
-                <span
-                  key={cat}
-                  className={`category-tag ${selectedCategories.includes(cat) ? 'active' : ''}`}
-                  onClick={() => toggleCategory(cat)}
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
+            {showCategories && (
+              <div className="categories-popup">
+                {Object.entries(TAG_GROUPS).map(([groupName, tags]) => (
+                  <div key={groupName} className="tag-group">
+                    <div className="tag-group-title">{groupName}</div>
+                    <div className="tag-group-items">
+                      {tags.map(tag => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`category-tag ${selectedCategories.includes(tag) ? 'active' : ''}`}
+                          onClick={() => toggleCategory(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
