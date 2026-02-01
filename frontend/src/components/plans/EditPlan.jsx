@@ -6,6 +6,7 @@ import { createStage, updateStage, deleteStagebyPlanAndStageId } from '../../api
 import { createTask, updateTask, deleteTask } from '../../api/task';
 import { createSubtask, updateSubtask, deleteSubtask } from '../../api/subtask';
 import { uploadImage } from '../../api/image';
+import { setTagsForPlan } from '../../api/tag';
 import './EditPlan.css';
 
 const EditPlan = ({ plan, setPlan, onPreview, onSave, onCancel }) => {
@@ -51,6 +52,15 @@ const EditPlan = ({ plan, setPlan, onPreview, onSave, onCancel }) => {
         description: localPlan.description,
         picture: picturePath,
       });
+
+      // 3. Update tags for the plan
+      if (localPlan.categories) {
+        try {
+          await setTagsForPlan(planId, localPlan.categories);
+        } catch (tagError) {
+          console.error('Failed to update tags:', tagError);
+        }
+      }
 
       // 2. Process stages
       for (const stage of updatedStages) {

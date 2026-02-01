@@ -5,6 +5,7 @@ import { createPlan } from "../api/plan";
 import { createTask } from "../api/task";
 import { createSubtask } from "../api/subtask";
 import { uploadImage } from "../api/image";
+import { setTagsForPlan } from "../api/tag";
 import { useNavigate } from "react-router-dom";
 import { usePlans } from "../context/PlanContext.jsx";
 
@@ -137,6 +138,16 @@ const CreatePlan = () => {
                             status: subtask.status || 'incompleted',
                         });
                     }
+                }
+            }
+
+            // Save tags for the plan
+            if (planData.categories && planData.categories.length > 0) {
+                try {
+                    await setTagsForPlan(planId, planData.categories);
+                    console.log("Saved tags for plan:", planData.categories);
+                } catch (tagError) {
+                    console.error("Error saving tags:", tagError);
                 }
             }
 
