@@ -376,3 +376,34 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Start subtask button */
+.btn-start-subtask {
+  padding: 6px 16px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-start-subtask:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-start-subtask:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Edit button disabled state */
+.btn-edit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #9ca3af;
+}
