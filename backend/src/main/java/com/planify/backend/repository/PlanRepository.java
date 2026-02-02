@@ -56,9 +56,14 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
     SELECT DISTINCT p FROM Plan p
     JOIN p.tagPlans tp
     JOIN tp.tag t
-    WHERE t.tagName IN :tagNames
+    WHERE t.tagName IN :tagNames AND p.visibility = 'public'
+    GROUP BY p.id
+    HAVING COUNT(DISTINCT t.tagName) = :tagCount
 """)
-    List<Plan> findByTagNames(@Param("tagNames") List<String> tagNames);
+    List<Plan> findByTagNames(
+            @Param("tagNames") List<String> tagNames,
+            @Param("tagCount") long tagCount
+    );
 
     @Query("""
     SELECT DISTINCT p FROM Plan p
@@ -66,11 +71,15 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
     JOIN tp.tag t
     WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))
     AND t.tagName IN :tagNames
+    GROUP BY p.id
+    HAVING COUNT(DISTINCT t.tagName) = :tagCount
 """)
     List<Plan> searchByQueryAndTags(
             @Param("query") String query,
-            @Param("tagNames") List<String> tagNames
+            @Param("tagNames") List<String> tagNames,
+            @Param("tagCount") long tagCount
     );
+
 
 
     @Modifying

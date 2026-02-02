@@ -1,57 +1,50 @@
-
 import { useState, useCallback, useMemo, useEffect } from 'react';
 
-import ExploreHeader from '../components/explore/ExploreHeader';
-import ExploreTags from '../components/explore/ExploreTags';
-import Carousel from '../components/plans/Carousel';
-import UserCarousel from '../components/users/UserCarousel';
-import PlanList from '../components/plans/PlanList';
-import { usePlans } from '../queries/usePlans';
+import ExploreHeader from '../components/explore/ExploreHeader.jsx';
+import ExploreTags from '../components/explore/ExploreTags.jsx';
+import Carousel from '../components/plans/Carousel.jsx';
+import UserCarousel from '../components/users/UserCarousel.jsx';
+import PlanList from '../components/plans/PlanList.jsx';
 import { searchPlans } from '../api/plan.js';
 import './ExplorePage.css';
+import { usePlans } from '../queries/usePlans';
 
-const MOCK_USERS = [
-  { id: 'user-1', name: 'Emma Johnson', description: 'IELTS 8.5 | Official Examiner & Mentor', avatar: null, followers: 2450, plans: 18, isFollowing: false },
-  { id: 'user-2', name: 'Alex Chen', description: 'TOEFL 115+ | 12 years teaching experience', avatar: null, followers: 1890, plans: 14, isFollowing: true },
-  { id: 'user-3', name: 'Sarah Williams', description: 'Helping students reach Band 7+ since 2015', avatar: null, followers: 3200, plans: 22, isFollowing: false },
-  { id: 'user-4', name: 'Michael Park', description: 'Cambridge CELTA | Pronunciation specialist', avatar: null, followers: 980, plans: 9, isFollowing: false },
-  { id: 'user-5', name: 'Lisa Nguyen', description: 'Business English & Job Interview Coach', avatar: null, followers: 1560, plans: 11, isFollowing: true },
-  { id: 'user-6', name: 'David Brown', description: 'SAT/ACT Expert | Top 1% scorer', avatar: null, followers: 2100, plans: 16, isFollowing: false }
-];
 
 const ExplorePage = () => {
   const [activeTab, setActiveTab] = useState('subject');
   const [pinnedTags, setPinnedTags] = useState([]);
   const [fullView, setFullView] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [explorePlans, setExplorePlans] = useState([]);
+  const [searchedPlans, setSearchedPlans] = useState([]);
+  const [loadingSearch, setLoadingSearch] = useState(null);
   const [exploreUsers, setExploreUsers] = useState([]);
 
   const { data: plans, isLoading } = usePlans();
-
   const currentUserId = Number(localStorage.getItem("userId"));
-
-  // const explorePlans = useMemo(() => {
-  //   if (isLoading) return [];
-  //   return plans.filter(plan => plan.ownerId !== currentUserId)
-  // }, [plans, isLoading]);
-
+  const isSearching = searchTerm.length > 0 || pinnedTags.length > 0;
   //===================SearchPlan========================
   useEffect(() => {
-    setLoading(true);
+    if (!isSearching) return;
+
+    setLoadingSearch(true);
 
     searchPlans({
       query: searchTerm,
       tags: pinnedTags
     })
       .then(res => {
-        setExplorePlans(res.data.result ?? []);
+        setSearchedPlans(res.data.result ?? []);
       })
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingSearch(false));
 
   }, [searchTerm, pinnedTags]);
+
+  const explorePlans = useMemo(() => {
+    const source = isSearching ? searchedPlans : plans;
+
+    return source.filter(plan => plan.ownerId !== currentUserId);
+  }, [plans, searchedPlans, isSearching, currentUserId]);
 
   //=====================================================================
 
@@ -106,7 +99,7 @@ const ExplorePage = () => {
   }
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || loadingSearch) {
     return (
       <div className="explore-page loading-container">
         <div className="spinner-wrapper">
@@ -118,7 +111,6 @@ const ExplorePage = () => {
   }
 
   // Main Explore View
-
   return (
     <div className="explore-page">
       <ExploreHeader
@@ -135,7 +127,7 @@ const ExplorePage = () => {
       />
 
       <Carousel
-        title="Popular Plans"
+        title="Community Plans"
         items={explorePlans}
         type="plan"
         onViewMore={() => handleViewMore('All Plans', explorePlans, 'plan')}
