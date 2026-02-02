@@ -15,6 +15,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -84,16 +87,21 @@ public class PlanController {
                                                 .build());
         }
 
-        @GetMapping("/plans/filter")
-        ResponseEntity<ApiResponse<List<PlanResponse>>> filterPlans(@RequestParam(required = false) List<String> tags) {
-                List<Plan> results = planService.filterPlansByTags(tags);
+    @GetMapping("/plans/filter")
+    ResponseEntity<ApiResponse<List<PlanResponse>>> filterPlans(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) List<String> tags
+    ) {
+        List<Plan> results = planService.filterPlans(query, tags);
 
-                return ResponseEntity.status(HttpStatus.OK)
-                                .body(ApiResponse.<List<PlanResponse>>builder()
-                                                .code(HttpStatus.OK.value())
-                                                .result(planMapper.toResponseList(results))
-                                                .build());
-        }
+        return ResponseEntity.ok(
+                ApiResponse.<List<PlanResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .result(planMapper.toResponseList(results))
+                        .build()
+        );
+    }
+
 
         @PatchMapping("/plans/{planId}")
         ResponseEntity<ApiResponse<PlanResponse>> updatePlanPartial(@PathVariable Integer planId,

@@ -2,6 +2,7 @@ package com.planify.backend.service;
 
 import com.planify.backend.constant.NotificationTypeConst;
 import com.planify.backend.dto.request.NotificationRequest;
+import com.planify.backend.dto.response.DailyPerformanceResponse;
 import com.planify.backend.model.DailyPerformance;
 import com.planify.backend.model.User;
 import com.planify.backend.repository.DailyPerformanceRepository;
@@ -93,5 +94,27 @@ public class DailyNotificationService {
         } finally {
             SecurityContextHolder.clearContext();
         }
+    }
+    public DailyPerformanceResponse getToday(Long userId) {
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end   = today.atTime(23, 59, 59);
+
+        DailyPerformanceResponse response = dailyPerformanceRepository.getTodaySummary(
+                userId,
+                start,
+                end
+        );
+        // phòng trường hợp không có record nào
+        if (response == null) {
+            return DailyPerformanceResponse.builder()
+                    .subtasksCompleted(0)
+                    .subtasksIncompleted(0)
+                    .subtasksCancelled(0)
+                    .build();
+        }
+
+        return response;
     }
 }

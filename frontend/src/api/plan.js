@@ -47,3 +47,11 @@ export const startPlan = async (planId) =>
 
 export const completePlan = async (planId) =>
     await httpAuth.patch(`/plans/${planId}/complete`, {});
+
+export const searchPlans = ({ query, tags }) => {
+    const params = {};
+    if (query) params.query = query;
+    if (tags?.length) params.tags = tags;
+
+    return httpAuth.get(`/plans/filter`, { params });
+};

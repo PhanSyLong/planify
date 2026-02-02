@@ -9,14 +9,14 @@ const TABS = [
   { id: 'other', label: 'Other' }
 ];
 
-const ExploreHeader = ({ activeTab, setActiveTab }) => {
+const ExploreHeader = ({ activeTab, setActiveTab, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = useCallback((e) => {
     e.preventDefault();
-    console.log('Searching for:', searchTerm);
+    onSearch(searchTerm);
     // TODO: Implement actual search
-  }, [searchTerm]);
+  }, [searchTerm, onSearch]);
 
   const handleSearchChange = useCallback((e) => {
     setSearchTerm(e.target.value);

@@ -110,13 +110,27 @@ public class PlanService {
                 .collect(Collectors.toList());
     }
 
-    public List<Plan> filterPlansByTags(List<String> tagNames) {
-        // Bạn có thể thêm logic kiểm tra ở đây
-        if (tagNames == null || tagNames.isEmpty()) {
+    public List<Plan> filterPlans(String query, List<String> tags) {
+
+        boolean hasQuery = query != null && !query.trim().isEmpty();
+        boolean hasTags = tags != null && !tags.isEmpty();
+
+        if (!hasQuery && !hasTags) {
             return planRepository.findAll();
         }
-        return planRepository.findByTagNames(tagNames);
+
+        if (hasQuery && !hasTags) {
+            return planRepository.searchByTitle(query);
+        }
+
+        if (!hasQuery && hasTags) {
+            return planRepository.findByTagNames(tags);
+        }
+
+        // 👇 có cả query + tag
+        return planRepository.searchByQueryAndTags(query, tags);
     }
+
 
 
     // New: partial update for Plan
