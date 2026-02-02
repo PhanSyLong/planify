@@ -2,9 +2,11 @@ package com.planify.backend.controller;
 
 import com.planify.backend.dto.request.NotificationRequest;
 import com.planify.backend.dto.response.ApiResponse;
+import com.planify.backend.dto.response.DailyPerformanceResponse;
 import com.planify.backend.dto.response.NotificationResponse;
 import com.planify.backend.mapper.NotificationMapper;
 import com.planify.backend.model.Notification;
+import com.planify.backend.service.DailyNotificationService;
 import com.planify.backend.service.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import java.util.List;
 public class NotificationController {
     NotificationService notificationService;
     NotificationMapper notificationMapper;
+    DailyNotificationService  dailyNotificationService;
 
     @PostMapping("/notifications")
     ResponseEntity<ApiResponse<NotificationResponse>> addNotification(@RequestBody NotificationRequest request) {
@@ -78,6 +81,12 @@ public class NotificationController {
     public SseEmitter stream(@AuthenticationPrincipal Jwt jwt) {
         Long userId = jwt.getClaim("userId");
         return notificationService.subscribe(userId);
+    }
+
+    @GetMapping("/daily-performance/today")
+    public DailyPerformanceResponse getToday(@AuthenticationPrincipal Jwt jwt) {
+        Long userId = jwt.getClaim("userId");
+        return dailyNotificationService.getToday(userId);
     }
 
 }

@@ -67,3 +67,21 @@ export const getAllPlans = async() => {
         withCredentials: true,
     });
 };
+export const searchPlans = ({ query, tags }) => {
+    const token = localStorage.getItem("accessToken");
+
+    const params = {};
+    if (query) params.query = query;
+    if (tags?.length) params.tags = tags;
+
+    return axios.get(`${API_URL}/filter`, {
+        params,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+

@@ -3,14 +3,14 @@ import './ExploreTags.css';
 
 const TAG_GROUPS = {
   subject: [
-    "Math", "Physics", "Chemistry", "Literature", "English",
-    "Biology", "History", "Geography", "Computer Science"
+    "math", "physics", "chemistry", "literature", "english",
+    "biology", "history", "geography", "computer science"
   ],
   certificate: [
-    "IELTS", "TOEIC", "VSTEP", "SAT", "IELTS UKVI", "TOPIK"
+    "ietls", "toeic", "vstep", "sat", "topik"
   ],
   other: [
-    "Soft Skills", "Programming", "Design", "Marketing", "Foreign Languages"
+    "soft skills", "programming", "design", "marketing"
   ],
 };
 
