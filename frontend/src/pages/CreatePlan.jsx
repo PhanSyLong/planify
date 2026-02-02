@@ -1,13 +1,12 @@
 import { useState, useCallback } from "react";
 import PlanInfo from "../components/createplan/PlanInfo";
-import PreviewModal from "../components/createplan/Preview.jsx";
+import PreviewModal from "../components/createplan/Preview";
 import { createPlan } from "../api/plan";
 import { createTask } from "../api/task";
 import { createSubtask } from "../api/subtask";
 import { uploadImage } from "../api/image";
 import { setTagsForPlan } from "../api/tag";
 import { useNavigate } from "react-router-dom";
-import { usePlans } from "../context/PlanContext.jsx";
 
 import "./CreatePlan.css";
 import { createStage } from "../api/stage.js";
@@ -27,11 +26,28 @@ const CreatePlan = () => {
             planId: crypto.randomUUID(),
             title: '',
             description: '',
-            tasks: [],
+            tasks: [{
+                tempId: crypto.randomUUID(),
+                stageId: crypto.randomUUID(),
+                // title: '',
+                description: '',
+                subtasks: [
+                    {
+                    tempId: crypto.randomUUID(),
+                    taskId: crypto.randomUUID(),
+                    title: '',
+                    description: '',
+                    duration: 0,
+                    status: 'incompleted',
+                    daysLeft: 0,
+                    startedAt: '',
+                    completedAt: '',
+                    }
+                ],
+            }],
         }],
     });
     const [showPreview, setShowPreview] = useState(false);
-    const { addPlan, hydratePlan } = usePlans();
     const navigate = useNavigate();
 
     // Generic updater
@@ -42,9 +58,8 @@ const CreatePlan = () => {
         }));
     }, []);
 
-    const handleCreate = useCallback(async () => {
-        const { title, description, imageFile } = planData;
-
+    const handleCreate = useCallback( async() => {
+        const { title, description, imageFile} = planData;
         if (!title.trim()) {
             alert("Please enter a plan title");
             return;
@@ -88,7 +103,7 @@ const CreatePlan = () => {
             const taskEntries = [];
             planData.stages.forEach(stage => {
                 stage.tasks.forEach(task => {
-                    taskEntries.push({ stageTempId: stage.tempId, task });
+                    taskEntries.push({ stageTempId: stage.tempId, task});
                 });
             });
 
@@ -102,7 +117,6 @@ const CreatePlan = () => {
                 });
                 taskResponses.push(resp);
             }
-
 
             const taskIdMap = {};
             taskEntries.forEach((entry, index) => {
@@ -140,7 +154,6 @@ const CreatePlan = () => {
                     }
                 }
             }
-
             // Save tags for the plan
             if (planData.categories && planData.categories.length > 0) {
                 try {
@@ -151,9 +164,7 @@ const CreatePlan = () => {
                 }
             }
 
-            const fullPlan = await hydratePlan(planId);  // Combine subfields
-            addPlan(fullPlan);
-            console.log("Created plan with data:", fullPlan);
+            console.log("Created plan with data:", planData);
 
             navigate(`/plans/${planId}`);
 
@@ -197,7 +208,7 @@ const CreatePlan = () => {
 
             {/* Preview Modal */}
             {showPreview && (
-                <PreviewModal planData={planData} onClose={() => setShowPreview(false)} />
+                <PreviewModal planData={planData} onClose={() => setShowPreview(false)}/>
             )}
         </div>
     );

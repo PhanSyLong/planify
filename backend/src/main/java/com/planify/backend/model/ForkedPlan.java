@@ -27,7 +27,7 @@ public class ForkedPlan {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "adopted_user_id")
-    User adoptedUser;
+    User adopter;
 
     @CreationTimestamp
     @Column(name="created_at", nullable = false, updatable = false)

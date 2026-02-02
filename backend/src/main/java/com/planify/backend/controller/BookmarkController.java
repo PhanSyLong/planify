@@ -29,23 +29,23 @@ public class BookmarkController {
     @PostMapping("/plans/{planId}/bookmark")
     ResponseEntity<ApiResponse<Void>> bookmark(@PathVariable Integer planId) {
         bookmarkService.bookmark(planId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<Void>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
+                        .code(HttpStatus.OK.value())
                         .build());
     }
 
     @DeleteMapping("/plans/{planId}/bookmark")
     ResponseEntity<ApiResponse<Void>> removeBookmark(@PathVariable Integer planId) {
         bookmarkService.removeBookmark(planId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<Void>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
+                        .code(HttpStatus.OK.value())
                         .build());
     }
 
     @GetMapping("/users/{userId}/bookmarks")
-    ResponseEntity<ApiResponse<List<PlanResponse>>> getBookmarks(@PathVariable Integer userId) {
+    ResponseEntity<ApiResponse<List<PlanResponse>>> getBookmarkedPlans(@PathVariable Integer userId) {
         List<com.planify.backend.model.Plan> plans = bookmarkService.getBookmarkedPlans(userId);
 
         return ResponseEntity.status(HttpStatus.OK)

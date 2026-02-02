@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @Service
+@Slf4j
 public class BookmarkService {
     UserRepository userRepository;
     PlanRepository planRepository;
@@ -35,9 +37,9 @@ public class BookmarkService {
         if (!bookmarkRepository.existsByUserIdAndPlanId(currentUserId, planId)) {
             bookmark.setUser(currentUser);
             bookmark.setPlan(plan);
+            bookmarkRepository.save(bookmark);
         }
-
-        bookmarkRepository.save(bookmark);
+        log.info("Bookmark ID {} has been booked", planId);
     }
 
     @Transactional
@@ -47,6 +49,7 @@ public class BookmarkService {
             return;
         }
         bookmarkRepository.deleteByUserIdAndPlanId(currentUserId, planId);
+        log.info("Bookmark ID {} has been unbooked", planId);
     }
 
     public List<Plan> getBookmarkedPlans(Integer userId) {

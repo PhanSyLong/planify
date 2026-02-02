@@ -67,7 +67,7 @@ public class NotificationService {
         if (plan != null){
             notification.setPlan(plan);
         }
-        if (recipient.getNotification_enabled().equals("false")){
+        if (recipient.getNotification_enabled() == null || recipient.getNotification_enabled().equals("false")){
             return notificationRepository.save(notification);
         }
 

@@ -1,67 +1,38 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import LikeButton from './LikeButton';        // ← Đã thêm import
+import LikeButton from './LikeButton.jsx';        // ← Đã thêm import
 import './ViewPlan.css';
-import { usePlans } from '../../context/PlanContext';
+import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import httpPublic from '../../api/httpPublic';
-
-const MOCK_PLANS = {
-  'plan-1': {
-    title: 'IELTS Speaking Mastery',
-    description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
-    previewUrl: null,
-    categories: ['Language', 'Exam', 'English'],
-    stages: [
-      {
-        title: 'Week 1-2: Fluency & Coherence',
-        description: 'Build confidence and natural speaking flow.',
-        tasks: [
-          {
-            title: 'Daily Topic Practice',
-            description: 'Speak on 3 Part 1 topics every day.',
-            duration: '14',
-            subtasks: ['Record yourself', 'Note new vocabulary', 'Self-evaluate fluency'],
-          },
-          {
-            title: 'Long Turn Practice',
-            description: 'Practice Part 2 cue cards.',
-            duration: '14',
-            subtasks: ['Time yourself (2 min)', 'Use linking words'],
-          },
-        ],
-      },
-      {
-        title: 'Week 3-4: Lexical Resource',
-        description: 'Expand vocabulary and use idiomatic language.',
-        tasks: [
-          {
-            title: 'Themed Vocabulary Lists',
-            description: 'Learn 20 new words/phrases per theme.',
-            duration: '14',
-            subtasks: ['Environment', 'Technology', 'Education', 'Health'],
-          },
-        ],
-      },
-    ],
-  },
-};
 
 const ViewPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { data: fullPlan, isLoading, error, isError } = useHydratedPlan(id);
 
-  // const [plan, setPlan] = useState(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);   // ← Thêm state này
+  const trackRecentPlan = (plan) => {
+    const raw = localStorage.getItem("recentPlans");
+    const plans = raw ? JSON.parse(raw) : [];
 
-  const { plans, getCachedPlanById } = usePlans();
-  const loading = !plans.length;
-  // const plan = MOCK_PLANS['plan-1'];
-  const plan = getCachedPlanById(Number(id));
-  const error = !loading && !plan ? "Plan not found" : null;
+    const filtered = plans.filter(p => p.id !== plan.id);
 
-  console.log("Viewing plan: ", plan)
-  const handleForkClick = useCallback(() => {
-    console.log('Fork Plan clicked - feature in development');
+    const updated = [
+      fullPlan,
+      ...filtered,
+    ].slice(0, 6);  // Maximum of 6 recent plans
+
+    localStorage.setItem("recentPlans", JSON.stringify(updated));
+  };
+
+  useEffect(() => {
+    if (fullPlan){
+      trackRecentPlan(fullPlan);
+    }
+  });
+
+  // console.log("Viewing plan: ", fullPlan)
+  const handleForkClick = useCallback(async() => {
+    // console.log('Fork Plan clicked - feature in development');
     navigate(`/plans/${id}/fork`);
   }, [id, navigate]);
 
@@ -69,14 +40,7 @@ const ViewPlan = () => {
     navigate(-1);
   }, [navigate]);
 
-  // Handler cho LikeButton
-  const handleBookmarkToggle = useCallback((key, newValue) => {
-    setIsBookmarked(newValue);
-    console.log(`Plan ${id} bookmark toggled: ${newValue ? 'saved' : 'removed'}`);
-    // TODO: Gọi API lưu bookmark hoặc lưu vào localStorage/context
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="viewplan-loading">
         <div className="spinner" role="status" aria-label="Loading"></div>
@@ -85,10 +49,10 @@ const ViewPlan = () => {
     );
   }
 
-  if (error || !plan) {
+  if (isError || !fullPlan) {
     return (
       <div className="viewplan-error">
-        <h2>{error || 'Plan not found'}</h2>
+        <h2>{'Plan not found (Status code: ' + error.message.match(/\d+/g) + ')'}</h2>
         <button onClick={handleGoBack}>Go Back</button>
       </div>
     );
@@ -102,28 +66,23 @@ const ViewPlan = () => {
         </button>
 
         <div className="viewplan-actions">
-
-
           <button className="btn-fork" onClick={handleForkClick}>
             Fork Plan
           </button>
           <LikeButton
-            itemId={id}
-            type="plan"
-            isLiked={isBookmarked}
-            onToggle={handleBookmarkToggle}
+            itemId={Number(id)}
+            type='plan'
           />
-
         </div>
       </div>
 
-      <h1 className="viewplan-title">{plan.title}</h1>
+      <h1 className="viewplan-title">{fullPlan.title}</h1>
 
       <div className="viewplan-main">
         <div className="viewplan-sidebar">
           <div className="viewplan-image">
-            {plan.picture ? (
-              <img src={`${httpPublic.defaults.baseURL}${plan.picture}`} alt={plan.title} />
+            {fullPlan.picture ? (
+              <img src={`${httpPublic.defaults.baseURL}${fullPlan.picture}`} alt={fullPlan.title} />
             ) : (
               <div className="placeholder-image">
                 <div className="landscape-icon"></div>
@@ -134,13 +93,13 @@ const ViewPlan = () => {
           <div className="viewplan-info">
             <div className="info-section">
               <strong>Description</strong>
-              <p>{plan.description}</p>
+              <p>{fullPlan.description}</p>
             </div>
 
             <div className="info-section">
               <strong>Tags</strong>
               <div className="category-tags">
-                {(plan.categories || []).map((cat, i) => (
+                {(fullPlan.categories || []).map((cat, i) => (
                   <span key={i} className="category-tag">
                     {cat}
                   </span>
@@ -150,13 +109,13 @@ const ViewPlan = () => {
 
             <div className='plan-duration'>
               <strong>Duration</strong>
-              <p>{plan.duration} Days</p>
+              <p>{fullPlan.duration} Days</p>
             </div>
           </div>
         </div>
 
         <div className="viewplan-stages">
-          {(plan.stages || []).map((stage, stageIdx) => (
+          {(fullPlan.stages || []).map((stage, stageIdx) => (
             <div key={stageIdx} className="viewplan-stage">
               <div className="stage-header">
                 <h3 className="stage-title">
@@ -211,7 +170,7 @@ const ViewPlan = () => {
             </div>
           ))}
 
-          {(plan.stages || []).length === 0 && (
+          {(fullPlan.stages || []).length === 0 && (
             <p className="no-stages">No stages defined yet.</p>
           )}
         </div>

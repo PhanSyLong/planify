@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
-import { usePlans } from '../../context/PlanContext';
+import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import ViewMyPlan from './ViewMyPlan';
 import ViewPlan from './ViewPlan';
 
@@ -11,34 +10,19 @@ import ViewPlan from './ViewPlan';
  */
 const ViewPlanWrapper = () => {
   const { id } = useParams();
-  const { getCachedPlanById, plans } = usePlans();
+  const {data: fullPlan, isLoading } = useHydratedPlan(id); 
 
-  // Get current user ID from JWT token
-  const currentUserId = useMemo(() => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return null;
-      const decoded = jwtDecode(token);
-      return decoded.userId;
-    } catch (error) {
-      console.error('Failed to decode token:', error);
-      return null;
-    }
-  }, []);
-
-  // Get the plan from context
-  const plan = useMemo(() => {
-    return getCachedPlanById(Number(id));
-  }, [id, getCachedPlanById]);
+  // Get current user ID
+  const currentUserId = localStorage.getItem("userId");
 
   // Determine if current user owns this plan
   const isOwnedByCurrentUser = useMemo(() => {
-    if (!plan || !currentUserId) return false;
-    return plan.ownerId === currentUserId;
-  }, [plan, currentUserId]);
+    if (!fullPlan || !currentUserId) return false;
+    return fullPlan.ownerId === currentUserId;
+  }, [fullPlan, currentUserId]);
 
   // Show loading state while plans are being fetched
-  if (!plans || plans.length === 0) {
+  if (isLoading) {
     return (
       <div className="viewplan-loading">
         <div className="spinner" role="status" aria-label="Loading"></div>

@@ -45,12 +45,11 @@ public class PlanController {
         ResponseEntity<ApiResponse<Void>> deletePlan(@PathVariable Integer planId) {
                 planService.deletePlanById(planId);
 
-                return ResponseEntity.status(HttpStatus.OK)
-                                .body(ApiResponse.<Void>builder()
-                                                .code(HttpStatus.OK.value())
-                                                .message("Plan removed successfully")
-                                                .build());
-        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<Void>builder()
+                        .code(HttpStatus.OK.value())
+                        .build());
+    }
 
         @GetMapping("/plans/{planId}")
         ResponseEntity<ApiResponse<PlanResponse>> getPlanById(@PathVariable Integer planId) {

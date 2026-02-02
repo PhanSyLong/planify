@@ -1,56 +1,28 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Carousel from '../components/plans/Carousel.jsx';
 import PlanList from '../components/plans/PlanList.jsx';
-import { usePlans } from '../context/PlanContext.jsx';
-import { jwtDecode } from 'jwt-decode';
 import './MyPlan.css';
+import { usePlans } from '../queries/usePlans.js';
 
 const MyPlan = () => {
   const [fullView, setFullView] = useState(null);
-  const { plans } = usePlans();
+  const { data: plans, isLoading, isError } = usePlans();
+  const currentUserId = Number(localStorage.getItem("userId"));
 
-  // Get current user ID from JWT token
-  const currentUserId = useMemo(() => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return null;
-      const decoded = jwtDecode(token);
-      return decoded.userId;
-    } catch (error) {
-      console.error('Failed to decode token:', error);
-      return null;
-    }
-  }, []);
+  const allPlans = useMemo(() => {
+    if (isLoading) return [];
+    return plans.filter(plan => plan.ownerId === currentUserId);
+  }, [plans, currentUserId, isLoading]);
 
-  // Filter plans to show only those owned by current user
-  const planData = useMemo(() => {
-    const userPlans = plans.filter(plan => plan.ownerId === currentUserId);
+  const inProgressPlans = useMemo(() => {
+    if (isLoading) return [];
+    return allPlans.filter(plan => plan.status === "incompleted");
+  }, [allPlans, isLoading]);
 
-    return {
-      recentlyOpened: [
-        {
-          id: 'my-recent-1',
-          title: 'Morning Workout Routine',
-          duration: '30 days • Fitness',
-          ownerId: currentUserId,
-          createdAt: new Date('2024-12-15'),
-          lastOpened: new Date('2024-12-18')
-        }
-      ],
-      inProgress: [
-        {
-          id: 'my-progress-1',
-          title: 'Learn React Advanced',
-          duration: '60 days • Programming',
-          ownerId: currentUserId,
-          createdAt: new Date('2024-12-10'),
-          status: 'in-progress',
-          progress: 45
-        }
-      ],
-      allPlans: userPlans
-    };
-  }, [plans, currentUserId]);
+  const recentPlans = useMemo (() => {
+    const raw = localStorage.getItem("recentPlans");
+    return raw ? JSON.parse(raw) : [];
+  });
 
   const handleViewMore = useCallback((title, items) => {
     setFullView({ title, items });
@@ -59,6 +31,31 @@ const MyPlan = () => {
   const handleBack = useCallback(() => {
     setFullView(null);
   }, []);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-content">
+          <div className="loading-spinner" role="status" aria-label="Loading"></div>
+          <p className="loading-text">Loading your plans...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="loading-container">
+        <div className="loading-content">
+          <p className="loading-text" style={{ color: '#ef4444' }}>
+            Failed to load plans. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Full view mode
   if (fullView) {
@@ -77,7 +74,19 @@ const MyPlan = () => {
   // Main view - carousel sections
   return (
     <div className="myplan-container">
-      <PlanList plans={planData.allPlans} />
+      <Carousel
+        title="Recently Opened"
+        items={recentPlans}
+        onViewMore={() => handleViewMore('Recently Opened', recentPlans)}
+      />
+
+      <Carousel
+        title="In Progress"
+        items={inProgressPlans}
+        onViewMore={() => handleViewMore('In Progress', inProgressPlans)}
+      />
+
+      <PlanList plans={allPlans} />
     </div>
   );
 };

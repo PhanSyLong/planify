@@ -28,9 +28,9 @@ public class FollowController {
     ResponseEntity<ApiResponse<String>> follow(@PathVariable Integer targetId) {
         followService.follow(targetId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<String>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
+                        .code(HttpStatus.OK.value())
                         .build());
     }
 
@@ -38,9 +38,9 @@ public class FollowController {
     ResponseEntity<ApiResponse<String>> unfollow(@PathVariable Integer targetId) {
         followService.unfollow(targetId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.<String>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
+                        .code(HttpStatus.OK.value())
                         .build());
     }
 

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 //mainlayout
 import MainLayout from "./layouts/MainLayout";
@@ -31,19 +31,12 @@ import ForkPlan from "./components/fork&edit/ForkPlan.jsx"
 import Admin from "./pages/Admin.jsx";
 import ViewPlanWrapper from "./components/plans/ViewPlanWrapper.jsx";
 
-import { PlansProvider } from "./context/PlanContext";
-
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route
-            element={
-              <PlansProvider>
-                <Outlet/>
-              </PlansProvider>
-            }>
+          <Route>
             <Route path="/home" element={<Home />} />
             <Route path="/add" element={<Add />} />
 

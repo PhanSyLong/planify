@@ -111,21 +111,24 @@ const LoginSignup = () => {
 
       localStorage.setItem("accessToken", token);
 
+      let userId = null;
       let username = loginData.username;
       let detectedRole = data?.result?.role || data?.role || "";
 
       try {
         const meRes = await authApi.me();
+        userId = meRes?.data?.result?.id || meRes?.data?.id;
         username = meRes?.data?.result?.username || meRes?.data?.username || username;
         detectedRole = meRes?.data?.result?.role || meRes?.data?.role || detectedRole;
       } catch (meErr) {
         console.warn("Unable to retrieve user info (me):", meErr);
       }
-
+      
       if (!detectedRole) {
         detectedRole = username?.toLowerCase() === "admin" ? "admin" : "user";
       }
-
+      
+      localStorage.setItem("userId", userId);
       localStorage.setItem("role", detectedRole);
 
       addToast("success", `Login successful! Welcome ${username}!`);

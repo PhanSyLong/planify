@@ -1,62 +1,21 @@
-import axios from 'axios';
+import httpAuth from './httpAuth';
 
-const API_URL = `http://localhost:8080/planify`;
+export const createSubtask = async (subtask) =>
+    await httpAuth.post(`/subtasks`, subtask);
 
-export const createSubtask = async (subtask) => {
-    const token = localStorage.getItem("accessToken");
-    return await axios.post(`${API_URL}/subtasks`, subtask, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const deleteSubtask = async (planId, stageId, taskId, subtaskId) =>
+    await httpAuth.delete(`/plans/${planId}/${stageId}/${taskId}/${subtaskId}`);
 
-export const deleteSubtask = async (planId, stageId, taskId, subtaskId) => {
-    const token = localStorage.getItem("accessToken");
-    return await axios.delete(`${API_URL}/plans/${planId}/${stageId}/${taskId}/${subtaskId}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const getSubtasksByPlanId = (planId) =>
+    httpAuth.get(`/plans/${planId}/subtasks`);
 
-export const getSubtasksByPlanId = (planId) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.get(`${API_URL}/plans/${planId}/subtasks`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const getAllSubtasks = (planId, stageId, taskId, subtaskId) =>
+    httpAuth.get(`/plans/${planId}/${stageId}/${taskId}/${subtaskId}`);
 
-export const getAllSubtasks = (planId, stageId, taskId, subtaskId) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.get(`${API_URL}/plans/${planId}/${stageId}/${taskId}/${subtaskId}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const updateSubtask = async (subtaskId, subtaskData) =>
+    await httpAuth.patch(`/subtasks/${subtaskId}`, subtaskData);
 
-export const updateSubtask = async (subtaskId, subtaskData) => {
-    const token = localStorage.getItem("accessToken");
-    return await axios.patch(`${API_URL}/subtasks/${subtaskId}`, subtaskData, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
-
+// May be replaced
 export const startSubtask = async (subtaskId) => {
     const token = localStorage.getItem("accessToken");
     return await axios.patch(`${API_URL}/subtasks/${subtaskId}/start`, {}, {

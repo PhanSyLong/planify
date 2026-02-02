@@ -4,6 +4,7 @@ import EditPlan from './EditPlan';
 import PreviewModal from '../createplan/Preview';
 import StatusDropdown from '../../components/home/StatusDropdown';
 import ReviewPlanPopup from './ReviewPlanPopUp';
+import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import { usePlans } from '../../context/PlanContext';
 import { deletePlan, startPlan, completePlan } from '../../api/plan';
 import { startStage, completeStage } from '../../api/stage';
@@ -37,20 +38,16 @@ const ViewMyPlan = () => {
     newStatus: null
   });
 
-  const { getCachedPlanById, plans } = usePlans();
-
-  // Get plan from context
-  const contextPlan = useMemo(() => {
-    return getCachedPlanById(Number(id));
-  }, [id, getCachedPlanById]);
+  // Get full plan from query
+  const { data: fullPlan, isLoading } = useHydratedPlan(id);
 
   // Initialize plan state from context
   useMemo(() => {
-    if (contextPlan && !plan) {
-      setPlan(contextPlan);
-      setOriginalPlan(JSON.parse(JSON.stringify(contextPlan)));
+    if (fullPlan && !plan) {
+      setPlan(fullPlan);
+      setOriginalPlan(JSON.parse(JSON.stringify(fullPlan)));
     }
-  }, [contextPlan, plan]);
+  }, [fullPlan, plan]);
 
   // Initialize startedSubtasks from database data (check started_at field)
   useEffect(() => {
@@ -475,7 +472,7 @@ const ViewMyPlan = () => {
   }, []);
 
   // Show loading state while plans are being fetched from context
-  if (!plans || plans.length === 0) {
+  if (isLoading) {
     return (
       <div className="viewplan-loading">
         <div className="spinner" role="status" aria-label="Loading"></div>
