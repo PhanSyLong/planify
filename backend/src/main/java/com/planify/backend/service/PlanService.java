@@ -135,11 +135,11 @@ public class PlanService {
         }
 
         if (!hasQuery && hasTags) {
-            return planRepository.findByTagNames(tags);
+            return planRepository.findByTagNames(tags,tags.size());
         }
 
         // 👇 có cả query + tag
-        return planRepository.searchByQueryAndTags(query, tags);
+        return planRepository.searchByQueryAndTags(query, tags,tags.size());
     }
 
 
