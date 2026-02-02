@@ -56,3 +56,25 @@ export const updateStage = async (stageId, stageData) => {
         withCredentials: true,
     });
 };
+
+export const startStage = async (stageId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/stages/${stageId}/start`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const completeStage = async (stageId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/stages/${stageId}/complete`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};

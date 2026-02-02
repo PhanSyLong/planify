@@ -56,3 +56,25 @@ export const updateTask = async (taskId, taskData) => {
         withCredentials: true,
     });
 };
+
+export const startTask = async (taskId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/tasks/${taskId}/start`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const completeTask = async (taskId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/tasks/${taskId}/complete`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};

@@ -56,3 +56,25 @@ export const updateSubtask = async (subtaskId, subtaskData) => {
         withCredentials: true,
     });
 };
+
+export const startSubtask = async (subtaskId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/subtasks/${subtaskId}/start`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const completeSubtask = async (subtaskId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/subtasks/${subtaskId}/complete`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};

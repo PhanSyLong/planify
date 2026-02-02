@@ -1,11 +1,14 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import EditPlan from './EditPlan';
 import PreviewModal from '../createplan/Preview';
 import StatusDropdown from '../../components/home/StatusDropdown';
 import ReviewPlanPopup from './ReviewPlanPopUp';
 import { usePlans } from '../../context/PlanContext';
-import { deletePlan } from '../../api/plan';
+import { deletePlan, startPlan, completePlan } from '../../api/plan';
+import { startStage, completeStage } from '../../api/stage';
+import { startTask, completeTask } from '../../api/task';
+import { startSubtask, completeSubtask, updateSubtask } from '../../api/subtask';
 import httpPublic from '../../api/httpPublic';
 import './ViewMyPlan.css';
 
@@ -48,6 +51,30 @@ const ViewMyPlan = () => {
       setOriginalPlan(JSON.parse(JSON.stringify(contextPlan)));
     }
   }, [contextPlan, plan]);
+
+  // Initialize startedSubtasks from database data (check started_at field)
+  useEffect(() => {
+    if (plan && plan.stages) {
+      const started = new Set();
+      let anyStarted = false;
+
+      plan.stages.forEach((stage, stageIdx) => {
+        stage.tasks?.forEach((task, taskIdx) => {
+          task.subtasks?.forEach((subtask, subtaskIdx) => {
+            if (typeof subtask === 'object' && subtask.started_at) {
+              started.add(`${stageIdx}-${taskIdx}-${subtaskIdx}`);
+              anyStarted = true;
+            }
+          });
+        });
+      });
+
+      if (started.size > 0) {
+        setStartedSubtasks(started);
+        setHasStartedAnySubtask(anyStarted);
+      }
+    }
+  }, [plan]);
 
   // Calculate review statistics
   const calculateReviewData = useCallback(() => {
@@ -172,7 +199,7 @@ const ViewMyPlan = () => {
     setShowDeleteConfirm(false);
   }, []);
 
-  // Check if all subtasks in a task are completed (DONE or CANCELLED)
+  // Check if all subtasks in a task are completed (DONE or CANCELLED) - handles both backend and frontend status values
   const isTaskCompleted = useCallback((stageIdx, taskIdx) => {
     if (!plan) return false;
     const task = plan.stages[stageIdx]?.tasks[taskIdx];
@@ -181,7 +208,9 @@ const ViewMyPlan = () => {
     return task.subtasks.every(subtask => {
       const key = `${stageIdx}-${taskIdx}-${task.subtasks.indexOf(subtask)}`;
       const status = typeof subtask === 'object' ? subtask.status : 'INCOMPLETE';
-      return startedSubtasks.has(key) && (status === 'DONE' || status === 'CANCELLED');
+      const isFinished = status === 'DONE' || status === 'CANCELLED' ||
+        status === 'completed' || status === 'cancelled';
+      return startedSubtasks.has(key) && isFinished;
     });
   }, [plan, startedSubtasks]);
 
@@ -214,21 +243,42 @@ const ViewMyPlan = () => {
     return false;
   }, [plan, isTaskCompleted, isStageCompleted]);
 
-  // Check if subtask has been started
-  const isSubtaskStarted = useCallback((stageIdx, taskIdx, subtaskIdx) => {
-    return startedSubtasks.has(`${stageIdx}-${taskIdx}-${subtaskIdx}`);
-  }, [startedSubtasks]);
+  // Normalize backend status (lowercase) to frontend display status (uppercase)
+  const normalizeStatus = useCallback((status) => {
+    if (status === 'completed') return 'DONE';
+    if (status === 'cancelled') return 'CANCELLED';
+    if (status === 'incompleted') return 'INCOMPLETE';
+    return status || 'INCOMPLETE'; // Already uppercase or undefined
+  }, []);
 
-  // Check if subtask is finished (DONE or CANCELLED)
+  // Check if subtask has been started - check both local state AND database started_at field
+  const isSubtaskStarted = useCallback((stageIdx, taskIdx, subtaskIdx) => {
+    // Check local state first (for UI updates during session)
+    if (startedSubtasks.has(`${stageIdx}-${taskIdx}-${subtaskIdx}`)) {
+      return true;
+    }
+    // Also check the started_at field from database (for persistence after reload)
+    if (plan) {
+      const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
+      if (subtask && typeof subtask === 'object' && subtask.started_at) {
+        return true;
+      }
+    }
+    return false;
+  }, [startedSubtasks, plan]);
+
+  // Check if subtask is finished (DONE or CANCELLED) - handles both backend and frontend status values
   const isSubtaskFinished = useCallback((stageIdx, taskIdx, subtaskIdx) => {
     if (!plan) return false;
     const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
     if (!subtask || typeof subtask !== 'object') return false;
-    return subtask.status === 'DONE' || subtask.status === 'CANCELLED';
+    const status = subtask.status;
+    return status === 'DONE' || status === 'CANCELLED' ||
+      status === 'completed' || status === 'cancelled';
   }, [plan]);
 
   // Handle starting a subtask
-  const handleStartSubtask = useCallback((stageIdx, taskIdx, subtaskIdx) => {
+  const handleStartSubtask = useCallback(async (stageIdx, taskIdx, subtaskIdx) => {
     const isFirstEver = !hasStartedAnySubtask;
 
     if (isFirstEver) {
@@ -242,10 +292,39 @@ const ViewMyPlan = () => {
         newStatus: null
       });
     } else {
-      // Start immediately for subsequent subtasks
-      setStartedSubtasks(prev => new Set([...prev, `${stageIdx}-${taskIdx}-${subtaskIdx}`]));
+      // Start immediately for subsequent subtasks - call API
+      try {
+        const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
+        await startSubtask(subtask.id);
+
+        // Check if first subtask of task (no other started)
+        const task = plan.stages[stageIdx]?.tasks[taskIdx];
+        const taskHasStarted = task?.subtasks?.some(s => s.started_at);
+        if (!taskHasStarted) {
+          await startTask(task.id);
+        }
+
+        // Check if first task of stage
+        const stage = plan.stages[stageIdx];
+        const stageHasStarted = stage?.started_at;
+        if (!stageHasStarted && taskIdx === 0) {
+          await startStage(stage.id);
+        }
+
+        setStartedSubtasks(prev => new Set([...prev, `${stageIdx}-${taskIdx}-${subtaskIdx}`]));
+
+        // Update local plan state
+        setPlan(prevPlan => {
+          const updated = JSON.parse(JSON.stringify(prevPlan));
+          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].started_at = new Date().toISOString();
+          return updated;
+        });
+      } catch (error) {
+        console.error('Failed to start subtask:', error);
+        alert('Failed to start subtask. Please try again.');
+      }
     }
-  }, [hasStartedAnySubtask]);
+  }, [hasStartedAnySubtask, plan]);
 
   // Handle status change with confirmation
   const handleStatusChangeWithConfirmation = useCallback((stageIdx, taskIdx, subtaskIdx, newStatus) => {
@@ -261,21 +340,134 @@ const ViewMyPlan = () => {
     }
   }, []);
 
+  // Helper: Check if all subtasks in a task are finished
+  const areAllSubtasksInTaskFinished = useCallback((stageIdx, taskIdx, updatedPlan) => {
+    const task = updatedPlan.stages[stageIdx]?.tasks[taskIdx];
+    if (!task?.subtasks?.length) return true;
+    return task.subtasks.every(s =>
+      s.status === 'completed' || s.status === 'cancelled' ||
+      s.status === 'DONE' || s.status === 'CANCELLED'
+    );
+  }, []);
+
+  // Helper: Check if all tasks in a stage are finished
+  const areAllTasksInStageFinished = useCallback((stageIdx, updatedPlan) => {
+    const stage = updatedPlan.stages[stageIdx];
+    if (!stage?.tasks?.length) return true;
+    return stage.tasks.every((_, taskIdx) => areAllSubtasksInTaskFinished(stageIdx, taskIdx, updatedPlan));
+  }, [areAllSubtasksInTaskFinished]);
+
+  // Helper: Check if all stages are finished
+  const areAllStagesFinished = useCallback((updatedPlan) => {
+    return updatedPlan.stages.every((_, stageIdx) => areAllTasksInStageFinished(stageIdx, updatedPlan));
+  }, [areAllTasksInStageFinished]);
+
   // Confirm the modal action
-  const handleConfirmModal = useCallback(() => {
+  const handleConfirmModal = useCallback(async () => {
     const { type, stageIdx, taskIdx, subtaskIdx, newStatus } = confirmModal;
 
-    if (type === 'start-first') {
-      // Start the first subtask
-      setStartedSubtasks(prev => new Set([...prev, `${stageIdx}-${taskIdx}-${subtaskIdx}`]));
-      setHasStartedAnySubtask(true);
-    } else if (type === 'done' || type === 'cancel') {
-      // Update the subtask status
-      handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, newStatus);
+    try {
+      if (type === 'start-first') {
+        // Start the first subtask - call all cascading APIs
+        const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
+        const task = plan.stages[stageIdx]?.tasks[taskIdx];
+        const stage = plan.stages[stageIdx];
+
+        await startSubtask(subtask.id);
+        await startTask(task.id);
+        await startStage(stage.id);
+        await startPlan(plan.id);
+
+        setStartedSubtasks(prev => new Set([...prev, `${stageIdx}-${taskIdx}-${subtaskIdx}`]));
+        setHasStartedAnySubtask(true);
+
+        // Update local plan state
+        setPlan(prevPlan => {
+          const updated = JSON.parse(JSON.stringify(prevPlan));
+          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].started_at = new Date().toISOString();
+          updated.stages[stageIdx].tasks[taskIdx].started_at = new Date().toISOString();
+          updated.stages[stageIdx].started_at = new Date().toISOString();
+          updated.started_at = new Date().toISOString();
+          return updated;
+        });
+
+      } else if (type === 'done') {
+        // Complete the subtask
+        const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
+        const task = plan.stages[stageIdx]?.tasks[taskIdx];
+        const stage = plan.stages[stageIdx];
+
+        await completeSubtask(subtask.id);
+        await updateSubtask(subtask.id, { status: 'completed' });
+
+        // Compute updated plan state BEFORE setPlan (to avoid async timing issues)
+        const updatedPlan = JSON.parse(JSON.stringify(plan));
+        updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].status = 'completed';
+        updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].completed_at = new Date().toISOString();
+
+        // Update local state
+        setPlan(updatedPlan);
+
+        // Check cascading completions synchronously (no setTimeout needed)
+        try {
+          if (areAllSubtasksInTaskFinished(stageIdx, taskIdx, updatedPlan)) {
+            await completeTask(task.id);
+
+            if (areAllTasksInStageFinished(stageIdx, updatedPlan)) {
+              await completeStage(stage.id);
+
+              if (areAllStagesFinished(updatedPlan)) {
+                await completePlan(plan.id);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error completing parent entities:', err);
+        }
+
+        handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'DONE');
+
+      } else if (type === 'cancel') {
+        // Cancel the subtask
+        const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
+        const task = plan.stages[stageIdx]?.tasks[taskIdx];
+        const stage = plan.stages[stageIdx];
+
+        await updateSubtask(subtask.id, { status: 'cancelled' });
+
+        // Compute updated plan state BEFORE setPlan (to avoid async timing issues)
+        const updatedPlan = JSON.parse(JSON.stringify(plan));
+        updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].status = 'cancelled';
+
+        // Update local state
+        setPlan(updatedPlan);
+
+        // Check cascading completions synchronously
+        try {
+          if (areAllSubtasksInTaskFinished(stageIdx, taskIdx, updatedPlan)) {
+            await completeTask(task.id);
+
+            if (areAllTasksInStageFinished(stageIdx, updatedPlan)) {
+              await completeStage(stage.id);
+
+              if (areAllStagesFinished(updatedPlan)) {
+                await completePlan(plan.id);
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error completing parent entities:', err);
+        }
+
+        handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'CANCELLED');
+      }
+    } catch (error) {
+      console.error('Failed to update subtask:', error);
+      alert('Failed to update subtask. Please try again.');
     }
 
     setConfirmModal({ visible: false, type: null, stageIdx: null, taskIdx: null, subtaskIdx: null, newStatus: null });
-  }, [confirmModal, handleSubtaskStatusChange]);
+  }, [confirmModal, handleSubtaskStatusChange, plan, areAllSubtasksInTaskFinished, areAllTasksInStageFinished, areAllStagesFinished]);
 
   // Cancel the modal
   const handleCancelModal = useCallback(() => {
@@ -456,7 +648,7 @@ const ViewMyPlan = () => {
                                   ) : (
                                     // Show StatusDropdown if started
                                     <StatusDropdown
-                                      value={subtask.status || 'INCOMPLETE'}
+                                      value={normalizeStatus(subtask.status)}
                                       onChange={(newStatus) =>
                                         handleStatusChangeWithConfirmation(stageIdx, taskIdx, subtaskIdx, newStatus)
                                       }

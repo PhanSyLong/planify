@@ -122,9 +122,7 @@ public class StageService {
         );
         TimeStatus status;
 
-        if (actualDuration < stage.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > stage.getDuration()) {
+        if (actualDuration > stage.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;

@@ -164,9 +164,7 @@ public class TaskService {
         );
         TimeStatus status;
 
-        if (actualDuration < task.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > task.getDuration()) {
+        if (actualDuration > task.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;

@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const API_URL = `http://localhost:8080/planify/plans`;
 
-export const createPlan = async(plan) => {
+export const createPlan = async (plan) => {
     const token = localStorage.getItem("accessToken");
     return await axios.post(API_URL, plan, {
-	    headers: {
+        headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
@@ -13,7 +13,7 @@ export const createPlan = async(plan) => {
     });
 };
 
-export const deletePlan = async(planId) => {
+export const deletePlan = async (planId) => {
     const token = localStorage.getItem("accessToken");
     return await axios.delete(`${API_URL}/${planId}`, {
         headers: {
@@ -24,7 +24,7 @@ export const deletePlan = async(planId) => {
     });
 };
 
-export const updatePlan = async(planId, plan) => {
+export const updatePlan = async (planId, plan) => {
     const token = localStorage.getItem("accessToken");
     return await axios.patch(`${API_URL}/${planId}`, plan, {
         headers: {
@@ -57,9 +57,31 @@ export const getPlanById = (id) => {
     });
 };
 
-export const getAllPlans = async() => {
+export const getAllPlans = async () => {
     const token = localStorage.getItem("accessToken");
     return await axios.get(API_URL, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const startPlan = async (planId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/${planId}/start`, {}, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+    });
+};
+
+export const completePlan = async (planId) => {
+    const token = localStorage.getItem("accessToken");
+    return await axios.patch(`${API_URL}/${planId}/complete`, {}, {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

@@ -194,9 +194,7 @@ public class PlanService {
         );
         TimeStatus status;
 
-        if (actualDuration < plan.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > plan.getDuration()) {
+        if (actualDuration > plan.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;
