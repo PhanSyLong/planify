@@ -1,25 +1,29 @@
-import { getPlanById, getForkOrigin } from "../api/plan"; 
+import { getPlanById } from "../api/plan"; 
 import { getStagesByPlanId } from "../api/stage"
 import { getTasksByPlanId } from "../api/task";
 import { getSubtasksByPlanId } from "../api/subtask";
+import { getTagsByPlanId } from "../api/tag";
 
 export const hydratePlan = async (planId) => {
 	const [
 	  planRes, 
 	  stagesRes,
 	  tasksRes,
-	  subtasksRes
+	  subtasksRes,
+	  tagRes,
 	] = await Promise.all([
 	  getPlanById(planId),
 	  getStagesByPlanId(planId),
 	  getTasksByPlanId(planId),
-	  getSubtasksByPlanId(planId)
+	  getSubtasksByPlanId(planId),
+	  getTagsByPlanId(planId),
 	]);
 
 	const plan = planRes.data.result;
 	const stages = stagesRes.data.result;
 	const tasks = tasksRes.data.result;
 	const subtasks = subtasksRes.data.result;
+	const tags = tagRes.data.result;
 
 	// Grouping subtasks to tasks
 	const subtasksByTaskId = subtasks.reduce((acc, subtask) => {
@@ -42,9 +46,10 @@ export const hydratePlan = async (planId) => {
 	  tasks: tasksByStageId[stage.id] ?? []
 	}));
 
-	// Attaching stages to plan
+	// Attaching stages and tags to plan
 	return {
 	  ...plan,
-	  stages: hydratedStages
+	  stages: hydratedStages,
+	  categories: tags,
 	};
 };
