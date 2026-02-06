@@ -22,11 +22,19 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
   const [planPicture, setPlanPicture] = useState(initialPlan.picture || null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showCategories, setShowCategories] = useState(false);
-  const [stages, setStages] = useState(
-    initialPlan.stages?.length > 0
-      ? initialPlan.stages.map(stage => ({ ...stage }))
-      : [{ title: '', description: '', tasks: [] }]
-  );
+  const [stages, setStages] = useState(() => {
+    if (initialPlan.stages?.length > 0) {
+      // Deep copy stages with all nested tasks and subtasks
+      return initialPlan.stages.map(stage => ({
+        ...stage,
+        tasks: (stage.tasks || []).map(task => ({
+          ...task,
+          subtasks: (task.subtasks || []).map(subtask => ({ ...subtask }))
+        }))
+      }));
+    }
+    return [{ title: '', description: '', tasks: [] }];
+  });
   const [selectedCategories, setSelectedCategories] = useState(
     initialPlan.categories || []
   );

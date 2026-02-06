@@ -7,33 +7,21 @@ import './SavedPlan.css';
 
 const SavedPage = () => {
   const [fullView, setFullView] = useState(null);
-  const {bookmarks: plans, isLoading, isError } = useBookmarks();
+  const { bookmarks: plans, isLoading, isError } = useBookmarks();
   const hydratedPlans = useHydratedPlans(plans);
   const fullPlans = hydratedPlans.filter(q => q.data).map(q => q.data);
 
   const savedPlans = useMemo(() => {
-  if (!fullPlans) {
-    return {
-      english: [],
-      math: [],
-      computerScience: [],
-      all: [],
-    };
-  }
+    if (!fullPlans) {
+      return {
+        all: [],
+      };
+    }
 
-  return {
-    english: fullPlans.filter(plan =>
-      plan.categories?.includes('English')
-    ),
-    math: fullPlans.filter(plan =>
-      plan.categories?.includes('Math')
-    ),
-    computerScience: fullPlans.filter(plan =>
-      plan.categories?.includes('Computer Science')
-    ),
-    all: fullPlans,
-  };
-}, [fullPlans]);
+    return {
+      all: fullPlans,
+    };
+  }, [fullPlans]);
 
 
   // Memoized handler to prevent unnecessary re-renders
@@ -97,27 +85,6 @@ const SavedPage = () => {
   // Main view - carousel sections
   return (
     <div className="saved-page">
-      <Carousel
-        title="English"
-        items={savedPlans.english}
-        type="plan"
-        onViewMore={() => handleViewMore('english', 'English')}
-      />
-
-      <Carousel
-        title="Math"
-        items={savedPlans.math}
-        type="plan"
-        onViewMore={() => handleViewMore('math', 'Math')}
-      />
-
-      <Carousel
-        title="Computer Science"
-        items={savedPlans.computerScience}
-        type="plan"
-        onViewMore={() => handleViewMore('computerScience', 'Computer Science')}
-      />
-
       <Carousel
         title="All Saved Plans"
         items={fullPlans}

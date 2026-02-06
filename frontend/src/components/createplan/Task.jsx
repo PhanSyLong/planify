@@ -23,7 +23,8 @@ const Task = ({ task, taskNumber, updateTask, deleteTask }) => {
 
   // Hoặc dùng useMemo nếu muốn hiển thị mà không lưu vào state
   const computedDuration = useMemo(() => {
-    return task.subtasks.reduce((sum, sub) => sum + Number(sub.duration || 0), 0);
+    if (!task.subtasks || !Array.isArray(task.subtasks)) return 0;
+    return task.subtasks.reduce((sum, sub) => sum + Number(sub?.duration || 0), 0);
   }, [task.subtasks]);
 
   return (

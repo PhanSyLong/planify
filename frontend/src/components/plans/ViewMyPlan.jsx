@@ -57,7 +57,7 @@ const ViewMyPlan = () => {
       plan.stages.forEach((stage, stageIdx) => {
         stage.tasks?.forEach((task, taskIdx) => {
           task.subtasks?.forEach((subtask, subtaskIdx) => {
-            if (typeof subtask === 'object' && subtask.started_at) {
+            if (typeof subtask === 'object' && subtask.startedAt) {
               started.add(`${stageIdx}-${taskIdx}-${subtaskIdx}`);
               anyStarted = true;
             }
@@ -251,7 +251,7 @@ const ViewMyPlan = () => {
     // Also check the started_at field from database (for persistence after reload)
     if (plan) {
       const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
-      if (subtask && typeof subtask === 'object' && subtask.started_at) {
+      if (subtask && typeof subtask === 'object' && subtask.startedAt) {
         return true;
       }
     }
@@ -290,14 +290,14 @@ const ViewMyPlan = () => {
 
         // Check if first subtask of task (no other started)
         const task = plan.stages[stageIdx]?.tasks[taskIdx];
-        const taskHasStarted = task?.subtasks?.some(s => s.started_at);
+        const taskHasStarted = task?.subtasks?.some(s => s.startedAt);
         if (!taskHasStarted) {
           await startTask(task.id);
         }
 
         // Check if first task of stage
         const stage = plan.stages[stageIdx];
-        const stageHasStarted = stage?.started_at;
+        const stageHasStarted = stage?.startedAt;
         if (!stageHasStarted && taskIdx === 0) {
           await startStage(stage.id);
         }
@@ -307,7 +307,7 @@ const ViewMyPlan = () => {
         // Update local plan state
         setPlan(prevPlan => {
           const updated = JSON.parse(JSON.stringify(prevPlan));
-          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].started_at = new Date().toISOString();
+          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].startedAt = new Date().toISOString();
           return updated;
         });
       } catch (error) {
@@ -375,10 +375,10 @@ const ViewMyPlan = () => {
         // Update local plan state
         setPlan(prevPlan => {
           const updated = JSON.parse(JSON.stringify(prevPlan));
-          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].started_at = new Date().toISOString();
-          updated.stages[stageIdx].tasks[taskIdx].started_at = new Date().toISOString();
-          updated.stages[stageIdx].started_at = new Date().toISOString();
-          updated.started_at = new Date().toISOString();
+          updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].startedAt = new Date().toISOString();
+          updated.stages[stageIdx].tasks[taskIdx].startedAt = new Date().toISOString();
+          updated.stages[stageIdx].startedAt = new Date().toISOString();
+          updated.startedAt = new Date().toISOString();
           return updated;
         });
 
@@ -394,7 +394,7 @@ const ViewMyPlan = () => {
         // Compute updated plan state BEFORE setPlan (to avoid async timing issues)
         const updatedPlan = JSON.parse(JSON.stringify(plan));
         updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].status = 'completed';
-        updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].completed_at = new Date().toISOString();
+        updatedPlan.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].completedAt = new Date().toISOString();
 
         // Update local state
         setPlan(updatedPlan);
@@ -486,39 +486,12 @@ const ViewMyPlan = () => {
   }
 
   if (isEditing) {
-    // Create a version of the plan with subtasks as strings for EditPlan compatibility
-    const editedPlan = {
-      ...plan,
-      stages: plan.stages.map(stage => ({
-        ...stage,
-        tasks: stage.tasks.map(task => ({
-          ...task,
-          subtasks: task.subtasks ? task.subtasks.map(sub => sub.text) : []
-        }))
-      }))
-    };
-
+    // Pass the plan with full subtask objects to EditPlan
     return (
       <>
         <EditPlan
-          plan={editedPlan}
-          setPlan={(newPlan) => {
-            // Map back the edited texts to the original subtask objects, preserving status/deadline/etc.
-            setPlan(prev => {
-              const updated = { ...prev };
-              updated.stages = newPlan.stages.map((newStage, sIdx) => ({
-                ...newStage,
-                tasks: newStage.tasks.map((newTask, tIdx) => ({
-                  ...newTask,
-                  subtasks: newTask.subtasks.map((newSubText, stIdx) => ({
-                    ... (prev.stages[sIdx]?.tasks[tIdx]?.subtasks[stIdx] || {}),
-                    text: newSubText
-                  }))
-                }))
-              }));
-              return updated;
-            });
-          }}
+          plan={plan}
+          setPlan={setPlan}
           onPreview={handlePreview}
           onSave={handleSave}
           onCancel={handleCancel}
@@ -637,7 +610,7 @@ const ViewMyPlan = () => {
                     )}
 
                     {task.subtasks?.length > 0 && (
-                      <div className="view_subtasks">
+                      <div className="subtasks">
                         <strong>Subtasks:</strong>
                         <ul>
                           {task.subtasks.map((subtask, subtaskIdx) => (

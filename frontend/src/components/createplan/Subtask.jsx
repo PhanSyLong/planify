@@ -95,7 +95,7 @@ const Subtask = ({ subtasks, setSubtasks }) => {
       {/* List of subtasks with editable fields */}
       {subtasks.length > 0 && (
         <div className="subtask-list">
-          {subtasks.map((sub, index) => (
+          {subtasks.filter(sub => sub != null).map((sub, index) => (
             <div key={sub.id || sub.tempId || index} className="subtask-item">
               <div className="subtask-header">
                 <button

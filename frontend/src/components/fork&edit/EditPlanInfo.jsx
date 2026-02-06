@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Stage from '../createPlan/Stage';
+import Stage from '../createplan/Stage';
 import './EditPlanInfo.css';
 
 const CATEGORIES = [
