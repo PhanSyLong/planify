@@ -120,6 +120,7 @@ const PlanInfo = ({ planData, updatePlanData }) => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
+            onClick={(e) => e.stopPropagation()}
           />
           {planData.reviewUrl ? (
             <>
