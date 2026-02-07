@@ -45,7 +45,7 @@ const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
     completedOnTime = 0,
     completedLate = 0,
     inProgress = 0,
-    incomplete = 0,
+    notStarted = 0,
   } = reviewData || {};
 
 
@@ -100,8 +100,8 @@ const ReviewPlanPopup = ({ isOpen, onClose, containerRef, reviewData }) => {
             <div className="stat-item incomplete">
               <div className="stat-icon">○</div>
               <div className="stat-info">
-                <span className="stat-value">{incomplete}</span>
-                <span className="stat-label">Incomplete</span>
+                <span className="stat-value">{notStarted}</span>
+                <span className="stat-label">Not Started</span>
               </div>
             </div>
 

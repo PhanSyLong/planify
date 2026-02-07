@@ -9,6 +9,7 @@ import { deletePlan, startPlan, completePlan } from '../../api/plan';
 import { startStage, completeStage } from '../../api/stage';
 import { startTask, completeTask } from '../../api/task';
 import { startSubtask, completeSubtask, updateSubtask } from '../../api/subtask';
+import { recordSubtaskStart, recordSubtaskDone, recordSubtaskCancel } from '../../api/dailyPerformance';
 import httpPublic from '../../api/httpPublic';
 import './ViewMyPlan.css';
 
@@ -310,6 +311,9 @@ const ViewMyPlan = () => {
           updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].startedAt = new Date().toISOString();
           return updated;
         });
+
+        // Record in daily_performance table
+        await recordSubtaskStart(plan.id);
       } catch (error) {
         console.error('Failed to start subtask:', error);
         alert('Failed to start subtask. Please try again.');
@@ -382,6 +386,9 @@ const ViewMyPlan = () => {
           return updated;
         });
 
+        // Record in daily_performance table
+        await recordSubtaskStart(plan.id);
+
       } else if (type === 'done') {
         // Complete the subtask
         const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
@@ -418,6 +425,9 @@ const ViewMyPlan = () => {
 
         handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'DONE');
 
+        // Record in daily_performance table
+        await recordSubtaskDone(plan.id);
+
       } else if (type === 'cancel') {
         // Cancel the subtask
         const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
@@ -451,6 +461,9 @@ const ViewMyPlan = () => {
         }
 
         handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'CANCELLED');
+
+        // Record in daily_performance table
+        await recordSubtaskCancel(plan.id);
       }
     } catch (error) {
       console.error('Failed to update subtask:', error);

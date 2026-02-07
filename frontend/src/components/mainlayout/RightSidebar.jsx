@@ -11,7 +11,7 @@ export default function RightSidebar() {
 
       <section className="performance">
         <div className="performance-title">
-          Today’s Performance
+          Today's Performance
         </div>
         <TodayPieChart />
       </section>
