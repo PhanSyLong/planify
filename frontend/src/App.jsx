@@ -66,10 +66,9 @@ export default function App() {
             <Route path="/notifications" element={<Notification />} />
           </Route>
 
-          <Route path="/admin" element={<Admin />} />
-
         </Route>
         <Route path="/" element={<LogSign />} />
+        <Route path="/admin" element={<Admin />} />
 
       </Routes>
     </BrowserRouter>
