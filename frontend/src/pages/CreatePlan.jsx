@@ -48,6 +48,8 @@ const CreatePlan = () => {
     }],
   });
   const [showPreview, setShowPreview] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
 
   // Generic updater
@@ -58,12 +60,19 @@ const CreatePlan = () => {
     }));
   }, []);
 
-  const handleCreate = useCallback(async () => {
-    const { title, description, imageFile } = planData;
+  const handleCreateClick = useCallback(() => {
+    const { title } = planData;
     if (!title.trim()) {
       alert("Please enter a plan title");
       return;
     }
+    setShowConfirm(true);
+  }, [planData]);
+
+  const handleConfirmCreate = useCallback(async () => {
+    setShowConfirm(false);
+    setIsCreating(true);
+    const { title, description, imageFile } = planData;
 
     try {
       let reviewUrl = null;
@@ -170,6 +179,9 @@ const CreatePlan = () => {
 
     } catch (error) {
       console.error("Error creating plan:", error);
+      alert("Failed to create plan. Please try again.");
+    } finally {
+      setIsCreating(false);
     }
   }, [planData, navigate])
 
@@ -193,19 +205,40 @@ const CreatePlan = () => {
         <PlanInfo planData={planData} updatePlanData={updatePlanData} />
       </div>
 
-      {/* Action Buttons */}
       <div className="createplan-actions">
         <button className="review-btn" onClick={handlePreview}>
           Preview
         </button>
-        <button className="create-btn" onClick={handleCreate}>
-          Create
+        <button
+          className="create-btn"
+          onClick={handleCreateClick}
+          disabled={isCreating}
+        >
+          {isCreating ? 'Creating...' : 'Create'}
         </button>
       </div>
 
       {/* Preview Modal */}
       {showPreview && (
         <PreviewModal planData={planData} onClose={() => setShowPreview(false)} />
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal">
+            <h3>Create Plan</h3>
+            <p>Are you sure you want to create this plan?</p>
+            <div className="confirm-modal-actions">
+              <button className="confirm-no-btn" onClick={() => setShowConfirm(false)}>
+                Cancel
+              </button>
+              <button className="confirm-yes-btn" onClick={handleConfirmCreate}>
+                Yes, Create
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -8,7 +8,8 @@ import { useHydratedPlan } from '../../queries/useHydratedPlan';
 import { deletePlan, startPlan, completePlan } from '../../api/plan';
 import { startStage, completeStage } from '../../api/stage';
 import { startTask, completeTask } from '../../api/task';
-import { startSubtask, completeSubtask, updateSubtask } from '../../api/subtask';
+import { startSubtask, completeSubtask, updateSubtask, getSubtaskProgress } from '../../api/subtask';
+import { recordSubtaskStart, recordSubtaskDone, recordSubtaskCancel } from '../../api/dailyPerformance';
 import httpPublic from '../../api/httpPublic';
 import './ViewMyPlan.css';
 
@@ -22,6 +23,8 @@ const ViewMyPlan = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [reviewData, setReviewData] = useState({});
+  const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -72,62 +75,90 @@ const ViewMyPlan = () => {
     }
   }, [plan]);
 
-  // Calculate review statistics
-  const calculateReviewData = useCallback(() => {
-    if (!plan) return {};
+  // Fetch review statistics from backend
+  const fetchReviewData = useCallback(async () => {
+    if (!plan) return;
+
+    setIsLoadingReview(true);
 
     let totalSubtasks = 0;
     let cancelled = 0;
     let completedOnTime = 0;
     let completedLate = 0;
     let inProgress = 0;
-    let incomplete = 0;
+    let notStarted = 0;
 
-    plan.stages.forEach(stage => {
-      stage.tasks.forEach(task => {
-        if (task.subtasks) {
-          task.subtasks.forEach(subtask => {
-            totalSubtasks++;
+    try {
+      // Collect all subtask info for progress calls
+      const subtaskInfoList = [];
+      plan.stages.forEach((stage) => {
+        stage.tasks.forEach((task) => {
+          if (task.subtasks) {
+            task.subtasks.forEach((subtask) => {
+              if (typeof subtask === 'object' && subtask.id) {
+                subtaskInfoList.push({
+                  planId: plan.id,
+                  stageId: stage.id,
+                  taskId: task.id,
+                  subtaskId: subtask.id,
+                });
+              }
+            });
+          }
+        });
+      });
 
-            switch (subtask.status) {
-              case 'DONE':
-                if (subtask.completedAt && subtask.deadline) {
-                  const completed = new Date(subtask.completedAt);
-                  const deadline = new Date(subtask.deadline);
-                  if (completed <= deadline) {
-                    completedOnTime++;
-                  } else {
-                    completedLate++;
-                  }
-                } else {
-                  completedOnTime++;
-                }
-                break;
-              case 'CANCELLED':
-                cancelled++;
-                break;
-              case 'IN_PROGRESS':
-                inProgress++;
-                break;
-              case 'INCOMPLETE':
-                incomplete++;
-                break;
-              default:
-                incomplete++;
-            }
-          });
+      totalSubtasks = subtaskInfoList.length;
+
+      // Fetch progress for all subtasks in parallel
+      const progressPromises = subtaskInfoList.map((info) =>
+        getSubtaskProgress(info.planId, info.stageId, info.taskId, info.subtaskId)
+          .then((response) => response.data?.result)
+          .catch(() => null)
+      );
+
+      const progressResults = await Promise.all(progressPromises);
+
+      // Categorize by TimeStatus
+      progressResults.forEach((progress) => {
+        if (progress && progress.status) {
+          switch (progress.status) {
+            case 'CANCELLED':
+              cancelled++;
+              break;
+            case 'ON_TIME':
+              completedOnTime++;
+              break;
+            case 'LATE':
+              completedLate++;
+              break;
+            case 'IN_PROGRESS':
+              inProgress++;
+              break;
+            case 'NOT_STARTED':
+              notStarted++;
+              break;
+            default:
+              notStarted++;
+          }
+        } else {
+          notStarted++;
         }
       });
-    });
 
-    return {
-      totalSubtasks,
-      cancelled,
-      completedOnTime,
-      completedLate,
-      inProgress,
-      incomplete,
-    };
+      setReviewData({
+        totalSubtasks,
+        cancelled,
+        completedOnTime,
+        completedLate,
+        inProgress,
+        notStarted,
+      });
+    } catch (error) {
+      console.error('Error fetching review data:', error);
+    } finally {
+      setIsLoadingReview(false);
+    }
   }, [plan]);
 
   // Handle subtask status change
@@ -310,6 +341,9 @@ const ViewMyPlan = () => {
           updated.stages[stageIdx].tasks[taskIdx].subtasks[subtaskIdx].startedAt = new Date().toISOString();
           return updated;
         });
+
+        // Record in daily_performance table
+        await recordSubtaskStart(plan.id);
       } catch (error) {
         console.error('Failed to start subtask:', error);
         alert('Failed to start subtask. Please try again.');
@@ -382,6 +416,9 @@ const ViewMyPlan = () => {
           return updated;
         });
 
+        // Record in daily_performance table
+        await recordSubtaskStart(plan.id);
+
       } else if (type === 'done') {
         // Complete the subtask
         const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
@@ -418,6 +455,9 @@ const ViewMyPlan = () => {
 
         handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'DONE');
 
+        // Record in daily_performance table
+        await recordSubtaskDone(plan.id);
+
       } else if (type === 'cancel') {
         // Cancel the subtask
         const subtask = plan.stages[stageIdx]?.tasks[taskIdx]?.subtasks?.[subtaskIdx];
@@ -451,6 +491,9 @@ const ViewMyPlan = () => {
         }
 
         handleSubtaskStatusChange(stageIdx, taskIdx, subtaskIdx, 'CANCELLED');
+
+        // Record in daily_performance table
+        await recordSubtaskCancel(plan.id);
       }
     } catch (error) {
       console.error('Failed to update subtask:', error);
@@ -487,22 +530,14 @@ const ViewMyPlan = () => {
 
   if (isEditing) {
     // Pass the plan with full subtask objects to EditPlan
+    // Note: EditPlan handles its own preview modal internally
     return (
-      <>
-        <EditPlan
-          plan={plan}
-          setPlan={setPlan}
-          onPreview={handlePreview}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
-        {showPreview && (
-          <PreviewModal
-            planData={editedPlan}
-            onClose={() => setShowPreview(false)}
-          />
-        )}
-      </>
+      <EditPlan
+        plan={plan}
+        setPlan={setPlan}
+        onSave={handleSave}
+        onCancel={handleCancel}
+      />
     );
   }
 
@@ -515,14 +550,20 @@ const ViewMyPlan = () => {
 
         <div className="viewplan-actions">
           <div ref={reviewBtnRef} style={{ position: 'relative' }}>
-            <button className="btn-review" onClick={() => setShowReview(!showReview)}>
+            <button className="btn-review" onClick={() => {
+              setShowReview(!showReview);
+              if (!showReview) {
+                fetchReviewData();
+              }
+            }}>
               Review
             </button>
             <ReviewPlanPopup
               isOpen={showReview}
               onClose={() => setShowReview(false)}
               containerRef={reviewBtnRef}
-              reviewData={calculateReviewData()}
+              reviewData={reviewData}
+              isLoading={isLoadingReview}
             />
           </div>
           <button className="btn-edit" onClick={() => setIsEditing(true)} disabled={hasStartedAnySubtask}>

@@ -21,6 +21,8 @@ const ForkPlan = () => {
   const { data: fullPlan, isLoading } = useHydratedPlan(id);
   const [originalPlan, setOriginalPlan] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isForking, setIsForking] = useState(false);
   const [planData, setPlanData] = useState({
     title: '',
     description: '',
@@ -69,12 +71,19 @@ const ForkPlan = () => {
     if (id) loadOriginalPlan();
   }, [id, navigate]);
 
-  const handleCreate = useCallback(async () => {
-    const { title, description, imageFile } = planData;
+  const handleForkClick = useCallback(() => {
+    const { title } = planData;
     if (!title.trim()) {
       alert("Please enter a plan title");
       return;
     }
+    setShowConfirm(true);
+  }, [planData]);
+
+  const handleConfirmFork = useCallback(async () => {
+    setShowConfirm(false);
+    setIsForking(true);
+    const { title, description, imageFile } = planData;
 
     try {
       let reviewUrl = fullPlan.picture;
@@ -193,6 +202,8 @@ const ForkPlan = () => {
       addToast("error",
         err.response?.data?.message || err.message || "Forking failed!"
       );
+    } finally {
+      setIsForking(false);
     }
 
   }, [planData, id, navigate, fullPlan]);
@@ -247,8 +258,12 @@ const ForkPlan = () => {
           <button className="review-btn" onClick={handlePreview}>
             Preview
           </button>
-          <button className="create-btn" onClick={handleCreate}>
-            Fork Plan
+          <button
+            className="create-btn"
+            onClick={handleForkClick}
+            disabled={isForking}
+          >
+            {isForking ? 'Forking...' : 'Fork Plan'}
           </button>
         </div>
 
@@ -257,6 +272,24 @@ const ForkPlan = () => {
             planData={planData}
             onClose={() => setShowPreview(false)}
           />
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirm && (
+          <div className="confirm-modal-overlay">
+            <div className="confirm-modal">
+              <h3>Fork Plan</h3>
+              <p>Are you sure you want to create your personal copy of this plan?</p>
+              <div className="confirm-modal-actions">
+                <button className="confirm-no-btn" onClick={() => setShowConfirm(false)}>
+                  Cancel
+                </button>
+                <button className="confirm-yes-btn" onClick={handleConfirmFork}>
+                  Yes, Fork
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

@@ -23,3 +23,6 @@ export const completeSubtask = async (subtaskId) =>
 
 export const getTodoList = (userId) =>
     httpAuth.get(`/users/${userId}/todo`);
+
+export const getSubtaskProgress = (planId, stageId, taskId, subtaskId) =>
+    httpAuth.get(`/plans/${planId}/${stageId}/${taskId}/${subtaskId}/progress`);
