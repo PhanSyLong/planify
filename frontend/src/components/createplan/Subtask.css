@@ -76,6 +76,12 @@
   gap: 8px;
 }
 
+.duration-input input:focus {
+  outline: none;
+  border-color: #153677 !important;
+  box-shadow: 0 0 0 3px rgba(21, 54, 119, 0.15) !important;
+}
+
 .duration-input input {
   width: 100px;
 }
@@ -193,9 +199,14 @@
   .subtask-add-form {
     padding: 16px;
   }
+
   .subtask-add-btn {
     width: 100%;
     align-self: stretch;
     border-radius: 8px;
   }
+}
+
+textarea {
+  font-family: Arial, Helvetica, sans-serif;
 }

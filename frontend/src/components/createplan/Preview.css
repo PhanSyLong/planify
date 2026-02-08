@@ -17,6 +17,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -41,6 +42,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -199,4 +201,36 @@
   .preview-task {
     margin-left: 0;
   }
+}
+
+.preview-duration,
+.preview-visibility {
+  font-size: 14px;
+  color: #666;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.visibility-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.visibility-private {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.visibility-public {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.preview-stage-duration {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 12px;
 }

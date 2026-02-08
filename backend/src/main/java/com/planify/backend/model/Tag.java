@@ -19,7 +19,7 @@ public class Tag {
     @Column(name = "tag_name", nullable = false, length = 120)
     private String tagName;
 
-    @Column(name = "category", nullable = false,columnDefinition = "ENUM('subject', 'certificate')")
+    @Column(name = "category", nullable = false,columnDefinition = "ENUM('subject', 'certificate', 'other')")
     private String category;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)

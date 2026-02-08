@@ -205,7 +205,7 @@ DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag` (
   `id` int NOT NULL AUTO_INCREMENT,
   `tag_name` varchar(120) COLLATE utf8mb4_bin NOT NULL,
-  `category` enum('subject','certificate') COLLATE utf8mb4_bin NOT NULL,
+  `category` enum('subject','certificate','other') COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 

@@ -17,7 +17,7 @@ public interface UserMapper {
 
     UserResponse toUserResponse(User user);
 
-    //@Mapping(target = "username", ignore = true)  // Không cho phép update username
+    //@Mapping(target = "username", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userRoles", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request );

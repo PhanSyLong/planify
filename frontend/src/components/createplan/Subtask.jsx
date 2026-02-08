@@ -13,12 +13,14 @@ const Subtask = ({ subtasks, setSubtasks }) => {
       return;
     }
 
-    const duration = newDuration.trim() === "" ? "0" : newDuration.trim();
+    const duration = newDuration.trim() === "" ? 0 : parseInt(newDuration.trim(), 10) || 0;
 
     const newItem = {
+      tempId: crypto.randomUUID(),
       title,
       description: newDescription.trim(),
       duration,
+      status: 'incompleted',
     };
 
     setSubtasks([...subtasks, newItem]);
@@ -90,13 +92,12 @@ const Subtask = ({ subtasks, setSubtasks }) => {
         </button>
       </div>
 
-      {/* List of subtasks – không hiển thị total nữa */}
+      {/* List of subtasks with editable fields */}
       {subtasks.length > 0 && (
         <div className="subtask-list">
-          {subtasks.map((sub, index) => (
-            <div key={index} className="subtask-item">
+          {subtasks.filter(sub => sub != null).map((sub, index) => (
+            <div key={sub.id || sub.tempId || index} className="subtask-item">
               <div className="subtask-header">
-                <div className="subtask-title">{sub.title}</div>
                 <button
                   className="subtask-remove-btn"
                   onClick={() => removeSubtask(index)}
@@ -106,25 +107,43 @@ const Subtask = ({ subtasks, setSubtasks }) => {
                 </button>
               </div>
 
-              {sub.description && (
-                <div className="subtask-description">{sub.description}</div>
-              )}
+              {/* Editable Title */}
+              <div className="subtask-field">
+                <label>Title</label>
+                <input
+                  type="text"
+                  value={sub.title || ""}
+                  onChange={(e) => updateSubtask(index, "title", e.target.value)}
+                  placeholder="Subtask title"
+                />
+              </div>
 
+              {/* Editable Description */}
+              <div className="subtask-field">
+                <label>Description</label>
+                <textarea
+                  value={sub.description || ""}
+                  onChange={(e) => updateSubtask(index, "description", e.target.value)}
+                  placeholder="Description (optional)"
+                  rows={2}
+                />
+              </div>
+
+              {/* Editable Duration */}
               <div className="subtask-duration">
                 <span className="duration-label">Duration:</span>
                 <input
                   type="number"
                   min="0"
-                  value={sub.duration}
+                  value={sub.duration || 0}
                   onChange={(e) =>
-                    updateSubtask(index, "duration", e.target.value)
+                    updateSubtask(index, "duration", parseInt(e.target.value) || 0)
                   }
                 />
                 <span className="duration-unit">days</span>
               </div>
             </div>
           ))}
-          {/* Đã xóa phần total-duration ở đây */}
         </div>
       )}
     </div>

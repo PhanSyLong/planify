@@ -4,12 +4,7 @@
   top: calc(100% + 8px);
   right: 0;
 
-  /* Make it ignore parent's padding/margin better */
-  transform: translateX(0);           /* reset any inherited transform */
-  margin-right: 0 !important;         /* fight any external margin */
-
   width: 320px;
-  max-width: 95vw;                    /* ← prevent overflow on small screens */
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -18,36 +13,11 @@
   user-select: none;
 
   container-type: inline-size;
-  animation: fadeSlide 0.18s ease-out;
-
-  /* Very important additions: */
-  z-index: 1000;                      /* make sure it's above everything */
-  pointer-events: auto;               /* make sure clicks work properly */
+  animation: userDropdownSlide 0.18s ease-out;
 }
 
-/* Prevent it from going off-screen on the right on very small screens */
-@container (max-width: 360px) {
-  .user-dd {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);      /* center it when too narrow */
-    width: calc(100vw - 32px);        /* almost full width with safe margin */
-  }
-}
-
-/* Optional: stronger positioning when trigger is near the right edge */
-.popup-trigger {
-  position: relative;                 /* already good */
-}
-
-/* If you want it to always hug the right edge of viewport (aggressive version) */
-.user-dd.force-right {
-  right: 12px !important;             /* fixed distance from right edge of screen */
-  left: auto !important;
-}
-
-/* Animation matches other dropdowns */
-@keyframes fadeSlide {
+/* Animation riêng cho user dropdown */
+@keyframes userDropdownSlide {
   from {
     opacity: 0;
     transform: translateY(-6px);

@@ -14,7 +14,7 @@ const About = () => {
 
       {/* Our Story */}
       <section className="section story">
-        <div className="container">
+        <div className="about-container">
           <div className="grid two-columns reverse-on-mobile">
             <div className="story-text">
               <h2 className="section-title">Our Story</h2>
@@ -45,7 +45,7 @@ const About = () => {
 
       {/* Mission, Vision, Values */}
       <section className="section cards bg-light">
-        <div className="container">
+        <div className="about-container">
           <div className="grid three-columns">
             <div className="card text-center">
               <div className="card-icon">🎯</div>
@@ -74,7 +74,7 @@ const About = () => {
 
       {/* Features */}
       <section className="section features">
-        <div className="container">
+        <div className="about-container">
           <h2 className="section-title text-center">What Makes Planify Special</h2>
           <div className="grid two-columns">
             <div className="feature-item">
@@ -95,17 +95,12 @@ const About = () => {
 
       {/* Footer / CTA */}
       <section className="section cta text-center bg-light">
-        <div className="container">
+        <div className="about-container">
           <p className="lead">
             Planify is proudly developed by a passionate team of students as part of <strong>Group Project B3</strong>,<br />
             using modern technologies: React.js, Spring Boot, MySQL, and Agile methodology.
           </p>
-          <p style={{ marginTop: '32px' }}>
-            Ready to simplify your learning journey?<br /><br />
-            <a href="/logout" className="btn-primary">
-              Join Planify Today
-            </a>
-          </p>
+
         </div>
       </section>
     </div>

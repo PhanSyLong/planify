@@ -15,7 +15,6 @@ const ExploreHeader = ({ activeTab, setActiveTab, onSearch }) => {
   const handleSearch = useCallback((e) => {
     e.preventDefault();
     onSearch(searchTerm);
-    // TODO: Implement actual search
   }, [searchTerm, onSearch]);
 
   const handleSearchChange = useCallback((e) => {

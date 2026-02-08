@@ -1,7 +1,8 @@
 .notification-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   right: 0;
+  left: auto;
   width: 380px;
   max-height: 80vh;
   background: white;
@@ -9,11 +10,17 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   z-index: 1000;
-  animation: fadeSlide 0.18s ease-out;
   user-select: none;
+
+  /* Đổi tên animation */
+  opacity: 0;
+  transform: translateY(-6px);
+  animation: notificationSlide 0.18s ease-out forwards;
+  transform-origin: top right;
 }
 
-@keyframes fadeSlide {
+/* Đổi tên keyframes */
+@keyframes notificationSlide {
   from {
     opacity: 0;
     transform: translateY(-6px);
@@ -24,6 +31,7 @@
   }
 }
 
+/* Phần còn lại giữ nguyên */
 .notification-header {
   display: flex;
   justify-content: space-between;

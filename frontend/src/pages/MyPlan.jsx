@@ -1,110 +1,28 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Carousel from '../components/plans/Carousel.jsx';
 import PlanList from '../components/plans/PlanList.jsx';
 import './MyPlan.css';
-
-// ============================================================================
-// MOCK BACKEND SERVICE
-// ============================================================================
-const PlanService = {
-  async getUserPlans(userId) {
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    return {
-      recentlyOpened: [
-        {
-          id: 'my-recent-1',
-          title: 'Morning Workout Routine',
-          duration: '30 days • Fitness',
-          authorId: userId,
-          createdAt: new Date('2024-12-15'),
-          lastOpened: new Date('2024-12-18')
-        }
-      ],
-      inProgress: [
-        {
-          id: 'my-progress-1',
-          title: 'Learn React Advanced',
-          duration: '60 days • Programming',
-          authorId: userId,
-          createdAt: new Date('2024-12-10'),
-          status: 'in-progress',
-          progress: 45
-        }
-      ],
-      allPlans: [
-        {
-          id: 'my-recent-1',
-          title: 'Morning Workout Routine',
-          duration: '30 days • Fitness',
-          authorId: userId,
-          createdAt: new Date('2024-12-15'),
-          lastOpened: new Date('2024-12-18')
-        },
-        {
-          id: 'my-progress-1',
-          title: 'Learn React Advanced',
-          duration: '60 days • Programming',
-          authorId: userId,
-          createdAt: new Date('2024-12-10'),
-          status: 'in-progress',
-          progress: 45
-        },
-        {
-          id: 'my-all-1',
-          title: 'Healthy Meal Planning',
-          duration: '14 days • Nutrition',
-          authorId: userId,
-          createdAt: new Date('2024-12-05')
-        }
-      ]
-    };
-  }
-};
+import { usePlans } from '../queries/usePlans.js';
 
 const MyPlan = () => {
   const [fullView, setFullView] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [planData, setPlanData] = useState({
-    recentlyOpened: [],
-    inProgress: [],
-    allPlans: []
+  const { data: plans, isLoading, isError } = usePlans();
+  const currentUserId = Number(localStorage.getItem("userId"));
+
+  const allPlans = useMemo(() => {
+    if (isLoading) return [];
+    return plans.filter(plan => plan.ownerId === currentUserId);
+  }, [plans, currentUserId, isLoading]);
+
+  const inProgressPlans = useMemo(() => {
+    if (isLoading) return [];
+    return allPlans.filter(plan => plan.status === "incompleted");
+  }, [allPlans, isLoading]);
+
+  const recentPlans = useMemo (() => {
+    const raw = localStorage.getItem("recentPlans");
+    return raw ? JSON.parse(raw) : [];
   });
-
-  const currentUserId = useMemo(() => 'user123', []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchPlans = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await PlanService.getUserPlans(currentUserId);
-
-        if (isMounted) {
-          setPlanData(data);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err.message);
-          console.error('Failed to fetch plans:', err);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPlans();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentUserId]);
 
   const handleViewMore = useCallback((title, items) => {
     setFullView({ title, items });
@@ -115,7 +33,7 @@ const MyPlan = () => {
   }, []);
 
   // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="loading-container">
         <div className="loading-content">
@@ -127,7 +45,7 @@ const MyPlan = () => {
   }
 
   // Error state
-  if (error) {
+  if (isError) {
     return (
       <div className="loading-container">
         <div className="loading-content">
@@ -158,17 +76,17 @@ const MyPlan = () => {
     <div className="myplan-container">
       <Carousel
         title="Recently Opened"
-        items={planData.recentlyOpened}
-        onViewMore={() => handleViewMore('Recently Opened', planData.recentlyOpened)}
+        items={recentPlans}
+        onViewMore={() => handleViewMore('Recently Opened', recentPlans)}
       />
 
       <Carousel
         title="In Progress"
-        items={planData.inProgress}
-        onViewMore={() => handleViewMore('In Progress', planData.inProgress)}
+        items={inProgressPlans}
+        onViewMore={() => handleViewMore('In Progress', inProgressPlans)}
       />
 
-      <PlanList plans={planData.allPlans} />
+      <PlanList plans={allPlans} />
     </div>
   );
 };

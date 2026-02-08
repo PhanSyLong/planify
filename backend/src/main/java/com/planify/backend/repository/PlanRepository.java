@@ -63,7 +63,7 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
     List<Plan> findByTagNames(
             @Param("tagNames") List<String> tagNames,
             @Param("tagCount") long tagCount
-        );
+    );
 
     @Query("""
     SELECT DISTINCT p FROM Plan p
@@ -79,6 +79,7 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
             @Param("tagNames") List<String> tagNames,
             @Param("tagCount") long tagCount
     );
+
 
 
     @Modifying

@@ -1,6 +1,7 @@
 package com.planify.backend.service;
 
 import com.planify.backend.dto.request.StageRequest;
+import com.planify.backend.dto.request.StageUpdateRequest;
 import com.planify.backend.dto.response.ProgressResponse;
 import com.planify.backend.exception.AppException;
 import com.planify.backend.exception.ErrorCode;
@@ -13,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -37,6 +39,7 @@ public class StageService {
     }
 
     // New: remove a stage by planId and stageId, ensuring it belongs to the plan
+    @Transactional
     public void removeStageByPlanIdAndStageId(Integer planId, Integer stageId) {
         Stage stage = stageRepository.findStageByIdAndPlanId(stageId, planId);
         if (stage == null) {
@@ -44,6 +47,9 @@ public class StageService {
         }
 
         stageRepository.delete(stage);
+
+        Long planDuration = stageRepository.sumDurationByPlanId(planId);
+        planRepository.updateDuration(planId, planDuration);
     }
 
     // New: get all stages for a given plan
@@ -57,7 +63,7 @@ public class StageService {
     }
 
     // New: partial update for Stage
-    public Stage updateStagePartial(Integer stageId, com.planify.backend.dto.request.StageUpdateRequest request) {
+    public Stage updateStagePartial(Integer stageId, StageUpdateRequest request) {
         Stage stage = stageRepository.findStageById(stageId);
         if (stage == null) {
             throw new AppException(ErrorCode.STAGE_NOT_FOUND);
@@ -116,9 +122,7 @@ public class StageService {
         );
         TimeStatus status;
 
-        if (actualDuration < stage.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > stage.getDuration()) {
+        if (actualDuration > stage.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;

@@ -119,7 +119,9 @@ public class AuthenticationService {
         if(user.getUserRoles() != null) {
             user.getUserRoles()
                     .stream()
-                    .filter(ur -> ur != null && ur.getRole() != null && ur.getRole().getName() != null)
+                    .filter(ur -> ur != null &&
+                            ur.getRole() != null &&
+                            ur.getRole().getName() != null)
                     .forEach(ur -> stringJoiner.add(ur.getRole().getName().name()));
         }
 

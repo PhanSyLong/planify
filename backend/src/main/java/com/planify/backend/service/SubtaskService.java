@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
@@ -46,10 +47,19 @@ public class SubtaskService {
         // Save the new subtask
         Subtask saved = subtaskRepository.save(subtask);
 
-        // Detach all entities to prevent cascading issues
-        taskRepository.flush();
-
         // Recompute and persist durations up the chain: Task -> Stage -> Plan
+        // Use a separate transaction to avoid deadlock during concurrent subtask creation
+        updateDurationsAfterSubtaskAdd(task);
+
+        return saved;
+    }
+
+    /**
+     * Update durations without holding locks on multiple rows simultaneously.
+     * Called separately from subtask insertion to avoid deadlock in concurrent scenarios.
+     */
+    @Transactional
+    public void updateDurationsAfterSubtaskAdd(Task task) {
         Integer taskDuration = subtaskRepository.sumDurationByTaskId(task.getId());
         taskRepository.updateDuration(task.getId(), taskDuration);
 
@@ -64,8 +74,6 @@ public class SubtaskService {
                 planRepository.updateDuration(plan.getId(), planDuration);
             }
         }
-
-        return saved;
     }
 
     @Transactional
@@ -151,11 +159,19 @@ public class SubtaskService {
             );
         }
         if (subtask.getCompleted_at() == null) {
-            return new ProgressResponse(
-                    0,
-                    subtask.getDuration(),
-                    TimeStatus.IN_PROGRESS
-            );
+            if (Objects.equals(subtask.getStatus(), "cancelled")) {
+                return new ProgressResponse(
+                        0,
+                        subtask.getDuration(),
+                        TimeStatus.CANCELLED
+                );
+            } else {
+                return new ProgressResponse(
+                        0,
+                        subtask.getDuration(),
+                        TimeStatus.IN_PROGRESS
+                );
+            }
         }
 
         long actualDuration = TimeCalculator.calculateActualDays(
@@ -164,9 +180,7 @@ public class SubtaskService {
         );
         TimeStatus status;
 
-        if (actualDuration < subtask.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > subtask.getDuration()) {
+        if (actualDuration > subtask.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;
@@ -207,8 +221,10 @@ public class SubtaskService {
             if (!request.getDuration().equals(oldDuration)) {
                 subtask.setDuration(request.getDuration());
                 LocalDateTime startDate = subtask.getStarted_at();
-                LocalDateTime endDate = startDate.plusDays(request.getDuration());
-                subtask.setScheduledDate(endDate);
+                if (startDate != null) {
+                    LocalDateTime endDate = startDate.plusDays(request.getDuration());
+                    subtask.setScheduledDate(endDate);
+                }
                 durationChanged = true;
             }
         }

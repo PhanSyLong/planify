@@ -1,39 +1,89 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Stage from '../createplan/Stage';
+import httpPublic from '../../api/httpPublic';
 import './EditPlanInfo.css';
 
-const CATEGORIES = [
-  'Study', 'Work', 'Personal', 'Health', 'Fitness',
-  'Language', 'Exam', 'Project'
-];
+const TAG_GROUPS = {
+  subject: [
+    "Math", "Physics", "Chemistry", "Literature", "English",
+    "Biology", "History", "Geography", "Computer Science"
+  ],
+  certificate: [
+    "IELTS", "TOEIC", "VSTEP", "SAT", "IELTS UKVI", "TOPIK"
+  ],
+  other: [
+    "Soft Skills", "Programming", "Design", "Marketing", "Foreign Languages"
+  ],
+};
 
 const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
   const [planTitle, setPlanTitle] = useState(initialPlan.title || '');
   const [planDescription, setPlanDescription] = useState(initialPlan.description || '');
-  const [stages, setStages] = useState(
-    initialPlan.stages?.length > 0
-      ? initialPlan.stages.map(stage => ({ ...stage }))
-      : [{ title: '', description: '', tasks: [] }]
-  );
+  const [planPicture, setPlanPicture] = useState(initialPlan.picture || null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [showCategories, setShowCategories] = useState(false);
+  const [stages, setStages] = useState(() => {
+    if (initialPlan.stages?.length > 0) {
+      // Deep copy stages with all nested tasks and subtasks
+      return initialPlan.stages.map(stage => ({
+        ...stage,
+        tasks: (stage.tasks || []).map(task => ({
+          ...task,
+          subtasks: (task.subtasks || []).map(subtask => ({ ...subtask }))
+        }))
+      }));
+    }
+    return [{ title: '', description: '', tasks: [] }];
+  });
   const [selectedCategories, setSelectedCategories] = useState(
     initialPlan.categories || []
   );
+  const [visibility, setVisibility] = useState(
+    initialPlan.visibility || 'private'
+  );
+
+  const fileInputRef = useRef(null);
+
+  // Set initial image preview from existing plan picture
+  useEffect(() => {
+    if (initialPlan.picture && !imagePreview) {
+      setImagePreview(`${httpPublic.defaults.baseURL}${initialPlan.picture}`);
+    }
+  }, [initialPlan.picture, imagePreview]);
 
   // Update parent whenever state changes
   useEffect(() => {
     const updatedPlan = {
+      ...initialPlan,
       title: planTitle,
       description: planDescription,
+      picture: planPicture,
       categories: selectedCategories,
+      visibility: visibility,
       stages: stages.filter(stage =>
         stage.title || stage.description || (stage.tasks?.length > 0)
       )
     };
     onPlanChange?.(updatedPlan);
-  }, [planTitle, planDescription, selectedCategories, stages, onPlanChange]);
+  }, [planTitle, planDescription, planPicture, selectedCategories, visibility, stages, onPlanChange, initialPlan]);
+
+  const handleImageChange = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // Store file for upload - the parent component will handle the actual upload
+      setPlanPicture(file);
+    }
+  }, []);
+
+  const handleImageClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   const addStage = useCallback(() => {
-    setStages(prev => [...prev, { title: '', description: '', tasks: [] }]);
+    setStages(prev => [...prev, { tempId: crypto.randomUUID(), title: '', description: '', tasks: [] }]);
   }, []);
 
   const updateStage = useCallback((index, updatedStage) => {
@@ -62,6 +112,14 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
     );
   }, []);
 
+  // Tính tổng duration của plan từ tất cả stages
+  const computedPlanDuration = useMemo(() => {
+    return stages.reduce((total, stage) => {
+      const stageDuration = stage.tasks.reduce((sum, task) => sum + Number(task.duration || 0), 0);
+      return total + stageDuration;
+    }, 0);
+  }, [stages]);
+
   return (
     <div className="planinfo-wrapper">
       {/* Title */}
@@ -78,9 +136,32 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
 
       {/* Info Card */}
       <div className="planinfo-card">
-        <div className="image-upload">
-          <input type="file" accept="image/*" />
-          <span>Upload Image</span>
+        <div className="image-upload" onClick={handleImageClick}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+          />
+          {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Plan preview"
+              className="image-preview"
+            />
+          ) : (
+            <>
+              <div className="upload-placeholder">
+                <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span>Upload Image</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="planinfo-right">
@@ -94,21 +175,77 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
           </div>
 
           <div className="categories-section">
-            <button className="categories-btn" type="button">
-              Categories ({selectedCategories.length})
+            <button
+              className="categories-btn"
+              type="button"
+              onClick={() => setShowCategories(!showCategories)}
+            >
+              {showCategories ? 'Hide Categories' : 'Select Categories'}
+              {selectedCategories.length > 0 && ` (${selectedCategories.length})`}
             </button>
 
-            <div className="categories-popup">
-              {CATEGORIES.map(cat => (
-                <span
-                  key={cat}
-                  className={`category-tag ${selectedCategories.includes(cat) ? 'active' : ''}`}
-                  onClick={() => toggleCategory(cat)}
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
+            {showCategories && (
+              <div className="categories-popup">
+                {Object.entries(TAG_GROUPS).map(([groupName, tags]) => (
+                  <div key={groupName} className="tag-group">
+                    <div className="tag-group-title">{groupName}</div>
+                    <div className="tag-group-items">
+                      {tags.map(tag => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`category-tag ${selectedCategories.includes(tag) ? 'active' : ''}`}
+                          onClick={() => toggleCategory(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="plan-duration-visibility-container">
+        <div className="plan-duration-card">
+          <label>Duration</label>
+          <div className="duration-input">
+            <input
+              type="number"
+              value={computedPlanDuration}
+              readOnly
+              disabled
+            />
+            <span className="duration-unit">days</span>
+          </div>
+        </div>
+
+        <div className="plan-visibility-card">
+          <label>Visibility</label>
+          <div className="visibility-options">
+            <label className="visibility-option">
+              <input
+                type="radio"
+                name="edit-visibility"
+                value="private"
+                checked={visibility === 'private'}
+                onChange={() => setVisibility('private')}
+              />
+              <span>Private</span>
+            </label>
+            <label className="visibility-option">
+              <input
+                type="radio"
+                name="edit-visibility"
+                value="public"
+                checked={visibility === 'public'}
+                onChange={() => setVisibility('public')}
+              />
+              <span>Public</span>
+            </label>
           </div>
         </div>
       </div>
@@ -117,8 +254,9 @@ const EditPlanInfo = ({ initialPlan = {}, onPlanChange }) => {
       <div className="stage-list">
         {stages.map((stage, index) => (
           <Stage
-            key={index}
+            key={stage.id || stage.tempId || index}
             stage={stage}
+            stageNumber={index + 1}
             updateStage={(updated) => updateStage(index, updated)}
             deleteStage={() => deleteStage(index)}
           />

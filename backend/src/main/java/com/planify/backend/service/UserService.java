@@ -86,7 +86,7 @@ public class UserService {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    //@PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<UserResponse> getUsers(){
         log.info("In method get User");
         return userRepository.findAll().stream()
@@ -94,7 +94,7 @@ public class UserService {
                 .toList();
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    //@PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public UserResponse getUser(Integer id){
         return buildUserResponse(userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED))

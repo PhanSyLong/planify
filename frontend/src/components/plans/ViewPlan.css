@@ -192,8 +192,14 @@
 
 .stage-description {
   color: #666;
-  margin: 12px 0 20px;
+  margin: 8px 0 12px;
   line-height: 1.6;
+}
+
+.stage-duration {
+  color: #1e8a4b;
+  font-weight: 600;
+  margin: 8px 0 12px;
 }
 
 .stage-tasks {
@@ -208,7 +214,7 @@
 }
 
 .task-header {
-  margin-bottom: 8px;
+  margin: 8px 0 12px;
 }
 
 .task-title {
@@ -251,11 +257,48 @@
   margin-bottom: 4px;
 }
 
+.subtask-duration {
+  margin: 8px 0 8px 0;
+  color: #2B818C;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .no-stages {
   color: #888;
   font-style: italic;
   text-align: center;
   padding: 40px;
+}
+
+
+/* TOAST NOTIFICATIONS */
+.toasts {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  min-width: 300px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s ease-out;
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.toast.success {
+  background-color: #27ae60;
 }
 
 /* Loading & Error */
@@ -280,7 +323,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .viewplan-error button {
@@ -347,4 +392,63 @@
   .btn-fork {
     width: 100%;
   }
+}
+
+/* ==================== LIKE BUTTON IN HEADER ==================== */
+.viewplan-actions .like-btn {
+  position: static !important;
+  width: auto;
+  height: auto;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 1rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.viewplan-actions .like-btn:hover {
+  background: #f1f5f9 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.viewplan-actions .bookmark-icon {
+  font-size: 22px;
+  color: #64748b;
+}
+
+.viewplan-actions .like-btn.saved .bookmark-icon {
+  color: #3b82f6;           /* hoặc màu bạn thích: #e11d48, #f59e0b, ... */
+}
+
+.viewplan-actions .like-btn:hover .bookmark-icon {
+  color: #1e40af;
+}
+
+/* Nút Fork Plan */
+.btn-fork {
+  padding: 10px 20px;
+  background: #6366f1;          /* Indigo - bạn có thể đổi thành #3498db nếu thích */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  height: 42px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.btn-fork:hover {
+  background: #4f46e5;
+}
+
+.btn-fork:active {
+  background: #4338ca;
 }

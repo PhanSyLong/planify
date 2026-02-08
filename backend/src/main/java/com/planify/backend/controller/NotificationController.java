@@ -7,6 +7,7 @@ import com.planify.backend.dto.response.NotificationResponse;
 import com.planify.backend.mapper.NotificationMapper;
 import com.planify.backend.model.Notification;
 import com.planify.backend.service.DailyNotificationService;
+import com.planify.backend.service.DailyPerformanceService;
 import com.planify.backend.service.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -30,7 +32,8 @@ import java.util.List;
 public class NotificationController {
     NotificationService notificationService;
     NotificationMapper notificationMapper;
-    DailyNotificationService  dailyNotificationService;
+    DailyNotificationService dailyNotificationService;
+    DailyPerformanceService dailyPerformanceService;
 
     @PostMapping("/notifications")
     ResponseEntity<ApiResponse<NotificationResponse>> addNotification(@RequestBody NotificationRequest request) {
@@ -45,7 +48,8 @@ public class NotificationController {
     }
 
     @PostMapping("/notifications/send")
-    ResponseEntity<ApiResponse<NotificationResponse>> sendEmailNotification(@RequestBody NotificationRequest request, @RequestParam String title) {
+    ResponseEntity<ApiResponse<NotificationResponse>> sendEmailNotification(@RequestBody NotificationRequest request,
+            @RequestParam String title) {
         Notification notif = notificationService.sendEmailNotification(request, null, title);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -77,6 +81,7 @@ public class NotificationController {
                         .message("Notification removed successfully")
                         .build());
     }
+
     @GetMapping(value = "/notifications/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(@AuthenticationPrincipal Jwt jwt) {
         Long userId = jwt.getClaim("userId");
@@ -87,6 +92,45 @@ public class NotificationController {
     public DailyPerformanceResponse getToday(@AuthenticationPrincipal Jwt jwt) {
         Long userId = jwt.getClaim("userId");
         return dailyNotificationService.getToday(userId);
+    }
+
+    @PostMapping("/daily-performance/start")
+    public ResponseEntity<?> recordSubtaskStart(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam Integer planId) {
+        Long userId = jwt.getClaim("userId");
+        dailyPerformanceService.recordSubtaskStart(userId, planId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/daily-performance/done")
+    public ResponseEntity<?> recordSubtaskDone(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam Integer planId) {
+        Long userId = jwt.getClaim("userId");
+        dailyPerformanceService.recordSubtaskDone(userId, planId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/daily-performance/cancel")
+    public ResponseEntity<?> recordSubtaskCancel(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam Integer planId) {
+        Long userId = jwt.getClaim("userId");
+        dailyPerformanceService.recordSubtaskCancel(userId, planId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/daily-performance/weekly")
+    public List<DailyPerformanceResponse> getWeeklyPerformance(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        Long userId = jwt.getClaim("userId");
+        return dailyPerformanceService.getWeeklyPerformance(
+                userId,
+                LocalDate.parse(startDate),
+                LocalDate.parse(endDate));
     }
 
 }

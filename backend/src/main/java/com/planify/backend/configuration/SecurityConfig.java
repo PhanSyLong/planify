@@ -33,19 +33,7 @@ public class SecurityConfig {
     public SecurityConfig(@Lazy CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;
     }
-//    @Bean
-//    public BearerTokenResolver bearerTokenResolver() {
-//        return request -> {
-//            if (request.getCookies() == null) return null;
-//
-//            for (Cookie c : request.getCookies()) {
-//                if ("access_token".equals(c.getName())) {
-//                    return c.getValue(); // 👈 JWT lấy từ cookie
-//                }
-//            }
-//            return null;
-//        };
-//    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain sseFilterChain(HttpSecurity http) throws Exception {
@@ -67,29 +55,36 @@ public class SecurityConfig {
                                 })
                                 .jwt(jwt -> jwt.decoder(customJwtDecoder))
                 );
-
-        return http.build();
-        }
-
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 ->
-                                oauth2.jwt(jwt -> jwt.decoder(customJwtDecoder))
-                        //  đọc Authorization header
-                );
-
         return http.build();
     }
 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+        httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)//Cái này nó sẽ bảo vệ app của bạn khỏi attach 2 , ở đây mình không cần nên mình tắt nó đi
+
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/planify/notifications/stream").authenticated()
+                        .anyRequest().authenticated());
+
+        //Đến phần security của phương thức GET token , chúng ta sẽ cấu hình rằng : Nếu User mà có một token hợp lệ thì sẽ Get được
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2
+//                        // lấy JWT từ cookie
+//                        .bearerTokenResolver(bearerTokenResolver())
+
+                        // decode + verify JWT
+                        .jwt(jwtConfigurer ->
+                                jwtConfigurer.decoder(customJwtDecoder)
+                        ) //decoder : Chuyển đổi chuỗi JWT thành object để đọc thông tin bên trong:)
+        );
+
+
+        return httpSecurity.build();
+    }
 
 
     @Bean

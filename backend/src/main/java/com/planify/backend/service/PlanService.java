@@ -90,17 +90,6 @@ public class PlanService {
         return plan;
     }
 
-    public Plan getPlanByName(String name) {
-        Plan plan = planRepository.findPlanByName(name);
-        boolean isPublic = "public".equals(plan.getVisibility());
-
-        if (!isPublic && jwtUserContext.neitherPlanOwnerNorAdmin(plan)) {
-            // Hide the plan completely
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found");
-        }
-        return plan;
-    }
-
     public List<Plan> getPlanByUser(Integer userId) {
         List<Plan> plans = planRepository.findPlanByUserId(userId);
         return plans.stream()
@@ -138,7 +127,6 @@ public class PlanService {
             return planRepository.findByTagNames(tags,tags.size());
         }
 
-        // 👇 có cả query + tag
         return planRepository.searchByQueryAndTags(query, tags,tags.size());
     }
 
@@ -153,6 +141,7 @@ public class PlanService {
 
         if (request.getTitle() != null) plan.setTitle(request.getTitle());
         if (request.getDescription() != null) plan.setDescription(request.getDescription());
+        if (request.getVisibility() != null) plan.setVisibility(request.getVisibility());
         if (request.getPicture() != null) plan.setPicture(request.getPicture());
         if (request.getStatus() != null) plan.setStatus(request.getStatus());
 
@@ -207,9 +196,7 @@ public class PlanService {
         );
         TimeStatus status;
 
-        if (actualDuration < plan.getDuration()) {
-            status = TimeStatus.EARLY;
-        } else if (actualDuration > plan.getDuration()) {
+        if (actualDuration > plan.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;

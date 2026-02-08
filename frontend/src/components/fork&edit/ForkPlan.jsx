@@ -1,117 +1,212 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PlanInfo from "../createplan/PlanInfo";
-import PreviewModal from "../createplan/Preview.jsx";
+import PreviewModal from "../createplan/Preview";
+import { useHydratedPlan } from '../../queries/useHydratedPlan';
+import { createPlan, addForkRecord } from '../../api/plan.js';
+import { createStage } from "../../api/stage.js";
+import { createTask } from "../../api/task";
+import { createSubtask } from "../../api/subtask";
+import { uploadImage } from "../../api/image";
+import { setTagsForPlan } from "../../api/tag";
+import httpPublic from '../../api/httpPublic.js';
+
 import './ForkPlan.css';
 
-// Mock data - in real app, replace with API call
-const MOCK_PLANS = {
-  'plan-1': {
-    title: 'IELTS Speaking Mastery',
-    description: 'A complete 8-week program designed to help you achieve Band 7+ in IELTS Speaking. Includes daily practice, feedback tips, and real exam simulations.',
-    reviewUrl: null,
-    categories: ['Language', 'Exam', 'English'],
-    stages: [
-      {
-        title: 'Week 1-2: Fluency & Coherence',
-        description: 'Build confidence and natural speaking flow.',
-        tasks: [
-          {
-            title: 'Daily Topic Practice',
-            description: 'Speak on 3 Part 1 topics every day.',
-            duration: '14',
-            subtasks: ['Record yourself', 'Note new vocabulary', 'Self-evaluate fluency'],
-          },
-          {
-            title: 'Long Turn Practice',
-            description: 'Practice Part 2 cue cards.',
-            duration: '14',
-            subtasks: ['Time yourself (2 min)', 'Use linking words'],
-          },
-        ],
-      },
-      {
-        title: 'Week 3-4: Lexical Resource',
-        description: 'Expand vocabulary and use idiomatic language.',
-        tasks: [
-          {
-            title: 'Themed Vocabulary Lists',
-            description: 'Learn 20 new words/phrases per theme.',
-            duration: '14',
-            subtasks: ['Environment', 'Technology', 'Education', 'Health'],
-          },
-        ],
-      },
-    ],
-  },
-  // Add more plans as needed
-};
 
 const ForkPlan = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [loading, setLoading] = useState(true);
+  const [toasts, setToasts] = useState([]);
+  const { data: fullPlan, isLoading } = useHydratedPlan(id);
   const [originalPlan, setOriginalPlan] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isForking, setIsForking] = useState(false);
   const [planData, setPlanData] = useState({
     title: '',
     description: '',
     categories: [],
-    stages: [{ title: '', description: '', tasks: [] }],
-    reviewUrl: null,
+    visibility: 'private',
+    status: 'incompleted',
+    duration: 0,
+    imageFile: null,
+    reviewUrl: '',
+    stages: [],
   });
-  const [showPreview, setShowPreview] = useState(false);
+
+  const addToast = (type, message) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message }]);
+
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
 
   // Load original plan and pre-fill form
   useEffect(() => {
     const loadOriginalPlan = async () => {
-      setLoading(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 500)); // simulate network
-
-        const foundPlan = MOCK_PLANS[id];
-
-        if (!foundPlan) {
+        if (!fullPlan) {
           alert('Plan not found');
           navigate('/plans', { replace: true });
           return;
         }
-
-        setOriginalPlan(foundPlan);
+        setOriginalPlan(fullPlan);
 
         // Pre-fill with a copy, but change title to indicate it's a fork
         setPlanData({
-          ...foundPlan,
-          title: `Copy of ${foundPlan.title}`,
-          // reviewUrl: foundPlan.reviewUrl, // keep original image (or set null if you prefer)
+          ...fullPlan,
+          title: `Copy of ${fullPlan.title}`,
+          reviewUrl: `${httpPublic.defaults.baseURL}${fullPlan.picture}`,
         });
       } catch (err) {
         console.error(err);
         alert('Failed to load plan');
         navigate(-1);
-      } finally {
-        setLoading(false);
       }
     };
 
     if (id) loadOriginalPlan();
   }, [id, navigate]);
 
-  const handleCreate = useCallback(() => {
-    if (!planData.title.trim()) {
+  const handleForkClick = useCallback(() => {
+    const { title } = planData;
+    if (!title.trim()) {
       alert("Please enter a plan title");
       return;
     }
+    setShowConfirm(true);
+  }, [planData]);
 
-    console.log("✅ Forked plan created:", planData);
-    console.log("   Original plan ID:", id);
+  const handleConfirmFork = useCallback(async () => {
+    setShowConfirm(false);
+    setIsForking(true);
+    const { title, description, imageFile } = planData;
 
-    // TODO: Send to backend with forkedFrom: id
-    // e.g. { ...planData, forkedFrom: id }
+    try {
+      let reviewUrl = fullPlan.picture;
+      if (imageFile) {
+        const imgResponse = await uploadImage(imageFile);
+        reviewUrl = imgResponse.data.result;
+        console.log("Uploaded picture path:", reviewUrl);
+      }
 
-    alert("Plan forked successfully!");
-    navigate('/my-plans'); // or wherever your user's plans are listed
-  }, [planData, id, navigate]);
+      const planResponse = await createPlan({
+        title: title,
+        description: description,
+        picture: reviewUrl,
+        duration: planData.duration,
+        status: planData.status,
+        visibility: planData.visibility
+      });
+
+      const planId = planResponse.data.result.id;
+
+      // Create stages sequentially to preserve user-entered order
+      const stageResponses = [];
+      for (const stage of planData.stages) {
+        const resp = await createStage({
+          planId: planId,
+          title: stage.title,
+          description: stage.description,
+        });
+        stageResponses.push(resp);
+      }
+
+      const stageIdMap = {};
+      planData.stages.forEach((stage, index) => {
+        // Use stage.id (from hydrated plan) as the key, fall back to tempId for new plans
+        const stageKey = stage.id ?? stage.tempId;
+        stageIdMap[stageKey] = stageResponses[index].data.result.id;
+      });
+
+      const taskEntries = [];
+      planData.stages.forEach(stage => {
+        const stageKey = stage.id ?? stage.tempId;
+        stage.tasks.forEach(task => {
+          taskEntries.push({ stageKey, task });
+        });
+      });
+
+      // Create tasks sequentially to preserve ordering
+      const taskResponses = [];
+      for (const entry of taskEntries) {
+        const resp = await createTask({
+          stageId: stageIdMap[entry.stageKey],
+          // title: entry.task.title,
+          description: entry.task.description,
+        });
+        taskResponses.push(resp);
+      }
+
+      const taskIdMap = {};
+      taskEntries.forEach((entry, index) => {
+        // Use task.id (from hydrated plan) as the key, fall back to tempId for new plans
+        const taskKey = entry.task.id ?? entry.task.tempId;
+        taskIdMap[taskKey] = taskResponses[index].data.result.id;
+      });
+
+      // Process subtasks sequentially per task to avoid deadlock
+      // Group subtasks by task
+      const subtasksByTask = new Map();
+      planData.stages.forEach(stage =>
+        stage.tasks.forEach(task => {
+          if (task.subtasks && task.subtasks.length > 0) {
+            const taskKey = task.id ?? task.tempId;
+            const newTaskId = taskIdMap[taskKey];
+            if (!subtasksByTask.has(newTaskId)) {
+              subtasksByTask.set(newTaskId, []);
+            }
+            subtasksByTask.get(newTaskId).push(...task.subtasks);
+          }
+        })
+      );
+
+      // Create subtasks for each task sequentially to prevent concurrent lock contention
+      for (const [taskId, subtasks] of subtasksByTask.entries()) {
+        const validSubtasks = subtasks.filter(sub => sub.title && sub.title.trim());
+        if (validSubtasks.length > 0) {
+          // Create subtasks sequentially to avoid concurrent updates to the same task row
+          for (const subtask of validSubtasks) {
+            await createSubtask({
+              taskId: taskId,
+              title: subtask.title,
+              description: subtask.description || '',
+              duration: parseInt(subtask.duration, 10) || 0,
+              status: subtask.status || 'incompleted',
+            });
+          }
+        }
+      }
+      // Save tags for the plan
+      if (planData.categories && planData.categories.length > 0) {
+        try {
+          await setTagsForPlan(planId, planData.categories);
+          console.log("Saved tags for plan:", planData.categories);
+        } catch (tagError) {
+          console.error("Error saving tags:", tagError);
+        }
+      }
+
+      addForkRecord(id, planData.id);
+      console.log("Forked plan created: ", planData);
+      console.log("Original plan ID: ", id);
+
+      addToast("success", `Forking successful!`);
+      navigate(`/plans/${planId}`); // Redirect to the newly created plan
+
+    } catch (err) {
+      console.error("Fork error: ", err);
+      addToast("error",
+        err.response?.data?.message || err.message || "Forking failed!"
+      );
+    } finally {
+      setIsForking(false);
+    }
+
+  }, [planData, id, navigate, fullPlan]);
 
   const handlePreview = useCallback(() => {
     if (!planData.title.trim()) {
@@ -125,7 +220,7 @@ const ForkPlan = () => {
     setPlanData(prev => ({ ...prev, ...updates }));
   }, []);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="createplan-page">
         <div className="viewplan-loading">
@@ -136,36 +231,68 @@ const ForkPlan = () => {
   }
 
   return (
-    <div className="createplan-page">
-      <div className="createplan-header">
+    <>
+      {/* Toast notifications */}
+      <div className="toasts">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast ${toast.type}`}>
+            {toast.message}
+          </div>
+        ))}
+      </div>
+      <div className="createplan-page">
+        <div className="createplan-header">
 
-        {originalPlan && (
-          <div className="fork-notice">
-            Creating your personal copy of <strong>"{originalPlan.title}"</strong>
+          {originalPlan && (
+            <div className="fork-notice">
+              Creating your personal copy of <strong>"{originalPlan.title}"</strong>
+            </div>
+          )}
+        </div>
+
+        <div className="createplan-content">
+          <PlanInfo planData={planData} updatePlanData={updatePlanData} />
+        </div>
+
+        <div className="createplan-actions">
+          <button className="review-btn" onClick={handlePreview}>
+            Preview
+          </button>
+          <button
+            className="create-btn"
+            onClick={handleForkClick}
+            disabled={isForking}
+          >
+            {isForking ? 'Forking...' : 'Fork Plan'}
+          </button>
+        </div>
+
+        {showPreview && (
+          <PreviewModal
+            planData={planData}
+            onClose={() => setShowPreview(false)}
+          />
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirm && (
+          <div className="confirm-modal-overlay">
+            <div className="confirm-modal">
+              <h3>Fork Plan</h3>
+              <p>Are you sure you want to create your personal copy of this plan?</p>
+              <div className="confirm-modal-actions">
+                <button className="confirm-no-btn" onClick={() => setShowConfirm(false)}>
+                  Cancel
+                </button>
+                <button className="confirm-yes-btn" onClick={handleConfirmFork}>
+                  Yes, Fork
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
-
-      <div className="createplan-content">
-        <PlanInfo planData={planData} updatePlanData={updatePlanData} />
-      </div>
-
-      <div className="createplan-actions">
-        <button className="review-btn" onClick={handlePreview}>
-          Preview
-        </button>
-        <button className="create-btn" onClick={handleCreate}>
-          Fork Plan
-        </button>
-      </div>
-
-      {showPreview && (
-        <PreviewModal
-          planData={planData}
-          onClose={() => setShowPreview(false)}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

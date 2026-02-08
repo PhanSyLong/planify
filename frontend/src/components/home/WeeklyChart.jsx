@@ -6,6 +6,7 @@ import {
   faArrowLeft,
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { getWeeklyPerformance } from "../../api/dailyPerformance";
 
 export default function WeeklyChart() {
   const chartRef = useRef(null);
@@ -13,6 +14,7 @@ export default function WeeklyChart() {
 
   // Start of the current week (Monday)
   const [weekStart, setWeekStart] = useState(getStartOfWeek(new Date()));
+  const [isLoading, setIsLoading] = useState(false);
 
   // ---------- Helpers ----------
   function getStartOfWeek(date) {
@@ -33,64 +35,161 @@ export default function WeeklyChart() {
     });
   }
 
-  function getMockData() {
-    return {
-      done: [40, 50, 60, 70, 65, 55, 45],
-      Incomplete: [40, 30, 25, 20, 25, 30, 35],
-      cancel: [20, 20, 15, 10, 10, 15, 20],
-    };
+  function formatDate(date) {
+    return date.toISOString().split('T')[0];
   }
 
   // ---------- Chart ----------
   useEffect(() => {
     const labels = getWeekLabels(weekStart);
-    const data = getMockData();
 
-    if (chartInstance.current) {
-      chartInstance.current.destroy();
-    }
+    // Calculate start and end dates for the week
+    const startDate = formatDate(weekStart);
+    const endDate = new Date(weekStart);
+    endDate.setDate(endDate.getDate() + 6);
+    const endDateStr = formatDate(endDate);
 
-    chartInstance.current = new Chart(chartRef.current, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Done",
-            data: data.done,
-            stack: "weekly",
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getWeeklyPerformance(startDate, endDateStr);
+        const weeklyData = response.data || [];
+
+        // Initialize arrays for each day
+        const done = Array(7).fill(0);
+        const incomplete = Array(7).fill(0);
+        const cancel = Array(7).fill(0);
+
+        // Map API data to chart format
+        weeklyData.forEach(day => {
+          if (!day.date) return;
+          const dayDate = new Date(day.date);
+          const dayIndex = Math.floor((dayDate - weekStart) / (1000 * 60 * 60 * 24));
+          if (dayIndex >= 0 && dayIndex < 7) {
+            done[dayIndex] = day.subtasksCompleted || 0;
+            incomplete[dayIndex] = day.subtasksIncompleted || 0;
+            cancel[dayIndex] = day.subtasksCancelled || 0;
+          }
+        });
+
+        // Calculate percentages for each day
+        const donePercent = [];
+        const incompletePercent = [];
+        const cancelPercent = [];
+
+        for (let i = 0; i < 7; i++) {
+          const total = done[i] + incomplete[i] + cancel[i];
+          if (total === 0) {
+            donePercent.push(0);
+            incompletePercent.push(0);
+            cancelPercent.push(0);
+          } else {
+            donePercent.push(Math.round((done[i] / total) * 100));
+            incompletePercent.push(Math.round((incomplete[i] / total) * 100));
+            cancelPercent.push(Math.round((cancel[i] / total) * 100));
+          }
+        }
+
+        // Destroy existing chart
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+
+        chartInstance.current = new Chart(chartRef.current, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Done",
+                data: donePercent,
+                stack: "weekly",
+                backgroundColor: "rgba(54, 162, 235, 0.75)",
+                // Store raw counts for tooltip
+                rawData: done,
+              },
+              {
+                label: "Incomplete",
+                data: incompletePercent,
+                stack: "weekly",
+                backgroundColor: "rgba(255, 205, 86, 0.75)",
+                rawData: incomplete,
+              },
+              {
+                label: "Cancel",
+                data: cancelPercent,
+                stack: "weekly",
+                backgroundColor: "rgba(255, 99, 132, 0.75)",
+                rawData: cancel,
+              },
+            ],
           },
-          {
-            label: "Incomplete",
-            data: data.Incomplete,
-            stack: "weekly",
-          },
-          {
-            label: "Cancel",
-            data: data.cancel,
-            stack: "weekly",
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { stacked: true },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              callback: (v) => `${v}%`,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { stacked: true },
+              y: {
+                stacked: true,
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: (v) => `${v}%`,
+                },
+              },
+            },
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const dataset = context.dataset;
+                    const rawValue = dataset.rawData?.[context.dataIndex] || 0;
+                    const percentValue = context.parsed.y || 0;
+                    return `${dataset.label}: ${rawValue} (${percentValue}%)`;
+                  },
+                },
+              },
             },
           },
-        },
-        plugins: {
-          legend: { position: "bottom" },
-        },
-      },
-    });
+        });
+      } catch (err) {
+        console.error("Failed to load weekly performance", err);
+        // Show empty chart on error
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+        chartInstance.current = new Chart(chartRef.current, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              { label: "Done", data: Array(7).fill(0), stack: "weekly", backgroundColor: "rgb(54, 162, 235)" },
+              { label: "Incomplete", data: Array(7).fill(0), stack: "weekly", backgroundColor: "rgb(255, 205, 86)" },
+              { label: "Cancel", data: Array(7).fill(0), stack: "weekly", backgroundColor: "rgb(255, 99, 132)" },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { stacked: true },
+              y: {
+                stacked: true,
+                beginAtZero: true,
+                max: 100,
+                ticks: { callback: (v) => `${v}%` },
+              },
+            },
+            plugins: { legend: { position: "bottom" } },
+          },
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
 
     return () => chartInstance.current?.destroy();
   }, [weekStart]);
@@ -120,6 +219,7 @@ export default function WeeklyChart() {
       </div>
 
       <div className="weekly-chart__canvas">
+        {isLoading && <div className="loading-overlay">Loading...</div>}
         <canvas ref={chartRef}></canvas>
       </div>
     </div>

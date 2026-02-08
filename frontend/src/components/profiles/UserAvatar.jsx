@@ -1,50 +1,53 @@
+import { useState } from "react";
+import FollowButton from "../users/FollowButton"; // điều chỉnh path cho đúng
 import "./UserAvatar.css";
 
-export default function UserAvatar({ username, stats, avatar, isFollowing, onFollowToggle }) {
-  const initial = username.charAt(0).toUpperCase();
+export default function UserAvatar({
+  username,
+  email,
+  avatar,
+  isFollowing: initialIsFollowing = false,
+  onFollowToggle = () => {},
+  isOwnProfile = false,
+  userId,
+}) {
+  const initial = username?.charAt(0)?.toUpperCase() || "?";
 
   return (
     <div className="user-avatar-section">
       <div className="user-avatar-frame">
         {avatar ? (
-          <img src={avatar} alt={username} className="user-avatar-image" />
+          <img
+            src={avatar}
+            alt={username}
+            className="user-avatar-image"
+            onError={(e) => (e.target.src = "/default-avatar.png")}
+          />
         ) : (
           <div className="user-avatar-placeholder">{initial}</div>
         )}
       </div>
 
       <div className="user-avatar-info">
-        <h1 className="user-avatar-username">{username}</h1>
+        <div className="user-header-row">
+          <div className="user-name-group">
+            <h1 className="user-avatar-username">{username || "User"}</h1>
+            {email && <p className="user-avatar-email">{email}</p>}
+          </div>
 
-        <div className="user-avatar-stats">
-          <div className="user-avatar-stat">
-            <span className="user-avatar-stat-number">{stats.followings}</span>
-            <span>followings</span>
-          </div>
-          <span>•</span>
-          <div className="user-avatar-stat">
-            <span className="user-avatar-stat-number">{stats.followers}</span>
-            <span>followers</span>
-          </div>
-          <span>•</span>
-          <div className="user-avatar-stat">
-            <span className="user-avatar-stat-number">{stats.plans}</span>
-            <span>plans</span>
-          </div>
+          {!isOwnProfile && userId && (
+            <FollowButton
+              userId={userId}
+              initialIsFollowing={initialIsFollowing}
+              size="default"
+              onToggle={(newFollowing) => {
+                onFollowToggle(newFollowing);
+              }}
+            />
+          )}
         </div>
 
-        <div className="user-avatar-actions">
-          <button
-            className={`user-avatar-follow-btn ${isFollowing ? "following" : ""}`}
-            onClick={onFollowToggle}
-          >
-            {isFollowing ? "Following" : "Follow"}
-          </button>
-
-          <button className="user-avatar-more-btn" aria-label="More options">
-            ⋯
-          </button>
-        </div>
+        {/* Bỏ toàn bộ phần stats */}
       </div>
     </div>
   );

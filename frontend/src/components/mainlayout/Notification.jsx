@@ -4,59 +4,59 @@ import { useNavigate } from 'react-router-dom';
 import './Notification.css'; // we'll create this next
 
 const Notifications = () => {
-    const [filter, setFilter] = useState('all');
-    const [notifications, setNotifications] = useState([]);
-    const navigate = useNavigate();
+  const [filter, setFilter] = useState('all');
+  const [notifications, setNotifications] = useState([]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const es = new EventSource(
-            "http://localhost:8080/planify/notifications/stream",
-            { withCredentials: true }
-        );
-
-        es.onopen = () => {
-            console.log(" ✅ SSE connected");
-        };
-
-        es.addEventListener("notification", (e) => {
-            const data = JSON.parse(e.data);
-
-            console.log(" RAW SSE DATA:", data);
-            // map backend → frontend model
-            const notif = {
-                id: data.id,
-                planId: data.planId,
-                name: data.title,
-                action: data.type,
-                message: data.messageText,
-                time: "just now",
-                read: false,
-                link: `/plans/${data.planId}`
-            };
-
-            //  UI realtime
-            setNotifications(prev => [notif, ...prev]);
-        });
-
-        // error -> close SSE
-        es.onerror = (err) => {
-            console.error("❌ SSE error", err);
-            es.close();
-        };
-
-        //  Cleanup when reload / unmount
-        return () => {
-            console.log(" SSE is cleanup");
-            es.close();
-        };
-    }, []);
-
-
-    const displayedNotifications = notifications.filter(
-        notif => filter === 'all' || !notif.read
+  useEffect(() => {
+    const es = new EventSource(
+      "http://localhost:8080/planify/notifications/stream",
+      { withCredentials: true }
     );
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    es.onopen = () => {
+      console.log(" ✅ SSE connected");
+    };
+
+    es.addEventListener("notification", (e) => {
+      const data = JSON.parse(e.data);
+
+      console.log(" RAW SSE DATA:", data);
+      // map backend → frontend model
+      const notif = {
+        id: data.id,
+        planId: data.planId,
+        name: data.title,
+        action: data.type,
+        message: data.messageText,
+        time: "just now",
+        read: false,
+        link: `/plans/${data.planId}`
+      };
+
+      //  UI realtime
+      setNotifications(prev => [notif, ...prev]);
+    });
+
+    // error -> close SSE
+    es.onerror = (err) => {
+      console.error("❌ SSE error", err);
+      es.close();
+    };
+
+    //  Cleanup when reload / unmount
+    return () => {
+      console.log(" SSE is cleanup");
+      es.close();
+    };
+  }, []);
+
+
+  const displayedNotifications = notifications.filter(
+    notif => filter === 'all' || !notif.read
+  );
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
 
   return (
@@ -100,9 +100,9 @@ const Notifications = () => {
               onClick={() => notif.link && navigate(notif.link)}
               style={notif.link ? { cursor: 'pointer' } : {}}
             >
-                {notif.avatar && (
-                    <img src={notif.avatar} alt={notif.name} className="avatar" />
-                )}
+              {notif.avatar && (
+                <img src={notif.avatar} alt={notif.name} className="avatar" />
+              )}
               <div className="content">
                 <p className="main-text">
                   <strong>{notif.name}</strong> {notif.action}

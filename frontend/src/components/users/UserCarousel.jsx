@@ -9,7 +9,7 @@ const CARD_WIDTH = 180;
 const GAP = 18;
 const ITEM_TOTAL_WIDTH = CARD_WIDTH + GAP;
 
-const UserCarousel = ({ title, users, onViewMore }) => {
+const UserCarousel = ({ title, users, onViewMore, onFollowToggle }) => {
   const [offset, setOffset] = useState(0);
   const [visibleItems, setVisibleItems] = useState(5);
   const wrapperRef = useRef(null);
@@ -24,36 +24,25 @@ const UserCarousel = ({ title, users, onViewMore }) => {
     };
 
     calculateVisible();
-
     const resizeObserver = new ResizeObserver(calculateVisible);
-    if (wrapperRef.current) {
-      resizeObserver.observe(wrapperRef.current);
-    }
+    if (wrapperRef.current) resizeObserver.observe(wrapperRef.current);
 
-    return () => {
-      resizeObserver.disconnect();
-    };
+    return () => resizeObserver.disconnect();
   }, []);
 
-  const maxOffset = useMemo(() => Math.max(0, users.length - visibleItems), [users.length, visibleItems]);
+  const maxOffset = useMemo(() => Math.max(0, (users?.length || 0) - visibleItems), [users?.length, visibleItems]);
+
   const hasPrev = offset > 0;
   const hasNext = offset < maxOffset;
 
-  const handlePrevious = useCallback(() => {
-    setOffset(prev => Math.max(0, prev - 1));
-  }, []);
-
-  const handleNext = useCallback(() => {
-    setOffset(prev => Math.min(maxOffset, prev + 1));
-  }, [maxOffset]);
+  const handlePrevious = useCallback(() => setOffset((prev) => Math.max(0, prev - 1)), []);
+  const handleNext = useCallback(() => setOffset((prev) => Math.min(maxOffset, prev + 1)), [maxOffset]);
 
   const trackStyle = useMemo(() => ({
     transform: `translateX(-${offset * ITEM_TOTAL_WIDTH}px)`
   }), [offset]);
 
-  if (!users || users.length === 0) {
-    return null;
-  }
+  if (!users || users.length === 0) return null;
 
   return (
     <div className="carousel-box">
@@ -66,30 +55,32 @@ const UserCarousel = ({ title, users, onViewMore }) => {
 
       <div className="carousel" data-has-prev={hasPrev} data-has-next={hasNext}>
         {hasPrev && (
-          <button
-            className="nav-btn left"
-            onClick={handlePrevious}
-            aria-label="Previous"
-          >
+          <button className="nav-btn left" onClick={handlePrevious} aria-label="Previous">
             <FontAwesomeIcon icon={faAngleLeft} size="2x" className="icon" />
           </button>
         )}
 
         {hasNext && (
-          <button
-            className="nav-btn right"
-            onClick={handleNext}
-            aria-label="Next"
-          >
+          <button className="nav-btn right" onClick={handleNext} aria-label="Next">
             <FontAwesomeIcon icon={faAngleRight} size="2x" className="icon" />
           </button>
         )}
 
         <div className="carousel-wrapper" ref={wrapperRef}>
           <div className="carousel-track" style={trackStyle}>
-            {users.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
+            {Array.isArray(users) && users.length > 0 ? (
+              users.map((user) => (
+                <UserCard
+                  key={user.id}
+                  user={user}
+                  onFollowToggle={onFollowToggle}
+                />
+              ))
+            ) : (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
+                No users available
+              </div>
+            )}
           </div>
         </div>
       </div>

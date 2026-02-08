@@ -1,48 +1,22 @@
-import axios from 'axios';
+import httpAuth from './httpAuth';
 
-const API_URL = `http://localhost:8080/planify`;
+export const createStage = async (stage) =>
+    await httpAuth.post(`/stages`, stage);
 
-export const createStage = async(stage) => {
-    const token = localStorage.getItem("accessToken");
-    return await axios.post(`${API_URL}/stages`, stage, {
-	    headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const deleteStagebyPlanAndStageId = async (planId, stageId) =>
+    await httpAuth.delete(`/plans/${planId}/${stageId}`);
 
-export const deleteStagebyPlanAndStageId = async(planId, stageId) => {
-    const token = localStorage.getItem("accessToken");
-    return await axios.delete(`${API_URL}/plans/${planId}/${stageId}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const getStagesByPlanId = (planId) =>
+    httpAuth.get(`/plans/${planId}/stages`);
 
-export const getStagesByPlanId = (planId) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.get(`${API_URL}/plans/${planId}/stages`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const getStageByPlanAndStageId = (planId, stageId) =>
+    httpAuth.get(`/plans/${planId}/${stageId}`);
 
-export const getStageByPlanAndStageId = (planId, stageId) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.get(`${API_URL}/plans/${planId}/${stageId}`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-    });
-};
+export const updateStage = async (stageId, stageData) =>
+    await httpAuth.patch(`/stages/${stageId}`, stageData);
 
+export const startStage = async (stageId) =>
+    await httpAuth.patch(`/stages/${stageId}/start`, {});
+
+export const completeStage = async (stageId) =>
+    await httpAuth.patch(`/stages/${stageId}/complete`, {});

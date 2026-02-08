@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { authApi } from './auth';
 
 const httpAuth = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/planify',
-  withCredentials: false,
+  withCredentials: true,
 });
 
 httpAuth.interceptors.request.use((config) => {
@@ -12,5 +13,16 @@ httpAuth.interceptors.request.use((config) => {
   }
   return config;
 });
+
+httpAuth.interceptors.response.use(
+  res => res, 
+  err => {
+    if (err.response?.status === 401){
+      authApi.logout();
+      window.location.href = "/";  // Restart App completely
+    }
+    return Promise.reject(err);
+  }
+);
 
 export default httpAuth;

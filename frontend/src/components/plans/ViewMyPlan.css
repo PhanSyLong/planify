@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 0;
+  padding: 8px 6px;
   min-height: 40px;
 }
 
@@ -16,7 +16,7 @@
 }
 
 /* Đảm bảo dropdown luôn ở bên phải và không bị ảnh hưởng */
-.viewplan-container .subtask-item > :last-child {
+.viewplan-container .subtask-item> :last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -94,6 +94,7 @@
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -166,8 +167,243 @@
     gap: 8px;
   }
 
-  .viewplan-container .subtask-item > :last-child {
+  .viewplan-container .subtask-item> :last-child {
     align-self: flex-end;
     margin-left: 0;
   }
+}
+
+/* Delete button */
+.btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #D10000;
+  color: white;
+  transition: opacity 0.2s ease;
+}
+
+.btn-delete:hover {
+  opacity: 0.9;
+}
+
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Confirm Modal */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px 32px;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-modal h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #002765;
+}
+
+.delete-confirm-modal h3 {
+  color: #D10000;
+}
+
+.confirm-modal p {
+  margin: 0 0 24px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirm-yes-btn,
+.confirm-no-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.confirm-yes-btn {
+  background-color: #153677;
+  color: white;
+}
+
+.delete-confirm-btn {
+  background-color: #D10000;
+}
+
+.confirm-no-btn {
+  background-color: #edeef0;
+  color: #333;
+}
+
+.confirm-yes-btn:hover,
+.confirm-no-btn:hover {
+  opacity: 0.9;
+}
+
+.confirm-yes-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Delete Button */
+.btn-delete {
+  padding: 10px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirm-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.delete-confirm-modal h3 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.delete-confirm-modal p {
+  margin: 0 0 8px 0;
+  color: #4b5563;
+}
+
+.delete-confirm-modal .delete-warning {
+  color: #dc2626;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.delete-confirm-actions .btn-cancel {
+  padding: 10px 20px;
+  background-color: #e5e7eb;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.delete-confirm-actions .btn-cancel:hover {
+  background-color: #d1d5db;
+}
+
+.delete-confirm-actions .btn-confirm-delete {
+  padding: 10px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.delete-confirm-actions .btn-confirm-delete:hover {
+  background-color: #b91c1c;
+}
+
+.delete-confirm-actions .btn-confirm-delete:disabled,
+.delete-confirm-actions .btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Start subtask button */
+.btn-start-subtask {
+  padding: 6px 16px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-start-subtask:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-start-subtask:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Edit button disabled state */
+.btn-edit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #9ca3af;
 }

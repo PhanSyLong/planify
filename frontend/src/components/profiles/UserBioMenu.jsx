@@ -1,156 +1,144 @@
-import { useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+// src/components/profiles/UserBioMenu.jsx
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { followApi } from "../../api/follow";
+import UserCard from "../users/UserCard";
+import PlanCard from "../plans/PlanCard";          // ← import PlanCard
+import { usePlans } from "../../queries/usePlans"; // ← giả định bạn có hook này
+
 import "./UserBioMenu.css";
 
-const MOCK_USER_PLANS = [
-  { id: 1, title: "Morning Workout Routine", stages: 3, tasks: 9 },
-  { id: 2, title: "Healthy Meal Prep", stages: 4, tasks: 12 },
-  { id: 3, title: "Yoga for Beginners", stages: 5, tasks: 15 },
-];
-
-const MOCK_USER_SAVED = [
-  { id: 4, title: "Advanced JavaScript", stages: 8, tasks: 32 },
-];
-
-const MOCK_USER_FOLLOWINGS = [
-  { id: 1, username: "fitness_pro", plans: 12, followers: 340 },
-  { id: 2, username: "chef_master", plans: 25, followers: 890 },
-];
-
-const MOCK_USER_FOLLOWERS = [
-  { id: 3, username: "health_fan", plans: 7, followers: 120 },
-  { id: 4, username: "gym_buddy", plans: 15, followers: 280 },
-  { id: 5, username: "yoga_life", plans: 10, followers: 195 },
-];
-
-function UserFollowerCard({ user, isFollowing, onFollowToggle, onUserClick }) {
-  return (
-    <div className="user-follower-card">
-      <div
-        className="user-follower-card-avatar user-follower-card-clickable"
-        onClick={() => onUserClick(user.username)}
-      >
-        {user.username.charAt(0).toUpperCase()}
-      </div>
-      <div
-        className="user-follower-card-info user-follower-card-clickable"
-        onClick={() => onUserClick(user.username)}
-      >
-        <div className="user-follower-card-name">{user.username}</div>
-        <div className="user-follower-card-stats">
-          {user.plans} plans • {user.followers} followers
-        </div>
-      </div>
-      <button
-        className={`user-follower-follow-btn ${isFollowing ? "following" : ""}`}
-        onClick={() => onFollowToggle(user.id)}
-      >
-        {isFollowing ? "Following" : "Follow"}
-      </button>
-    </div>
-  );
-}
-
 export default function UserBioMenu({ bio, stats, onFollowChange }) {
+  const { id: profileId } = useParams(); // profileId từ URL: /user/:id hoặc /profile/:id
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("plans");
 
-  // Track follow state for all users in followings and followers
-  const [followStates, setFollowStates] = useState({
-    // Initialize followings as followed
-    ...Object.fromEntries(MOCK_USER_FOLLOWINGS.map(u => [u.id, true])),
-    // Initialize followers as not followed
-    ...Object.fromEntries(MOCK_USER_FOLLOWERS.map(u => [u.id, false]))
-  });
+  const [activeTab, setActiveTab] = useState("public-plans");
 
-  const handleFollowToggle = useCallback((userId) => {
-    setFollowStates(prev => {
-      const newState = !prev[userId];
+  // Dữ liệu followers & followings từ API
+  const [followers, setFollowers] = useState([]);
+  const [followings, setFollowings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-      // Notify parent component about follow change
-      onFollowChange?.(userId, newState);
+  // Lấy tất cả plans (giả định usePlans trả về plans của toàn hệ thống hoặc có thể filter)
+  const { data: plans = [], isLoading: isLoadingPlans } = usePlans();
 
-      // TODO: API call to follow/unfollow user
-      console.log(newState ? "Followed" : "Unfollowed", "user:", userId);
+  // Lọc public plans của user này
+  const publicPlans = useMemo(() => {
+    if (isLoadingPlans || !plans?.length || !profileId) return [];
 
-      return { ...prev, [userId]: newState };
-    });
-  }, [onFollowChange]);
+    return plans.filter(
+      (plan) =>
+        plan.ownerId === Number(profileId) && plan.visibility === "public"
+    );
+  }, [plans, isLoadingPlans, profileId]);
 
-  const handleUserClick = useCallback((username) => {
-    navigate(`/user/${username}`);
-  }, [navigate]);
+  // Fetch followers / followings khi tab thay đổi
+  useEffect(() => {
+    if (!profileId || (activeTab !== "followers" && activeTab !== "followings")) {
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        let res;
+        if (activeTab === "followers") {
+          res = await followApi.getFollowers(profileId);
+          setFollowers(res?.data?.result || []);
+        } else {
+          res = await followApi.getFollowings(profileId);
+          setFollowings(res?.data?.result || []);
+        }
+      } catch (err) {
+        console.error("Lỗi tải danh sách follow:", err);
+        setError("Không tải được danh sách");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [activeTab, profileId]);
+
+  const handleFollowToggle = useCallback(
+    (userId, newIsFollowing) => {
+      onFollowChange?.(userId, newIsFollowing);
+      // Nếu cần cập nhật local state followers/followings thì thêm logic ở đây
+    },
+    [onFollowChange]
+  );
 
   const renderContent = useMemo(() => {
-    switch (activeTab) {
-      case "plans":
-        return MOCK_USER_PLANS.length > 0 ? (
-          <div className="user-content-grid">
-            {MOCK_USER_PLANS.map((plan) => (
-              <div key={plan.id} className="user-plan-card">
-                <div className="user-plan-card-image">📋</div>
-                <div className="user-plan-card-content">
-                  <div className="user-plan-card-title">{plan.title}</div>
-                  <div className="user-plan-card-meta">
-                    {plan.stages} stages • {plan.tasks} tasks
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="user-empty-state">
-            <p>No plans yet</p>
-            <span>This user hasn't created any plans</span>
-          </div>
-        );
+    // Loading & error chung cho followers/followings
+    if (loading && (activeTab === "followers" || activeTab === "followings")) {
+      return <div className="user-empty-state">Đang tải...</div>;
+    }
+    if (error && (activeTab === "followers" || activeTab === "followings")) {
+      return <div className="user-empty-state error">{error}</div>;
+    }
 
-      case "saved":
-        return MOCK_USER_SAVED.length > 0 ? (
-          <div className="user-content-grid">
-            {MOCK_USER_SAVED.map((plan) => (
-              <div key={plan.id} className="user-plan-card">
-                <div className="user-plan-card-image">📋</div>
-                <div className="user-plan-card-content">
-                  <div className="user-plan-card-title">{plan.title}</div>
-                  <div className="user-plan-card-meta">
-                    {plan.stages} stages • {plan.tasks} tasks
-                  </div>
-                </div>
-              </div>
+    switch (activeTab) {
+      case "public-plans":
+        if (isLoadingPlans) {
+          return <div className="user-empty-state">Đang tải kế hoạch...</div>;
+        }
+
+        if (publicPlans.length === 0) {
+          return (
+            <div className="user-empty-state">
+              <p>Chưa có kế hoạch công khai nào</p>
+              <span>Người dùng này chưa công bố kế hoạch nào</span>
+            </div>
+          );
+        }
+
+        return (
+          <div className="user-content-grid public-plans-grid">
+            {publicPlans.map((plan) => (
+              <PlanCard key={plan.id} item={plan} />
             ))}
-          </div>
-        ) : (
-          <div className="user-empty-state">
-            <p>No saved plans</p>
           </div>
         );
 
       case "followings":
+        if (followings.length === 0) {
+          return (
+            <div className="user-empty-state">
+              <p>Chưa theo dõi ai</p>
+              <span>Người dùng này chưa follow bất kỳ ai</span>
+            </div>
+          );
+        }
         return (
           <div className="user-content-grid">
-            {MOCK_USER_FOLLOWINGS.map((user) => (
-              <UserFollowerCard
+            {followings.map((user) => (
+              <UserCard
                 key={user.id}
                 user={user}
-                isFollowing={followStates[user.id]}
                 onFollowToggle={handleFollowToggle}
-                onUserClick={handleUserClick}
               />
             ))}
           </div>
         );
 
       case "followers":
+        if (followers.length === 0) {
+          return (
+            <div className="user-empty-state">
+              <p>Chưa có người theo dõi</p>
+              <span>Người dùng này chưa có follower nào</span>
+            </div>
+          );
+        }
         return (
           <div className="user-content-grid">
-            {MOCK_USER_FOLLOWERS.map((user) => (
-              <UserFollowerCard
+            {followers.map((user) => (
+              <UserCard
                 key={user.id}
                 user={user}
-                isFollowing={followStates[user.id]}
                 onFollowToggle={handleFollowToggle}
-                onUserClick={handleUserClick}
               />
             ))}
           </div>
@@ -159,30 +147,26 @@ export default function UserBioMenu({ bio, stats, onFollowChange }) {
       default:
         return null;
     }
-  }, [activeTab, followStates, handleFollowToggle, handleUserClick]);
+  }, [
+    activeTab,
+    loading,
+    error,
+    followers,
+    followings,
+    publicPlans,
+    isLoadingPlans,
+    handleFollowToggle,
+  ]);
 
   return (
     <div className="user-bio-menu-container">
-      <div className="user-bio-section">
-        <div className="user-bio-box">
-          <div className="user-bio-title">About</div>
-          <p className="user-bio-text">{bio || "No bio yet"}</p>
-        </div>
-      </div>
-
       <div className="user-content-section">
         <div className="user-content-tabs">
           <button
-            className={`user-content-tab ${activeTab === "plans" ? "active" : ""}`}
-            onClick={() => setActiveTab("plans")}
+            className={`user-content-tab ${activeTab === "public-plans" ? "active" : ""}`}
+            onClick={() => setActiveTab("public-plans")}
           >
-            Plans
-          </button>
-          <button
-            className={`user-content-tab ${activeTab === "saved" ? "active" : ""}`}
-            onClick={() => setActiveTab("saved")}
-          >
-            Saved
+            Public Plans
           </button>
           <button
             className={`user-content-tab ${activeTab === "followings" ? "active" : ""}`}
@@ -197,6 +181,7 @@ export default function UserBioMenu({ bio, stats, onFollowChange }) {
             Followers
           </button>
         </div>
+
         <div className="user-content-area">{renderContent}</div>
       </div>
     </div>

@@ -1,17 +1,19 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import Stage from "./Stage";
 import "./PlanInfo.css";
 
-const CATEGORIES = [
-  "Study",
-  "Work",
-  "Personal",
-  "Health",
-  "Fitness",
-  "Language",
-  "Exam",
-  "Project"
-];
+const TAG_GROUPS = {
+  subject: [
+    "Math", "Physics", "Chemistry", "Literature", "English",
+    "Biology", "History", "Geography", "Computer Science"
+  ],
+  certificate: [
+    "IELTS", "TOEIC", "VSTEP", "SAT", "IELTS UKVI", "TOPIK"
+  ],
+  other: [
+    "Soft Skills", "Programming", "Design", "Marketing", "Foreign Languages"
+  ],
+};
 
 const PlanInfo = ({ planData, updatePlanData }) => {
   const [showCategories, setShowCategories] = useState(false);
@@ -55,7 +57,12 @@ const PlanInfo = ({ planData, updatePlanData }) => {
 
   const addStage = useCallback(() => {
     updatePlanData({
-      stages: [...planData.stages, { title: '', description: '', tasks: [] }]
+      stages: [...planData.stages, {
+        tempId: crypto.randomUUID(),
+        title: '',
+        description: '',
+        tasks: []
+      }]
     });
   }, [planData.stages, updatePlanData]);
 
@@ -82,6 +89,14 @@ const PlanInfo = ({ planData, updatePlanData }) => {
     updatePlanData({ categories: newCategories });
   }, [planData.categories, updatePlanData]);
 
+  // Tính tổng duration của plan từ tất cả stages
+  const computedPlanDuration = useMemo(() => {
+    return planData.stages.reduce((total, stage) => {
+      const stageDuration = stage.tasks.reduce((sum, task) => sum + Number(task.duration || 0), 0);
+      return total + stageDuration;
+    }, 0);
+  }, [planData.stages]);
+
   return (
     <div className="planinfo-wrapper">
       {/* Plan Title */}
@@ -104,12 +119,12 @@ const PlanInfo = ({ planData, updatePlanData }) => {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onClick={(e) => e.stopPropagation()}  // Fix prompting twice
             onChange={handleImageChange}
+            onClick={(e) => e.stopPropagation()}
           />
           {planData.reviewUrl ? (
             <>
-            {/* <p>{`${httpPublic.defaults.baseURL}${planData.reviewUrl}`}</p> */}
+              {/* <p>{`${httpPublic.defaults.baseURL}${planData.reviewUrl}`}</p> */}
               <img src={`${planData.reviewUrl}`} alt="Plan preview" className="image-preview" />
               <button className="image-remove-btn" onClick={handleRemoveImage}>
                 ×
@@ -118,9 +133,9 @@ const PlanInfo = ({ planData, updatePlanData }) => {
           ) : (
             <div className="image-upload-label">
               <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
               </svg>
               <span>Upload Image</span>
             </div>
@@ -144,23 +159,72 @@ const PlanInfo = ({ planData, updatePlanData }) => {
               onClick={() => setShowCategories(!showCategories)}
             >
               {showCategories ? 'Hide Categories' : 'Select Categories'}
+              {planData.categories?.length > 0 && ` (${planData.categories?.length})`}
             </button>
 
             {showCategories && (
               <div className="categories-popup">
-                {CATEGORIES.map((cat) => (
-                  <span
-                    key={cat}
-                    className={`category-tag ${
-                      planData.categories.includes(cat) ? "active" : ""
-                    }`}
-                    onClick={() => toggleCategory(cat)}
-                  >
-                    {cat}
-                  </span>
+                {Object.entries(TAG_GROUPS).map(([groupName, tags]) => (
+                  <div key={groupName} className="tag-group">
+                    <div className="tag-group-title">{groupName}</div>
+                    <div className="tag-group-items">
+                      {tags.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`category-tag ${planData.categories.includes(tag) ? "active" : ""
+                            }`}
+                          onClick={() => toggleCategory(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className="plan-duration-visibility-container">
+        <div className="plan-duration-card">
+          <label>Duration</label>
+          <div className="duration-input">
+            <input
+              type="number"
+              value={computedPlanDuration}
+              readOnly
+              disabled
+            />
+            <span className="duration-unit">days</span>
+          </div>
+        </div>
+
+        <div className="plan-visibility-card">
+          <label>Visibility</label>
+          <div className="visibility-options">
+            <label className="visibility-option">
+              <input
+                type="radio"
+                name="visibility"
+                value="private"
+                checked={planData.visibility === 'private'}
+                onChange={() => updatePlanData({ visibility: 'private' })}
+              />
+              <span>Private</span>
+            </label>
+            <label className="visibility-option">
+              <input
+                type="radio"
+                name="visibility"
+                value="public"
+                checked={planData.visibility === 'public'}
+                onChange={() => updatePlanData({ visibility: 'public' })}
+              />
+              <span>Public</span>
+            </label>
           </div>
         </div>
       </div>

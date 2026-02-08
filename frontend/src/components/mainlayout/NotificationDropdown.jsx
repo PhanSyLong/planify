@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './NotificationDropdown.css';
 
-const NotificationDropdown = ({ isOpen, onClose, containerRef, notifications = [] }) => {
+const NotificationDropdown = ({
+  isOpen,
+  onClose,
+  containerRef,
+  notifications = [] // ← receive from parent
+}) => {
   const dropdownRef = useRef(null);
   const [filter, setFilter] = useState('all'); // 'all' or 'unread'
 
@@ -26,18 +31,17 @@ const NotificationDropdown = ({ isOpen, onClose, containerRef, notifications = [
 
   if (!isOpen) return null;
 
-  const displayedNotifications = notifications.filter(notif =>
-    filter === 'all' || !notif.read
-  );
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const displayedNotifications = filter === 'unread'
+    ? notifications.filter(n => !n.read)
+    : notifications;
 
   return (
     <div className="notification-dropdown" ref={dropdownRef}>
       <div className="notification-header">
         <h3>Notifications</h3>
-        {notifications.filter(n => !n.read).length > 0 && (
-          <span className="unread-badge">
-            {notifications.filter(n => !n.read).length} new
-          </span>
+        {unreadCount > 0 && (
+          <span className="unread-badge">{unreadCount} new</span>
         )}
       </div>
 
@@ -83,17 +87,16 @@ const NotificationDropdown = ({ isOpen, onClose, containerRef, notifications = [
       </div>
 
       <div className="notification-footer">
-          <button
-            className="view-all"
-            onClick={() => {
-              onClose();
-              // navigate to full page - assuming you have useNavigate
-              window.location.href = '/notifications';
-              // or better: use navigate('/notifications') if you import useNavigate
-            }}
-          >
-            View all notifications
-          </button>
+        <button
+          className="view-all"
+          onClick={() => {
+            onClose();
+            window.location.href = '/notifications';
+            // or better: use useNavigate() if you can import it here
+          }}
+        >
+          View all notifications
+        </button>
       </div>
     </div>
   );

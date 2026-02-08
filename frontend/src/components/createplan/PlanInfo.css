@@ -171,6 +171,117 @@
   box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
 }
 
+/* Plan duration card */
+.plan-duration-visibility-container {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.plan-duration-card {
+  background: #e8e9eb;
+  border-radius: 20px;
+  padding: clamp(16px, 3cqi, 24px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.plan-visibility-card {
+  width: 100%;
+  background: #e8e9eb;
+  border-radius: 20px;
+  padding: clamp(16px, 3cqi, 24px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.plan-visibility-card label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #002765;
+  display: block;
+}
+
+.visibility-options {
+  display: flex;
+  gap: 24px;
+  padding: 8px 0px;
+}
+
+.visibility-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 14px;
+  color: #333;
+}
+
+.visibility-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  accent-color: #4e085f;
+  cursor: pointer;
+}
+
+.visibility-option span {
+  user-select: none;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #333 !important;
+  cursor: pointer;
+  text-align: center;
+}
+
+@container planinfo (max-width: 600px) {
+  .plan-duration-visibility-container {
+    flex-direction: column;
+  }
+}
+
+.plan-duration-card label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #002765;
+  display: block;
+}
+
+.duration-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.duration-input input {
+  width: 100px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  background: #f5f6f7;
+}
+
+@container task (max-width: 400px) {
+  .duration-input input {
+    width: 80px;
+  }
+}
+
+.duration-input input:focus {
+  border-color: #4e085f;
+  box-shadow: 0 0 0 3px rgba(78, 8, 95, 0.1);
+}
+
+.duration-unit {
+  font-size: 16px;
+  color: #666;
+}
+
 /* Categories */
 .categories-section {
   display: flex;
@@ -190,8 +301,32 @@
 
 .categories-popup {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: #f5f6f7;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.tag-group {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
+}
+
+.tag-group-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #002765;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tag-group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .category-tag {
