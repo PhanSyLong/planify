@@ -31,19 +31,7 @@ const CreatePlan = () => {
         stageId: crypto.randomUUID(),
         // title: '',
         description: '',
-        subtasks: [
-          {
-            tempId: crypto.randomUUID(),
-            taskId: crypto.randomUUID(),
-            title: '',
-            description: '',
-            duration: 0,
-            status: 'incompleted',
-            daysLeft: 0,
-            startedAt: '',
-            completedAt: '',
-          }
-        ],
+        subtasks: [],
       }],
     }],
   });
