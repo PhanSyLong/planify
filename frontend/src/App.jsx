@@ -47,17 +47,14 @@ export default function App() {
 
             {/* MyPlan Routes */}
             <Route path="/myplan" element={<MyPlan />} />
-            <Route path="/myplan/plans/:id" element={<ViewMyPlan />} />
 
 
             {/* Saved Plan Routes */}
             <Route path="/saved" element={<SavedPlan />} />
-            <Route path="/saved/plans/:id" element={<ViewPlan />} />
             <Route path="/plans/:id/fork" element={<ForkPlan />} />
 
             {/* Community/Explore Routes */}
             <Route path="/commu" element={<Commu />} />
-            <Route path="/commu/plans/:id" element={<ViewPlan />} />
 
             {/* Unified Plan View Route - Smart wrapper that shows ViewMyPlan or ViewPlan */}
             <Route path="/plans/:id" element={<ViewPlanWrapper />} />
