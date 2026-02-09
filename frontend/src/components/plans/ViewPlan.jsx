@@ -57,9 +57,13 @@ const ViewPlan = () => {
   }, [id]);
 
   if (isError || !fullPlan) {
+    const statusCode = error?.message?.match(/\d+/g)?.[0];
+
     return (
       <div className="viewplan-error">
-        <h2>{'Plan not found (Status code: ' + error.message.match(/\d+/g) + ')'}</h2>
+        <h2>{statusCode 
+          ? `Plan not found (Status code: ${statusCode})`
+          : 'Plan not found'}</h2>
         <button onClick={handleGoBack}>Go Back</button>
       </div>
     );
