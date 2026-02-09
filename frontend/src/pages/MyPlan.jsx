@@ -21,7 +21,7 @@ const MyPlan = () => {
 
   const recentPlans = useMemo (() => {
     const raw = localStorage.getItem("recentPlans");
-    return raw ? JSON.parse(raw) : [];
+    return raw ? JSON.parse(raw).filter((plan => plans.includes(plan))) : [];
   });
 
   const handleViewMore = useCallback((title, items) => {
