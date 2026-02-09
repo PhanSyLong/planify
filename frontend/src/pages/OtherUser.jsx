@@ -37,12 +37,6 @@ export default function OtherUser() {
   if (error) return <div className="error">{error}</div>;
   if (!user) return null;
 
-  const stats = {
-    followings: user.followings || 0,
-    followers: user.followers || 0,
-    plans: user.plans || 0,
-  };
-
   return (
     <div className="otheruser-page">
       <UserAvatar
@@ -50,15 +44,14 @@ export default function OtherUser() {
         username={user.username}
         email={user.email}
         avatar={user.avatar}
-        stats={stats}
         initialIsFollowing={user.isFollowing || false}
         isOwnProfile={false}
       />
 
       <UserBioMenu
         bio={user.bio || "No bio available"}
-        stats={stats}
-        userId={id}
+        // onFollowChange nếu bạn muốn xử lý gì thêm khi follow/unfollow
+        // onFollowChange={(userId, isFollowing) => console.log(userId, isFollowing)}
       />
     </div>
   );

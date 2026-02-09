@@ -7,7 +7,7 @@ import "./MyProfile.css";
 
 export default function MyProfile() {
   const [userData, setUserData] = useState(null);
-  const [myId, setMyId] = useState(null);          // ← lưu ID thật của user hiện tại
+  const [myId, setMyId] = useState(null);
   const [stats, setStats] = useState({
     followings: 0,
     followers: 0,
@@ -78,7 +78,7 @@ export default function MyProfile() {
         bio={userData.bio || "Chưa có tiểu sử"}
         stats={stats}
         onStatsChange={handleStatsChange}
-        userId={myId}                     // ← Truyền ID thật xuống đây
+        userId={myId}
       />
     </div>
   );

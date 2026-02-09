@@ -1,82 +1,89 @@
 // src/components/profiles/UserBioMenu.jsx
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { followApi } from "../../api/follow";
 import UserCard from "../users/UserCard";
-import PlanCard from "../plans/PlanCard";          // ← import PlanCard
-import { usePlans } from "../../queries/usePlans"; // ← giả định bạn có hook này
+import PlanCard from "../plans/PlanCard";
+import { usePlans } from "../../queries/usePlans";
 
 import "./UserBioMenu.css";
 
-export default function UserBioMenu({ bio, stats, onFollowChange }) {
-  const { id: profileId } = useParams(); // profileId từ URL: /user/:id hoặc /profile/:id
-  const navigate = useNavigate();
+export default function UserBioMenu({ bio }) {
+  const { id: profileId } = useParams();
 
   const [activeTab, setActiveTab] = useState("public-plans");
 
-  // Dữ liệu followers & followings từ API
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // Lấy tất cả plans (giả định usePlans trả về plans của toàn hệ thống hoặc có thể filter)
+  const [loadingFollow, setLoadingFollow] = useState(true);
+  const [errorFollow, setErrorFollow] = useState(null);
+
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans();
 
-  // Lọc public plans của user này
+  // Pre-fetch followers & followings ngay khi mount (để count đúng từ đầu)
+  useEffect(() => {
+    if (!profileId) return;
+
+    const fetchFollowData = async () => {
+      setLoadingFollow(true);
+      setErrorFollow(null);
+      try {
+        const [followersRes, followingsRes] = await Promise.all([
+          followApi.getFollowers(profileId),
+          followApi.getFollowings(profileId),
+        ]);
+
+        setFollowers(followersRes?.data?.result || []);
+        setFollowings(followingsRes?.data?.result || []);
+      } catch (err) {
+        console.error("Lỗi preload follow data:", err);
+        setErrorFollow("Không tải được dữ liệu follow");
+      } finally {
+        setLoadingFollow(false);
+      }
+    };
+
+    fetchFollowData();
+  }, [profileId]);
+
   const publicPlans = useMemo(() => {
     if (isLoadingPlans || !plans?.length || !profileId) return [];
 
     return plans.filter(
-      (plan) =>
-        plan.ownerId === Number(profileId) && plan.visibility === "public"
+      (plan) => plan.ownerId === Number(profileId) && plan.visibility === "public"
     );
   }, [plans, isLoadingPlans, profileId]);
 
-  // Fetch followers / followings khi tab thay đổi
-  useEffect(() => {
-    if (!profileId || (activeTab !== "followers" && activeTab !== "followings")) {
-      return;
-    }
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        let res;
-        if (activeTab === "followers") {
-          res = await followApi.getFollowers(profileId);
-          setFollowers(res?.data?.result || []);
-        } else {
-          res = await followApi.getFollowings(profileId);
-          setFollowings(res?.data?.result || []);
-        }
-      } catch (err) {
-        console.error("Lỗi tải danh sách follow:", err);
-        setError("Không tải được danh sách");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [activeTab, profileId]);
-
   const handleFollowToggle = useCallback(
-    (userId, newIsFollowing) => {
-      onFollowChange?.(userId, newIsFollowing);
-      // Nếu cần cập nhật local state followers/followings thì thêm logic ở đây
+    (targetUserId, newIsFollowing) => {
+      // Cập nhật local state để UI phản ánh ngay (đặc biệt khi unfollow)
+      if (activeTab === "followers") {
+        setFollowers((prev) =>
+          newIsFollowing
+            ? prev // follow lại (hiếm xảy ra ở tab này)
+            : prev.filter((u) => u.id !== targetUserId)
+        );
+      } else if (activeTab === "followings") {
+        setFollowings((prev) =>
+          newIsFollowing
+            ? prev
+            : prev.filter((u) => u.id !== targetUserId)
+        );
+      }
+      // Nếu bạn cần thông báo hoặc cập nhật gì thêm (ví dụ: refetch stats ở parent), có thể thêm ở đây
     },
-    [onFollowChange]
+    [activeTab]
   );
 
   const renderContent = useMemo(() => {
-    // Loading & error chung cho followers/followings
-    if (loading && (activeTab === "followers" || activeTab === "followings")) {
+    // Loading & error cho tab follow
+    if (loadingFollow && (activeTab === "followers" || activeTab === "followings")) {
       return <div className="user-empty-state">Đang tải...</div>;
     }
-    if (error && (activeTab === "followers" || activeTab === "followings")) {
-      return <div className="user-empty-state error">{error}</div>;
+
+    if (errorFollow && (activeTab === "followers" || activeTab === "followings")) {
+      return <div className="user-empty-state error">{errorFollow}</div>;
     }
 
     switch (activeTab) {
@@ -149,8 +156,8 @@ export default function UserBioMenu({ bio, stats, onFollowChange }) {
     }
   }, [
     activeTab,
-    loading,
-    error,
+    loadingFollow,
+    errorFollow,
     followers,
     followings,
     publicPlans,
@@ -166,19 +173,21 @@ export default function UserBioMenu({ bio, stats, onFollowChange }) {
             className={`user-content-tab ${activeTab === "public-plans" ? "active" : ""}`}
             onClick={() => setActiveTab("public-plans")}
           >
-            Public Plans
+            Public Plans ({publicPlans.length})
           </button>
+
           <button
             className={`user-content-tab ${activeTab === "followings" ? "active" : ""}`}
             onClick={() => setActiveTab("followings")}
           >
-            Followings
+            Followings ({followings.length})
           </button>
+
           <button
             className={`user-content-tab ${activeTab === "followers" ? "active" : ""}`}
             onClick={() => setActiveTab("followers")}
           >
-            Followers
+            Followers ({followers.length})
           </button>
         </div>
 
