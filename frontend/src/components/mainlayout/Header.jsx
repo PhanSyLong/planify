@@ -16,7 +16,7 @@ import { authApi } from "../../api/auth";
 
 import "./Header.css";
 
-export default function Header() {
+export default function Header({ notifications = [], setNotifications }) {
   const [openPopup, setOpenPopup] = useState(null);
   // "user" | "notif" | "lang" | null
   const [userName, setUserName] = useState("");
@@ -43,6 +43,7 @@ export default function Header() {
 
   const toggle = (name) =>
     setOpenPopup((prev) => (prev === name ? null : name));
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <header className="app-header">
@@ -69,19 +70,26 @@ export default function Header() {
         </div>
 
         {/* Notifications */}
-        <div ref={notifRef} className="popup-trigger">
-          <FontAwesomeIcon
-            icon={faBell}
-            onClick={() => toggle("notif")}
-          />
-          <NotificationDropdown
-            isOpen={openPopup === "notif"}
-            onClose={() => setOpenPopup(null)}
-            containerRef={notifRef}
-          />
-        </div>
+          <div ref={notifRef} className="popup-trigger notif-trigger">
+              <FontAwesomeIcon
+                  icon={faBell}
+                  onClick={() => toggle("notif")}
+              />
 
-        {/* User */}
+              {unreadCount > 0 && (
+                  <span className="notif-badge">{unreadCount}</span>
+              )}
+
+              <NotificationDropdown
+                  isOpen={openPopup === "notif"}
+                  onClose={() => setOpenPopup(null)}
+                  containerRef={notifRef}
+                  notifications={notifications}        // ✅ THÊM
+                  setNotifications={setNotifications}  // ✅ THÊM
+              />
+          </div>
+
+          {/* User */}
         <div ref={userRef} className="popup-trigger">
           <FontAwesomeIcon
             icon={faUser}

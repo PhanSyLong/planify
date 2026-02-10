@@ -93,7 +93,6 @@ public class NotificationService {
         notification.setRecipient(recipient);
         Plan plan = planRepository.findById(request.getPlanId())
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
-
         notification.setPlan(plan);
 
         Notification saved = notificationRepository.save(notification);
@@ -138,7 +137,7 @@ public class NotificationService {
         notification.setTime(request.getTime());
         notification.setType(request.getType());
         notification.setMessageText(request.getMessageText());
-        notification.setPlan(dailyPerformance.getPlan());
+//        notification.setPlan(dailyPerformance.getPlan());
         notification.setRecipient(recipient);
         Plan plan = planRepository.findById(request.getPlanId())
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
@@ -158,47 +157,51 @@ public class NotificationService {
 
     // =======================================SSE======================================================
     public SseEmitter subscribe(Long userId) {
-        SseEmitter emitter = new SseEmitter(0L);
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
 
-        emitters.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>())
+        emitters
+                .computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>())
                 .add(emitter);
+
         log.info("SSE subscribed: userId={}, total={}",
                 userId, emitters.get(userId).size());
+
+        // Gửi event kết nối
         try {
-            emitter.send(SseEmitter.event().name("connected").data("ok"));
+            emitter.send(SseEmitter.event()
+                    .name("connected")
+                    .data("ok"));
         } catch (IOException e) {
             removeEmitter(userId, emitter);
+            return emitter;
         }
-
         emitter.onCompletion(() -> {
+            log.info("SSE completed userId={}", userId);
             removeEmitter(userId, emitter);
-            emitter.complete();
         });
 
         emitter.onTimeout(() -> {
+            log.info("SSE timeout userId={}", userId);
             removeEmitter(userId, emitter);
-            emitter.complete();
         });
 
         emitter.onError(e -> {
+            log.info("SSE error userId={}, msg={}", userId, e.getMessage());
             removeEmitter(userId, emitter);
-            emitter.complete();
         });
-
 
         return emitter;
     }
 
+
     public void send(Long userId, Object data) {
         List<SseEmitter> userEmitters = emitters.get(userId);
-
         if (userEmitters == null || userEmitters.isEmpty()) {
-            System.out.println("❌ NO SSE connection for userId = " + userId);
+            log.debug("❌ NO SSE connection for userId={}", userId);
             return;
         }
 
-        System.out.println("✅ SSE connections for userId = " + userId
-                + " = " + userEmitters.size());
+        List<SseEmitter> deadEmitters = new CopyOnWriteArrayList<>();
 
         for (SseEmitter emitter : userEmitters) {
             try {
@@ -207,18 +210,28 @@ public class NotificationService {
                                 .name("notification")
                                 .data(data)
                 );
-            } catch (IOException e) {
-                removeEmitter(userId, emitter);
-                emitter.complete();
+            } catch (IOException | IllegalStateException e) {
+
+                log.info("Remove dead SSE emitter userId={}, reason={}",
+                        userId, e.getMessage());
+
+                deadEmitters.add(emitter);
             }
         }
-    }
 
+        userEmitters.removeAll(deadEmitters);
+        if (userEmitters.isEmpty()) {
+            emitters.remove(userId);
+        }
+    }
 
     private void removeEmitter(Long userId, SseEmitter emitter) {
         List<SseEmitter> list = emitters.get(userId);
         if (list != null) {
             list.remove(emitter);
+            if (list.isEmpty()) {
+                emitters.remove(userId);
+            }
         }
     }
     // ========================================================================================

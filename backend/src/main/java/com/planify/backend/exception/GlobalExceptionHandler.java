@@ -8,13 +8,28 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+
+import java.io.IOException;
 
 @ControllerAdvice //Khai báo class này để khi có một Exception xảy ra thì Class này sẽ chịu trách nhiệm xử lý
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(Exception exception){
+
+    @ExceptionHandler({
+            IOException.class,
+            IllegalStateException.class,
+            AsyncRequestNotUsableException.class
+    })
+    public void ignoreSseException(Exception ex) {
+        // ✅ SSE client disconnect → KHÔNG PHẢI ERROR
+        // ❌ KHÔNG log error
+        // ❌ KHÔNG trả ApiResponse
+    }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
         log.error("Unhandled exception occurred", exception);
         ApiResponse apiResponse = new ApiResponse();
 
@@ -23,7 +38,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(apiResponse);//Đây nội dung là trả về lỗi từ người dùng gây ra (lỗi 400)
     }
-    
+
     @ExceptionHandler(value = AuthenticationException.class)
     ResponseEntity<ApiResponse> handlingAuthenticationException(AuthenticationException exception){
         log.error("Authentication exception occurred", exception);
@@ -32,7 +47,7 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage(ErrorCode.UNAUTHENTICATED.getMessage());
         return ResponseEntity.status(401).body(apiResponse);
     }
-    
+
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception){
         log.error("Access denied exception occurred", exception);
@@ -71,4 +86,5 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
+
 }

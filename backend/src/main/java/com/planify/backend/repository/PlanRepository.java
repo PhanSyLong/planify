@@ -37,14 +37,19 @@ public interface PlanRepository extends JpaRepository<@NonNull Plan, @NonNull In
             "AND p.reminderSent = FALSE")
     List<Plan> findRemindersPlanWithDetails(@Param("now") LocalDateTime now);
 
-    /** Expired Plan Function
-     */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT p FROM Plan p " +
-            "JOIN FETCH p.owner u " +
-            "WHERE p.expiredAt <= :now " +
-            "AND p.expiredSent = FALSE")
-    List<Plan> findDuePlansWithDetails(@Param("now") LocalDateTime now);
+    @Query("""
+    SELECT p FROM Plan p
+    JOIN FETCH p.owner u
+    WHERE p.expiredSent = FALSE
+      AND p.expiredAt > :fromPlus1Day
+      AND p.expiredAt <= :toPlus1Day
+""")
+    List<Plan> findPlansToNotify(
+            @Param("fromPlus1Day") LocalDateTime fromPlus1Day,
+            @Param("toPlus1Day") LocalDateTime toPlus1Day
+    );
+
 
     @Query("""
     SELECT p FROM Plan p

@@ -43,6 +43,9 @@ public class Subtask {
     @Column(name = "scheduled_date")
     LocalDateTime scheduledDate;
 
+    @Column(name = "scheduled_sent")
+    boolean scheduledSent;
+
     @Column(name="started_at")
     LocalDateTime started_at;
 

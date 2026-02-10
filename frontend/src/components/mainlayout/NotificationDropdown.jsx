@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './NotificationDropdown.css';
+import { useNavigate } from "react-router-dom";
+
 
 const NotificationDropdown = ({
   isOpen,
   onClose,
   containerRef,
-  notifications = [] // ← receive from parent
+  notifications = [], // ← receive from parent
+  setNotifications
 }) => {
-  const dropdownRef = useRef(null);
-  const [filter, setFilter] = useState('all'); // 'all' or 'unread'
+    const navigate = useNavigate();
+    const dropdownRef = useRef(null);
+    const [filter, setFilter] = useState('all'); // 'all' or 'unread'
 
   // Click outside to close
   useEffect(() => {
@@ -35,8 +39,22 @@ const NotificationDropdown = ({
   const displayedNotifications = filter === 'unread'
     ? notifications.filter(n => !n.read)
     : notifications;
+    const handleClick = (notif) => {
+        // 1. mark as read
+        setNotifications(prev =>
+            prev.map(n =>
+                n.id === notif.id ? { ...n, read: true } : n
+            )
+        );
 
-  return (
+        // 2. navigate
+        if (notif.link) {
+            navigate(notif.link);
+            onClose(); // đóng dropdown
+        }
+    };
+
+    return (
     <div className="notification-dropdown" ref={dropdownRef}>
       <div className="notification-header">
         <h3>Notifications</h3>
@@ -68,12 +86,21 @@ const NotificationDropdown = ({
           </p>
         ) : (
           displayedNotifications.map((notif) => (
-            <div
-              key={notif.id}
-              className={`notification-item ${!notif.read ? 'unread' : ''}`}
-            >
-              <img src={notif.avatar} alt={notif.name} className="avatar" />
-              <div className="content">
+              <div
+                  key={notif.id}
+                  className={`notification-item ${!notif.read ? 'unread' : ''}`}
+                  onClick={() => handleClick(notif)}
+              >
+
+                  {notif.avatar && (
+                      <img
+                          src={notif.avatar}
+                          alt={notif.name}
+                          className="avatar"
+                      />
+                  )}
+
+                  <div className="content">
                 <p>
                   <strong>{notif.name}</strong> {notif.action}
                   {notif.message && <span className="message"> {notif.message}</span>}

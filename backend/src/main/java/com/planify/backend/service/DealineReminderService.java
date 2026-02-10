@@ -2,9 +2,8 @@ package com.planify.backend.service;
 
 import com.planify.backend.constant.NotificationTypeConst;
 import com.planify.backend.dto.request.NotificationRequest;
-import com.planify.backend.model.Plan;
-import com.planify.backend.model.User;
-import com.planify.backend.repository.PlanRepository;
+import com.planify.backend.model.*;
+import com.planify.backend.repository.SubtaskRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +23,7 @@ import java.util.List;
 
 public class DealineReminderService {
 
-    final PlanRepository planRepository;
+    final SubtaskRepository  subtaskRepository;
     final NotificationService notificationService;
 
     @Scheduled(fixedRate = 60000)
@@ -41,71 +40,40 @@ public class DealineReminderService {
 
         try {
             LocalDateTime now = LocalDateTime.now();
+            LocalDateTime from = now.plusDays(1);
+            LocalDateTime to   = from.plusMinutes(1);
 
             // ============================Find reminder Plan==================================
-            List<Plan> reminders = planRepository.findRemindersPlanWithDetails(now);
-            for (Plan plan : reminders) {
-                User recipient = plan.getOwner();
+            List<Subtask> subTasks =
+                    subtaskRepository.findSubTasksToRemind(from, to);
 
-                // Create REQUEST DTO
-                NotificationRequest notificationRequest = NotificationRequest.builder()
-                        .recipientId(recipient.getId())
-                        .type(NotificationTypeConst.PLAN_REMINDER)
-                        .messageText(
-                                "The deadline for plan \"" + plan.getTitle() + "\" is coming up"
-                        )
-                        .planId(plan.getId())
-                        .time(plan.getExpiredAt())
-                        .build();
+            for (Subtask st : subTasks) {
 
-                // Send Mail
-                notificationService.sendEmailNotification(
-                        notificationRequest,
-                        plan,
-                        "PLAN DEADLINE REMINDER"
-                );
-                notificationService.sendWebNotification(
-                        notificationRequest,
-                        "PLAN DEADLINE REMINDER"
-                );
+                Task task = st.getTask_id();
+                Stage stage = task.getStage_id();
+                Plan plan = stage.getPlan_id();
+                User user = plan.getOwner();
 
-                plan.setReminderSent(true);
-            }
-
-            // ==============================Find expired Plan===============================================
-            List<Plan> duePlans = planRepository.findDuePlansWithDetails(now);
-            for (Plan plan : duePlans) {
-                Plan managedPlan = planRepository.findById(plan.getId())
-                        .orElseThrow(() -> new RuntimeException("Plan not found"));
-                User recipient = managedPlan.getOwner();
-                // Create REQUEST DTO
-                NotificationRequest notificationRequest = NotificationRequest.builder()
-                        .recipientId(recipient.getId()) // USER ID
+                NotificationRequest req = NotificationRequest.builder()
+                        .recipientId(user.getId())
                         .type(NotificationTypeConst.PLAN_EXPIRED)
                         .messageText(
-                                "The deadline for plan \"" + plan.getDescription() + "\" is expired"
+                                "Subtask \"" + st.getTitle() + "\" " + " will expired tomorow"
                         )
                         .planId(plan.getId())
-                        .time(plan.getExpiredAt())
+                        .time(st.getScheduledDate())
                         .build();
-                // Send Mail
-                notificationService.sendEmailNotification(
-                        notificationRequest,
-                        plan,
-                        "PLAN IS EXPIRED" //
-                );
-                notificationService.sendWebNotification(
-                        notificationRequest,
-                        "PLAN IS EXPIRED" //
-                );
-                plan.setExpiredSent(true);
+
+                notificationService.sendWebNotification(req, "SUBTASK REMINDER");
+                notificationService.sendEmailNotification(req, plan, "SUBTASK REMINDER");
+
+                st.setScheduledSent(true);
             }
 
-            planRepository.saveAll(reminders);
-            planRepository.saveAll(duePlans);
+            subtaskRepository.saveAll(subTasks);
 
         } finally {
-            SecurityContextHolder.clearContext();  // Delete Authentication when task done
+            SecurityContextHolder.clearContext();
         }
     }
 }

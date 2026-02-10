@@ -27,8 +27,15 @@ const ViewMyPlan = () => {
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [reminderDate, setReminderDate] = useState('');
+  const [reminderHour, setReminderHour] = useState('08');
+  const [reminderMinute, setReminderMinute] = useState('00');
+  const [reminderSecond, setReminderSecond] = useState('00');
 
-  // Track started subtasks and confirmation dialogs
+
+
+    // Track started subtasks and confirmation dialogs
   const [startedSubtasks, setStartedSubtasks] = useState(new Set());
   const [hasStartedAnySubtask, setHasStartedAnySubtask] = useState(false);
   const [confirmModal, setConfirmModal] = useState({
@@ -44,14 +51,20 @@ const ViewMyPlan = () => {
   const { data: fullPlan, isLoading } = useHydratedPlan(id);
 
   // Initialize plan state from context
-  useMemo(() => {
-    if (fullPlan && !plan) {
-      setPlan(fullPlan);
-      setOriginalPlan(JSON.parse(JSON.stringify(fullPlan)));
-    }
-  }, [fullPlan, plan]);
+    useEffect(() => {
+        if (fullPlan) {
+            setPlan(fullPlan);
+            setOriginalPlan(JSON.parse(JSON.stringify(fullPlan)));
 
-  // Initialize startedSubtasks from database data (check started_at field)
+            // reset state phụ nếu cần
+            setStartedSubtasks(new Set());
+            setHasStartedAnySubtask(false);
+            setIsEditing(false);
+        }
+    }, [id, fullPlan]);
+
+
+    // Initialize startedSubtasks from database data (check started_at field)
   useEffect(() => {
     if (plan && plan.stages) {
       const started = new Set();
@@ -202,8 +215,11 @@ const ViewMyPlan = () => {
   const handleDeleteClick = useCallback(() => {
     setShowDeleteConfirm(true);
   }, []);
+    const handleReminderClick = () => {
+        alert("⏰ Reminder feature coming soon!");
+    };
 
-  const handleConfirmDelete = useCallback(async () => {
+    const handleConfirmDelete = useCallback(async () => {
     setIsDeleting(true);
     try {
       await deletePlan(id);
@@ -547,9 +563,8 @@ const ViewMyPlan = () => {
         <button className="viewplan-back-btn" onClick={handleGoBack}>
           ← Back
         </button>
-
         <div className="viewplan-actions">
-          <div ref={reviewBtnRef} style={{ position: 'relative' }}>
+            <div ref={reviewBtnRef} style={{ position: 'relative' }}>
             <button className="btn-review" onClick={() => {
               setShowReview(!showReview);
               if (!showReview) {
