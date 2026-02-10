@@ -71,3 +71,83 @@
     align-items: flex-start;
   }
 }
+
+/* Overdue subtask styling */
+.todo-item--overdue {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+  padding-left: 9px;
+  border-radius: 4px;
+}
+
+.todo-item--overdue .todo-text {
+  color: #dc2626;
+}
+
+/* Completed/cancelled subtask styling */
+.todo-item--completed .todo-text,
+.todo-item--cancelled .todo-text {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Confirmation Modal for ToDo */
+.todo-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.todo-confirm-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.todo-confirm-modal h3 {
+  margin: 0 0 12px 0;
+  color: #0c4a6e;
+}
+
+.todo-confirm-modal p {
+  margin: 0 0 20px 0;
+  color: #475569;
+}
+
+.todo-confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.todo-confirm-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-confirm-no {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-confirm-yes {
+  background: #0284c7;
+  color: white;
+}
+
+.btn-confirm-yes.cancel-action {
+  background: #dc2626;
+}

@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import StatusDropdown from "./StatusDropdown";
-import { getTodoList, updateSubtask } from "../../api/subtask";
+import { getTodoList, updateSubtask, completeSubtask } from "../../api/subtask";
+import { recordSubtaskDone, recordSubtaskCancel } from "../../api/dailyPerformance";
 import "./ToDo.css";
 
 export default function ToDo() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    visible: false,
+    type: null, // 'done' or 'cancel'
+    subtaskId: null,
+    planId: null,
+    newStatus: null
+  });
 
-  useEffect(() => {
+  const fetchTodoList = useCallback(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
       setLoading(false);
@@ -28,6 +36,10 @@ export default function ToDo() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchTodoList();
+  }, [fetchTodoList]);
 
   /**
    * Groups todo items by plan and sorts:
@@ -68,25 +80,80 @@ export default function ToDo() {
     return planArray;
   }
 
-  // Implement later
-  // async function updateTaskStatus(subtaskId, newStatus) {
-  //   // Optimistic update
-  //   setPlans((prev) =>
-  //     prev.map((plan) => ({
-  //       ...plan,
-  //       tasks: plan.tasks.map((task) =>
-  //         task.subtaskId === subtaskId ? { ...task, status: newStatus } : task
-  //       ),
-  //     }))
-  //   );
+  // Check if a subtask is overdue (scheduledDate is in the past and status is incomplete)
+  function isOverdue(task) {
+    if (!task.scheduledDate || task.status !== 'incompleted') return false;
+    const scheduled = new Date(task.scheduledDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return scheduled < today;
+  }
 
-  //   try {
-  //     await updateSubtask(subtaskId, { status: newStatus });
-  //   } catch (err) {
-  //     console.error("Failed to update subtask status:", err);
-  //     // Revert on error - refetch could be done here
-  //   }
-  // }
+  // Normalize status for display
+  function normalizeStatus(status) {
+    if (status === 'completed') return 'DONE';
+    if (status === 'cancelled') return 'CANCELLED';
+    if (status === 'incompleted') return 'INCOMPLETE';
+    return status || 'INCOMPLETE';
+  }
+
+  // Check if subtask is finished
+  function isFinished(status) {
+    return status === 'completed' || status === 'cancelled' ||
+      status === 'DONE' || status === 'CANCELLED';
+  }
+
+  // Handle status change with confirmation
+  function handleStatusChange(subtaskId, planId, newStatus) {
+    if (newStatus === 'DONE' || newStatus === 'CANCELLED') {
+      setConfirmModal({
+        visible: true,
+        type: newStatus === 'DONE' ? 'done' : 'cancel',
+        subtaskId,
+        planId,
+        newStatus
+      });
+    }
+  }
+
+  // Confirm the status change
+  async function handleConfirm() {
+    const { type, subtaskId, planId, newStatus } = confirmModal;
+
+    // Optimistic update
+    setPlans((prev) =>
+      prev.map((plan) => ({
+        ...plan,
+        tasks: plan.tasks.map((task) =>
+          task.subtaskId === subtaskId
+            ? { ...task, status: newStatus === 'DONE' ? 'completed' : 'cancelled' }
+            : task
+        ),
+      }))
+    );
+
+    setConfirmModal({ visible: false, type: null, subtaskId: null, planId: null, newStatus: null });
+
+    try {
+      if (type === 'done') {
+        await completeSubtask(subtaskId);
+        await updateSubtask(subtaskId, { status: 'completed' });
+        await recordSubtaskDone(planId);
+      } else if (type === 'cancel') {
+        await updateSubtask(subtaskId, { status: 'cancelled' });
+        await recordSubtaskCancel(planId);
+      }
+    } catch (err) {
+      console.error("Failed to update subtask status:", err);
+      // Revert on error - refetch
+      fetchTodoList();
+    }
+  }
+
+  // Cancel the modal
+  function handleCancelModal() {
+    setConfirmModal({ visible: false, type: null, subtaskId: null, planId: null, newStatus: null });
+  }
 
   if (loading) {
     return (
@@ -126,22 +193,60 @@ export default function ToDo() {
           </Link>
 
           <ul className="todo-list">
-            {plan.tasks.map((task) => (
-              <li className="todo-item" key={task.subtaskId}>
-                <span className="todo-text">• {task.title}</span>
+            {plan.tasks.map((task) => {
+              const overdue = isOverdue(task);
+              const finished = isFinished(task.status);
+              const statusClass = task.status === 'completed' ? 'todo-item--completed'
+                : task.status === 'cancelled' ? 'todo-item--cancelled'
+                  : '';
 
-                {/* Implement later */}
-                {/* <StatusDropdown
-                  value={task.status}
-                  onChange={(newStatus) =>
-                    updateTaskStatus(task.subtaskId, newStatus)
-                  }
-                /> */}
-              </li>
-            ))}
+              return (
+                <li
+                  className={`todo-item ${overdue ? 'todo-item--overdue' : ''} ${statusClass}`}
+                  key={task.subtaskId}
+                >
+                  <span className="todo-text">• {task.title}</span>
+
+                  <StatusDropdown
+                    value={normalizeStatus(task.status)}
+                    onChange={(newStatus) =>
+                      handleStatusChange(task.subtaskId, task.planId, newStatus)
+                    }
+                    disabled={finished}
+                  />
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}
+
+      {/* Confirmation Modal */}
+      {confirmModal.visible && (
+        <div className="todo-confirm-overlay">
+          <div className="todo-confirm-modal">
+            <h3>
+              {confirmModal.type === 'done' ? 'Complete Subtask' : 'Cancel Subtask'}
+            </h3>
+            <p>
+              {confirmModal.type === 'done'
+                ? 'Are you sure you want to mark this subtask as done? This action cannot be undone.'
+                : 'Are you sure you want to cancel this subtask? This action cannot be undone.'}
+            </p>
+            <div className="todo-confirm-actions">
+              <button className="btn-confirm-no" onClick={handleCancelModal}>
+                No, Go Back
+              </button>
+              <button
+                className={`btn-confirm-yes ${confirmModal.type === 'cancel' ? 'cancel-action' : ''}`}
+                onClick={handleConfirm}
+              >
+                {confirmModal.type === 'done' ? 'Yes, Complete' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

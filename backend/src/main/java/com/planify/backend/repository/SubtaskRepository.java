@@ -9,19 +9,33 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface SubtaskRepository extends JpaRepository<@NonNull Subtask, @NonNull Integer> {
-    @Query("select st from Subtask st where st.task_id.id = :taskId")
-    List<Subtask> findAllSubtask(@Param("taskId") @NonNull Integer taskId);
+        @Query("select st from Subtask st where st.task_id.id = :taskId")
+        List<Subtask> findAllSubtask(@Param("taskId") @NonNull Integer taskId);
 
-    @Query("select st from Subtask st where st.id = :subtaskId and st.task_id.id = :taskId")
-    Subtask findSubtaskByIdAndTaskId(@Param("subtaskId") @NonNull Integer subtaskId, @Param("taskId") @NonNull Integer taskId);
+        @Query("select st from Subtask st where st.id = :subtaskId and st.task_id.id = :taskId")
+        Subtask findSubtaskByIdAndTaskId(@Param("subtaskId") @NonNull Integer subtaskId,
+                        @Param("taskId") @NonNull Integer taskId);
 
-    @Query("SELECT st from Subtask st WHERE st.task_id.stage_id.plan_id.id = :planId")
-    List<Subtask> findAllSubtaskByPlanId(@Param("planId") @NonNull Integer planId);
+        @Query("SELECT st from Subtask st WHERE st.task_id.stage_id.plan_id.id = :planId")
+        List<Subtask> findAllSubtaskByPlanId(@Param("planId") @NonNull Integer planId);
 
-    @Query("select coalesce(sum(st.duration), 0) from Subtask st where st.task_id.id = :taskId")
-    Integer sumDurationByTaskId(@Param("taskId") @NonNull Integer taskId);
+        @Query("select coalesce(sum(st.duration), 0) from Subtask st where st.task_id.id = :taskId")
+        Integer sumDurationByTaskId(@Param("taskId") @NonNull Integer taskId);
 
-    // New: find incomplete subtasks (not completed) for an owner that have a scheduled_date, ordered by scheduled_date asc
-    @Query("select st from Subtask st where st.task_id.stage_id.plan_id.owner.id = :ownerId and st.status = 'incompleted' and st.scheduledDate is not null order by st.scheduledDate asc")
-    List<Subtask> findIncompleteScheduledByOwnerOrdered(@Param("ownerId") @NonNull Integer ownerId);
+        // New: find incomplete subtasks (not completed) for an owner that have a
+        // scheduled_date, ordered by scheduled_date asc
+        @Query("select st from Subtask st where st.task_id.stage_id.plan_id.owner.id = :ownerId and st.status = 'incompleted' and st.scheduledDate is not null order by st.scheduledDate asc")
+        List<Subtask> findIncompleteScheduledByOwnerOrdered(@Param("ownerId") @NonNull Integer ownerId);
+
+        // Find today's todo list: started today + completed/cancelled today +
+        // incomplete from past days
+        @Query("SELECT st FROM Subtask st WHERE st.task_id.stage_id.plan_id.owner.id = :ownerId " +
+                        "AND st.started_at IS NOT NULL " +
+                        "AND ((CAST(st.started_at AS date) = CURRENT_DATE) " +
+                        "     OR (st.completed_at IS NOT NULL AND CAST(st.completed_at AS date) = CURRENT_DATE) " +
+                        "     OR (st.status = 'cancelled' AND st.completed_at IS NULL AND CAST(st.started_at AS date) <= CURRENT_DATE) "
+                        +
+                        "     OR (st.status = 'incompleted' AND CAST(st.started_at AS date) < CURRENT_DATE)) " +
+                        "ORDER BY st.scheduledDate ASC")
+        List<Subtask> findTodayTodoList(@Param("ownerId") @NonNull Integer ownerId);
 }

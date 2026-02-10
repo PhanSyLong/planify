@@ -32,9 +32,9 @@ public class SubtaskService {
     private PlanRepository planRepository;
 
     @Transactional
-    public Subtask addSubtask(SubtaskRequest request){
+    public Subtask addSubtask(SubtaskRequest request) {
         Task task = taskRepository.findTaskById(request.getTaskId());
-        if(task == null){
+        if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);
         }
         Subtask subtask = new Subtask();
@@ -48,7 +48,8 @@ public class SubtaskService {
         Subtask saved = subtaskRepository.save(subtask);
 
         // Recompute and persist durations up the chain: Task -> Stage -> Plan
-        // Use a separate transaction to avoid deadlock during concurrent subtask creation
+        // Use a separate transaction to avoid deadlock during concurrent subtask
+        // creation
         updateDurationsAfterSubtaskAdd(task);
 
         return saved;
@@ -56,7 +57,8 @@ public class SubtaskService {
 
     /**
      * Update durations without holding locks on multiple rows simultaneously.
-     * Called separately from subtask insertion to avoid deadlock in concurrent scenarios.
+     * Called separately from subtask insertion to avoid deadlock in concurrent
+     * scenarios.
      */
     @Transactional
     public void updateDurationsAfterSubtaskAdd(Task task) {
@@ -80,7 +82,7 @@ public class SubtaskService {
     public void removeSubtask(Integer subtaskId, Integer taskId, Integer stageId, Integer planId) {
         // Validate that the task belongs to the given stage and plan
         Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
-        if (task == null){
+        if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);
         }
 
@@ -112,15 +114,15 @@ public class SubtaskService {
         }
     }
 
-    public Subtask getSubtaskById(Integer subtaskId, Integer taskId, Integer stageId, Integer planId){
+    public Subtask getSubtaskById(Integer subtaskId, Integer taskId, Integer stageId, Integer planId) {
         // Validate chain
         Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
-        if (task == null){
+        if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);
         }
 
         Subtask subtask = subtaskRepository.findSubtaskByIdAndTaskId(subtaskId, taskId);
-        if (subtask == null){
+        if (subtask == null) {
             throw new AppException(ErrorCode.SUBTASK_NOT_FOUND);
         }
 
@@ -131,53 +133,48 @@ public class SubtaskService {
         return subtaskRepository.findAllSubtaskByPlanId(planId);
     }
 
-    public List<Subtask> getAllSubtasks(Integer taskId, Integer stageId, Integer planId){
+    public List<Subtask> getAllSubtasks(Integer taskId, Integer stageId, Integer planId) {
         Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
-        if (task == null){
+        if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);
         }
 
         return subtaskRepository.findAllSubtask(taskId);
     }
 
-
     public ProgressResponse computeProgress(Integer planId, Integer stageId, Integer taskId, Integer subtaskId) {
         Task task = taskService.getTaskByIdAndStageId(taskId, stageId, planId);
-        if (task == null){
+        if (task == null) {
             throw new AppException(ErrorCode.TASK_NOT_FOUND);
         }
 
         Subtask subtask = subtaskRepository.findSubtaskByIdAndTaskId(subtaskId, taskId);
-        if (subtask == null){
+        if (subtask == null) {
             throw new AppException(ErrorCode.SUBTASK_NOT_FOUND);
         }
         if (subtask.getStarted_at() == null) {
             return new ProgressResponse(
                     0,
                     subtask.getDuration(),
-                    TimeStatus.NOT_STARTED
-            );
+                    TimeStatus.NOT_STARTED);
         }
         if (subtask.getCompleted_at() == null) {
             if (Objects.equals(subtask.getStatus(), "cancelled")) {
                 return new ProgressResponse(
                         0,
                         subtask.getDuration(),
-                        TimeStatus.CANCELLED
-                );
+                        TimeStatus.CANCELLED);
             } else {
                 return new ProgressResponse(
                         0,
                         subtask.getDuration(),
-                        TimeStatus.IN_PROGRESS
-                );
+                        TimeStatus.IN_PROGRESS);
             }
         }
 
         long actualDuration = TimeCalculator.calculateActualDays(
                 subtask.getStarted_at(),
-                subtask.getCompleted_at()
-        );
+                subtask.getCompleted_at());
         TimeStatus status;
 
         if (actualDuration > subtask.getDuration()) {
@@ -192,14 +189,13 @@ public class SubtaskService {
                 .build();
     }
 
-
-
-    // New: return incomplete scheduled subtasks for todo list ordered by scheduled_date asc
+    // Return today's todo list: all started today + incomplete from past days
     public List<Subtask> getTodoList(Integer ownerId) {
-        return subtaskRepository.findIncompleteScheduledByOwnerOrdered(ownerId);
+        return subtaskRepository.findTodayTodoList(ownerId);
     }
 
-    // New: partial update for Subtask. If duration is updated, propagate changes up to Task, Stage, and Plan.
+    // New: partial update for Subtask. If duration is updated, propagate changes up
+    // to Task, Stage, and Plan.
     @Transactional
     public Subtask updateSubtaskPartial(Integer subtaskId, SubtaskUpdateRequest request) {
         // Find the subtask
@@ -211,9 +207,12 @@ public class SubtaskService {
         Integer oldDuration = (subtask.getDuration() == 0) ? 0 : subtask.getDuration();
         boolean durationChanged = false;
 
-        if (request.getTitle() != null) subtask.setTitle(request.getTitle());
-        if (request.getDescription() != null) subtask.setDescription(request.getDescription());
-        if (request.getStatus() != null) subtask.setStatus(request.getStatus());
+        if (request.getTitle() != null)
+            subtask.setTitle(request.getTitle());
+        if (request.getDescription() != null)
+            subtask.setDescription(request.getDescription());
+        if (request.getStatus() != null)
+            subtask.setStatus(request.getStatus());
         if (request.getDuration() != null) {
             if (request.getDuration() < 0) {
                 throw new AppException(ErrorCode.INVALID_REQUEST);
@@ -269,6 +268,7 @@ public class SubtaskService {
         subtask.setScheduledDate(endDate);
         return subtaskRepository.save(subtask);
     }
+
     public Subtask completeSubtask(Integer subtaskId) {
         Subtask subtask = subtaskRepository.findById(subtaskId).orElse(null);
         if (subtask == null) {
