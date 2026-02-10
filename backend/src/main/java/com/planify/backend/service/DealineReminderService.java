@@ -40,7 +40,7 @@ public class DealineReminderService {
 
         try {
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime from = now.plusDays(1);
+            LocalDateTime from = now.plusHours(7);
             LocalDateTime to   = from.plusMinutes(1);
 
             // ============================Find reminder Plan==================================
