@@ -47,7 +47,7 @@ export default function UserAvatar({
           )}
         </div>
 
-        {/* Bỏ toàn bộ phần stats */}
+        {/* Đã xóa toàn bộ phần stats */}
       </div>
     </div>
   );

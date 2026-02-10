@@ -214,6 +214,8 @@ public class PlanService {
             throw new AppException(ErrorCode.PLAN_NOT_FOUND);
         }
         plan.setStarted_at(LocalDateTime.now());
+        LocalDateTime endDate = plan.getStarted_at().plusDays(plan.getDuration());
+        plan.setExpiredAt(endDate);
         return planRepository.save(plan);
     }
 

@@ -2,21 +2,48 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { followApi } from "../../api/follow";
 import UserCard from "../users/UserCard";
-import PlanCard from "../plans/PlanCard"; // ← Đảm bảo đường dẫn đúng với dự án của bạn
+import PlanCard from "../plans/PlanCard";
 import { usePlans } from "../../queries/usePlans";
 
 import "./MyBioMenu.css";
 
-export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
+export default function MyBioMenu({ bio, userId }) {
   const [activeTab, setActiveTab] = useState("public-plans");
 
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loadingFollow, setLoadingFollow] = useState(true); // riêng cho follow data
+  const [errorFollow, setErrorFollow] = useState(null);
 
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans();
+
+  // Pre-fetch followers & followings NGAY KHI MOUNT (không phụ thuộc tab)
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchFollowData = async () => {
+      setLoadingFollow(true);
+      setErrorFollow(null);
+      try {
+        const [followersRes, followingsRes] = await Promise.all([
+          followApi.getFollowers(userId),
+          followApi.getFollowings(userId),
+        ]);
+
+        setFollowers(followersRes?.data?.result || []);
+        setFollowings(followingsRes?.data?.result || []);
+      } catch (err) {
+        console.error("Lỗi preload follow data:", err);
+        setErrorFollow("Không tải được dữ liệu follow");
+      } finally {
+        setLoadingFollow(false);
+      }
+    };
+
+    fetchFollowData();
+  }, [userId]); // Chỉ chạy 1 lần khi có userId
+
+  // Chỉ fetch lại nếu cần (ví dụ sau khi follow/unfollow thay đổi lớn), nhưng thường không cần
 
   const publicPlans = useMemo(() => {
     if (isLoadingPlans || !plans?.length) return [];
@@ -26,70 +53,38 @@ export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
     );
   }, [plans, isLoadingPlans, userId]);
 
-  // Fetch followers / followings chỉ khi cần
-  useEffect(() => {
-    if (!userId || (activeTab !== "followers" && activeTab !== "followings")) {
-      return;
-    }
-
-    const fetchList = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        let res;
-        if (activeTab === "followers") {
-          res = await followApi.getFollowers(userId);
-          setFollowers(res?.data?.result || []);
-        } else if (activeTab === "followings") {
-          res = await followApi.getFollowings(userId);
-          setFollowings(res?.data?.result || []);
-        }
-      } catch (err) {
-        console.error(`Lỗi tải ${activeTab}:`, err);
-        setError(
-          `Không tải được danh sách ${
-            activeTab === "followers" ? "người theo dõi" : "đang theo dõi"
-          }`
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchList();
-  }, [activeTab, userId]);
-
   const handleFollowToggle = useCallback(
-    (userId, newIsFollowing) => {
+    (targetUserId, newIsFollowing) => {
       if (activeTab === "followers") {
-        onStatsChange?.((prev) => ({
-          ...prev,
-          followers: newIsFollowing
-            ? prev.followers + 1
-            : Math.max(0, prev.followers - 1),
-        }));
+        setFollowers((prev) =>
+          newIsFollowing
+            ? prev // follow lại → thường không xảy ra
+            : prev.filter((u) => u.id !== targetUserId)
+        );
+      } else if (activeTab === "followings") {
+        setFollowings((prev) =>
+          newIsFollowing
+            ? prev
+            : prev.filter((u) => u.id !== targetUserId)
+        );
       }
-      // Nếu cần cập nhật followings của chính mình → thêm logic tương tự
+      // Nếu muốn cập nhật count ngay lập tức ở tab khác → có thể set lại state tương ứng
     },
-    [activeTab, onStatsChange]
+    [activeTab]
   );
 
   const renderContent = useMemo(() => {
-    // Loading & error cho followers/followings
-    if (loading && (activeTab === "followers" || activeTab === "followings")) {
+    if (loadingFollow && (activeTab === "followers" || activeTab === "followings")) {
       return <div className="my-empty-state">Đang tải...</div>;
     }
 
-    if (error && (activeTab === "followers" || activeTab === "followings")) {
-      return <div className="my-empty-state error">{error}</div>;
+    if (errorFollow && (activeTab === "followers" || activeTab === "followings")) {
+      return <div className="my-empty-state error">{errorFollow}</div>;
     }
 
     switch (activeTab) {
       case "public-plans":
-        if (isLoadingPlans) {
-          return <div className="my-empty-state">Đang tải kế hoạch...</div>;
-        }
+        if (isLoadingPlans) return <div className="my-empty-state">Đang tải kế hoạch...</div>;
 
         if (publicPlans.length === 0) {
           return (
@@ -155,8 +150,8 @@ export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
     }
   }, [
     activeTab,
-    loading,
-    error,
+    loadingFollow,
+    errorFollow,
     followers,
     followings,
     publicPlans,
@@ -172,19 +167,21 @@ export default function MyBioMenu({ bio, stats, onStatsChange, userId }) {
             className={`my-content-tab ${activeTab === "public-plans" ? "active" : ""}`}
             onClick={() => setActiveTab("public-plans")}
           >
-            Public Plans
+            Public Plans ({publicPlans.length})
           </button>
+
           <button
             className={`my-content-tab ${activeTab === "followings" ? "active" : ""}`}
             onClick={() => setActiveTab("followings")}
           >
-            Followings
+            Followings ({followings.length})
           </button>
+
           <button
             className={`my-content-tab ${activeTab === "followers" ? "active" : ""}`}
             onClick={() => setActiveTab("followers")}
           >
-            Followers
+            Followers ({followers.length})
           </button>
         </div>
 
