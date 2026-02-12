@@ -5,7 +5,7 @@ import PreviewModal from '../createplan/Preview';
 import StatusDropdown from '../../components/home/StatusDropdown';
 import ReviewPlanPopup from './ReviewPlanPopUp';
 import { useHydratedPlan } from '../../queries/useHydratedPlan';
-import { deletePlan, startPlan, completePlan } from '../../api/plan';
+import { deletePlan, startPlan, completePlan, updatePlan } from '../../api/plan';
 import { startStage, completeStage } from '../../api/stage';
 import { startTask, completeTask } from '../../api/task';
 import { startSubtask, completeSubtask, updateSubtask, getSubtaskProgress } from '../../api/subtask';
@@ -449,6 +449,16 @@ const ViewMyPlan = () => {
 
               if (areAllStagesFinished(updatedPlan)) {
                 await completePlan(plan.id);
+
+                // Determine plan status: 'cancelled' if ALL subtasks are cancelled, else 'completed'
+                const allCancelled = updatedPlan.stages.every(stage =>
+                  stage.tasks.every(task =>
+                    task.subtasks?.every(s =>
+                      s.status === 'cancelled' || s.status === 'CANCELLED'
+                    )
+                  )
+                );
+                await updatePlan(plan.id, { status: allCancelled ? 'cancelled' : 'completed' });
               }
             }
           }
@@ -489,6 +499,16 @@ const ViewMyPlan = () => {
 
               if (areAllStagesFinished(updatedPlan)) {
                 await completePlan(plan.id);
+
+                // Determine plan status: 'cancelled' if ALL subtasks are cancelled, else 'completed'
+                const allCancelled = updatedPlan.stages.every(stage =>
+                  stage.tasks.every(task =>
+                    task.subtasks?.every(s =>
+                      s.status === 'cancelled' || s.status === 'CANCELLED'
+                    )
+                  )
+                );
+                await updatePlan(plan.id, { status: allCancelled ? 'cancelled' : 'completed' });
               }
             }
           }

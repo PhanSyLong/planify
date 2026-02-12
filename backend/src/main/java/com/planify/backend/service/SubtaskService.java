@@ -175,7 +175,7 @@ public class SubtaskService {
                 subtask.getCompleted_at());
         TimeStatus status;
 
-        if (actualDuration > subtask.getDuration()) {
+        if (actualDuration >= subtask.getDuration()) {
             status = TimeStatus.LATE;
         } else {
             status = TimeStatus.ON_TIME;
