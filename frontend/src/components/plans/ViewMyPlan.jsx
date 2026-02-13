@@ -655,7 +655,14 @@ const ViewMyPlan = () => {
 
             <div className='info-section'>
               <strong>Visibility</strong>
-              <p>{plan.visibility}</p>
+              <p>{plan.visibility.charAt(0).toUpperCase() + plan.visibility.slice(1)}</p>
+            </div>
+
+            <div className='info-section'>
+              <strong>Status</strong>
+              <span className={`status-badge status-${plan.status.toLowerCase()}`}>
+                {plan.status.charAt(0).toUpperCase() + plan.status.slice(1)}
+              </span>
             </div>
           </div>
         </div>

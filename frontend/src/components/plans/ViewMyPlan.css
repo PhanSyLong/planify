@@ -159,6 +159,29 @@
   background: #dc2626;
 }
 
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-incompleted {
+  background: #e5e7eb;
+  color: #475569;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .viewplan-container .subtask-item {
@@ -407,17 +430,18 @@
   cursor: not-allowed;
   background-color: #9ca3af;
 }
+
 /* Reminder button*/
 .btn-reminder {
-    background-color: #9ca3af;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #3b82f6;
-    background: white;
-    color: #3b82f6;
-    cursor: pointer;
+  background-color: #9ca3af;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #3b82f6;
+  background: white;
+  color: #3b82f6;
+  cursor: pointer;
 }
 
 .btn-reminder:hover {
-    background: #eff6ff;
+  background: #eff6ff;
 }
