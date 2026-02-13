@@ -1,11 +1,14 @@
 package com.planify.backend.repository;
 
 import com.planify.backend.model.Subtask;
+import jakarta.persistence.LockModeType;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SubtaskRepository extends JpaRepository<@NonNull Subtask, @NonNull Integer> {
@@ -38,4 +41,23 @@ public interface SubtaskRepository extends JpaRepository<@NonNull Subtask, @NonN
                         "     OR (st.status = 'incompleted' AND CAST(st.started_at AS date) < CURRENT_DATE)) " +
                         "ORDER BY st.scheduledDate ASC")
         List<Subtask> findTodayTodoList(@Param("ownerId") @NonNull Integer ownerId);
+
+        //
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("""
+        SELECT st FROM Subtask st
+        JOIN FETCH st.task_id t
+        JOIN FETCH t.stage_id s
+        JOIN FETCH s.plan_id p
+        JOIN FETCH p.owner u
+        WHERE st.scheduledDate > :from
+          AND st.scheduledDate <= :to
+          AND st.scheduledSent = false
+    """)
+        List<Subtask> findSubTasksToRemind(
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to
+        );
+
+
 }

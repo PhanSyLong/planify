@@ -139,14 +139,6 @@
   border-bottom: none;
 }
 
-.avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
 .content {
   margin-left: 12px;
   flex: 1;

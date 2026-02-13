@@ -407,3 +407,17 @@
   cursor: not-allowed;
   background-color: #9ca3af;
 }
+/* Reminder button*/
+.btn-reminder {
+    background-color: #9ca3af;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #3b82f6;
+    background: white;
+    color: #3b82f6;
+    cursor: pointer;
+}
+
+.btn-reminder:hover {
+    background: #eff6ff;
+}

@@ -1,63 +1,26 @@
 // src/pages/Notifications.jsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate,useOutletContext  } from 'react-router-dom';
 import './Notification.css'; // we'll create this next
 
 const Notifications = () => {
   const [filter, setFilter] = useState('all');
-  const [notifications, setNotifications] = useState([]);
+  const { notifications, setNotifications } = useOutletContext();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const es = new EventSource(
-      "http://localhost:8080/planify/notifications/stream",
-      { withCredentials: true }
-    );
-
-    es.onopen = () => {
-      console.log(" ✅ SSE connected");
-    };
-
-    es.addEventListener("notification", (e) => {
-      const data = JSON.parse(e.data);
-
-      console.log(" RAW SSE DATA:", data);
-      // map backend → frontend model
-      const notif = {
-        id: data.id,
-        planId: data.planId,
-        name: data.title,
-        action: data.type,
-        message: data.messageText,
-        time: "just now",
-        read: false,
-        link: `/plans/${data.planId}`
-      };
-
-      //  UI realtime
-      setNotifications(prev => [notif, ...prev]);
-    });
-
-    // error -> close SSE
-    es.onerror = (err) => {
-      console.error("❌ SSE error", err);
-      es.close();
-    };
-
-    //  Cleanup when reload / unmount
-    return () => {
-      console.log(" SSE is cleanup");
-      es.close();
-    };
-  }, []);
-
-
-  const displayedNotifications = notifications.filter(
-    notif => filter === 'all' || !notif.read
-  );
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+    const displayedNotifications = notifications.filter(
+    notif => filter === 'all' || !notif.read
+  );
+    const handleClick = (notif) => {
+        setNotifications(prev =>
+            prev.map(n =>
+                n.id === notif.id ? { ...n, read: true } : n
+            )
+        );
+        if (notif.link) navigate(notif.link);
+    };
 
   return (
     <div className="notifications-page">
@@ -97,7 +60,7 @@ const Notifications = () => {
             <div
               key={notif.id}
               className={`notification-item ${!notif.read ? 'unread' : ''}`}
-              onClick={() => notif.link && navigate(notif.link)}
+              onClick={() => handleClick(notif)}
               style={notif.link ? { cursor: 'pointer' } : {}}
             >
               {notif.avatar && (
