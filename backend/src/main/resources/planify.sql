@@ -191,6 +191,7 @@ CREATE TABLE `subtask` (
   `description` text COLLATE utf8mb4_bin,
   `duration` int NOT NULL,
   `status` enum('incompleted','completed','cancelled') COLLATE utf8mb4_bin DEFAULT NULL,
+  `scheduled_sent` BIT(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
   KEY `fk_subtask_task_idx` (`task_id`),
   CONSTRAINT `fk_subtask_task` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
